@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/12 22:26:08 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/12 23:46:39 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void webserv::remserv(std::vector<config>::iterator &old)
 
 const unsigned int webserv::get_nbr_server() const
 {
-	return (this->nbr_server);
+	return (*this->nbr_server);
 }
 
 void webserv::bind_server(std::vector<config>::iterator &bind)
@@ -66,7 +66,7 @@ void webserv::stop_all(std::vector<config>::iterator server)
 		{
 			this->stop_server(server);
 		}
-		catch (const err_init e)
+		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
 		}
@@ -75,7 +75,7 @@ void webserv::stop_all(std::vector<config>::iterator server)
 	std::cout << "All server stopped!" << std::endl;
 }
 
-const char *webserv::err_init::what() const
+const char *webserv::err_init::what() const throw()
 {
 	return ("class webserv already init!");	
 }
