@@ -1,30 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/13 15:49:46 by stissera         ###   ########.fr       */
+/*   Created: 2023/02/13 15:03:16 by stissera          #+#    #+#             */
+/*   Updated: 2023/02/13 15:58:25 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Webserv.hpp"
-bool webserv::created = false;
-int	main(int ac, char **av)
-{
-	std::cout << "Start" << std::endl;
-	webserv test;
-	try {
-		webserv test1;
-	}
-	catch (std::exception &e)
-	{
-		std::cout << e.what() << std::endl;
-	}
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
-	(void)ac;
-	(void)av;
-	return (0);
-}
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <map>
+
+struct	import_config
+{
+	std::vector<std::map<std::string, std::string> >	raw;
+};
+
+#endif

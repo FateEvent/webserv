@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/13 00:20:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/13 16:09:38 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,12 @@ webserv::~webserv()
 	this->created = false;
 }
 
-void webserv::addserv(std::vector<std::map<std::string, std::string> > const& config)
+void webserv::add(std::vector<std::map<std::string, std::string> > const& config)
 {
 	(void)config;
 }
 
-void webserv::remserv(std::vector<config>::iterator &old)
+void webserv::remove(std::vector<config>::iterator &old)
 {
 	(void)old;
 }
@@ -45,12 +45,12 @@ unsigned webserv::get_nbr_server() const
 	return (static_cast<unsigned int>(*this->nbr_server));
 }
 
-void webserv::bind_server(std::vector<config>::iterator &bind)
+void webserv::bind(std::vector<config>::iterator &bind)
 {
 	(void)bind;
 }
 
-void webserv::stop_server(std::vector<config>::iterator &stop)
+void webserv::stop(std::vector<config>::iterator &stop)
 {
 	(void)stop;
 }
@@ -66,7 +66,7 @@ void webserv::stop_all(std::vector<config>::iterator server)
 	{
 		try
 		{
-			this->stop_server(server);
+			this->stop(server);
 		}
 		catch (std::exception &e)
 		{
@@ -79,5 +79,5 @@ void webserv::stop_all(std::vector<config>::iterator server)
 
 const char *webserv::err_init::what() const throw()
 {
-	return ("class webserv already init!");	
+	return ("Instance webserv already init!");
 }
