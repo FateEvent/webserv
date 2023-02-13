@@ -1,6 +1,6 @@
 NAME		=	webserv
 CC			=	c++
-FLAGS		=	-wall -werror -std=c++98
+FLAGS		=	-Wall -Werror -Wextra -std=c++98
 INCLUDES	=	./include/Webserv.hpp
 FILES		=	main.cpp \
 				Webserv.cpp
@@ -9,7 +9,7 @@ SRCS		=	$(addprefix ./src/, $(FILES))
 OBJS		=	$(SRCS:%.c=%.o)
 
 $(NAME)		:	$(OBJS)
-				$(CC) $(FLAGS) $(OBJS) $(INCLUDES) -o $(NAME)
+				$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
 all			:	$(NAME)
 
