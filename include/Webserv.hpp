@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/13 16:09:39 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/14 00:00:36 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,24 +40,23 @@ struct	config
 
 class webserv
 {
-//	typedef typename std::vector<config>::size	size;
-
 	private:
-		webserv(webserv &other);
-		void	operator=(const webserv &other);
+		webserv() {};
+		webserv(webserv &) {};
+		webserv& operator=(webserv const&);
 		std::vector<config>		servers;
 		unsigned int			*nbr_server;
-		void					close(); // close connexion
-//		size					nbr_server;
+		void					close(std::vector<config>::iterator &); // close connexion
 
 	public:
-		webserv();
+		webserv(std::map<std::string, std::string> &);
 		~webserv();
-		void				add(std::vector<std::map<std::string, std::string> > const&);
+		void				add(std::vector<std::map<std::string, std::string> >::iterator const&);
 		void 				remove(std::vector<config>::iterator &);
 		void				bind(std::vector<config>::iterator &);
 		void				stop(std::vector<config>::iterator &);
 		unsigned			get_nbr_server() const;
+		std::string			get_info_on(std::vector<config>::iterator &) const;
 		void				bind_all(std::vector<config>::iterator);
 		void				stop_all(std::vector<config>::iterator);
 		class err_init : public std::exception

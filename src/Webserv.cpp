@@ -6,33 +6,36 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/13 16:09:38 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/14 00:09:34 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Webserv.hpp"
 
-webserv::webserv()
+webserv::webserv(std::map<std::string, std::string>& config)
 {
 	if (this->created)
 		throw err_init();
 	this->created = true;
 	std::cout << "Server created" << std::endl;
+	for ( std::map<std::string,std::string>::iterator it = config.begin(); it != config.end(); it++)
+	{
+		std::cout << "\033[0;36m" + it->first << " | " << it->second + "\033[0m" << std::endl;
+	}
 }
 
 webserv::~webserv()
 {
 	this->stop_all(this->servers.begin());
-	/* for (std::vector<config>::iterator it = this->servers.begin(); it != this->servers.end(); it++)
-	{
-		delete it;
-	} */
 	this->created = false;
 }
 
-void webserv::add(std::vector<std::map<std::string, std::string> > const& config)
+void webserv::add(std::vector<std::map<std::string, std::string> >::iterator const& server)
 {
-	(void)config;
+	for (std::map<std::string,std::string>::iterator it = server->begin(); it != server->end(); it++)
+	{
+		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
+	}
 }
 
 void webserv::remove(std::vector<config>::iterator &old)
@@ -77,7 +80,13 @@ void webserv::stop_all(std::vector<config>::iterator server)
 	std::cout << "All server stopped!" << std::endl;
 }
 
+std::string webserv::get_info_on(std::vector<config>::iterator &other) const
+{
+	(void)other;
+	return ("return test");
+}
+
 const char *webserv::err_init::what() const throw()
 {
-	return ("Instance webserv already init!");
+	return ("\033[0;31mInstance webserv already init!\033[0m");
 }
