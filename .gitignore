@@ -1,2 +1,6 @@
+#Exec
+*.o
+*.out
+
 .vscode
 *.json

@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/13 17:04:48 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/14 18:08:05 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,87 +14,62 @@
 #include <fstream>
 #include <string>
 #include <vector>
-/*					work in progress
-static int	ft_str_quote_checker_pt2(int *sq, int *dq)
-{
-	int	ret;
 
-	if (!*sq && !*dq)
-		ret = 0;
-	else if (*sq && !*dq)
-		ret = 1;
-	else
-		ret = 2;
-	return (ret);
-}
-
-static int	ft_str_quote_checker(char *str, size_t *index)
-{
-	size_t	i;
-	int		sq;
-	int		dq;
-
-	i = 0;
-	sq = 0;
-	dq = 0;
-	while (str[i] && i < *index)
-	{
-		if (str[i] == '\'' && !sq && !dq)
-			sq++;
-		else if (str[i] == '\'' && sq && !dq)
-			sq--;
-		else if (str[i] == '\"' && !dq && !sq)
-			dq++;
-		else if (str[i] == '\"' && !sq && dq)
-			dq--;
-		i++;
-	}
-	return (ft_str_quote_checker_pt2(&sq, &dq));
-}
-
-static int	ft_check_quotes(char *str)
-{
-	size_t	index;
-
-	index = ft_strlen(str);
-	if (index > 0)
-		return (ft_str_quote_checker(str, &index));
-	return (0);
-}
-
-int	search(std::string target, char opening, char closing)
+int	search(std::string target, char opening, char closure, std::vector<std::string> *arr)
 {
 	std::ifstream	inFlux("config/local.conf");
 	std::string		buffer;
+	bool			target_lookup(false);
+	size_t			op(0);
+	size_t			cl(0);
+	size_t			line(0);
 
 	if (!inFlux)
 	{
 		std::cerr << "Error: impossible to open the config file." << std::endl;
 		return (1);
 	}
-	std::vector<std::string>	arr;
-
 	while (getline(inFlux, buffer))
 	{
-		std::string::size_type	i(0);
-		std::string::size_type	pos = buffer.find(target);
-		if (pos != std::string::npos)
+		std::string::size_type	t_pos = buffer.find(target);
+		line++;
+		if (t_pos != std::string::npos)
+			target_lookup = true;
+		if (target_lookup)
 		{
-
-			outFlux << s2;
-			i += s1.length();
-			pos = buffer.find(s1, pos + 1);
-			while (i < pos && buffer[i] != '\0')
+			std::string::size_type	pos = buffer.find(opening);
+			if (pos != std::string::npos)
 			{
-				outFlux.put(buffer[i]);
-				i++;
+				std::cout << line << std::endl;
+				op++;
 			}
-			if (buffer[i] == '\0')
-				outFlux.put('\n');
-
+			if (op >= 1)
+			{
+				arr->push_back(buffer);
+				for (std::vector<std::string>::iterator	first = arr->begin(); first != arr->end(); ++first)
+					std::cout << *first << std::endl;
+				
+			}
+			std::string::size_type	pos2 = buffer.find(closure);
+			if (pos2 != std::string::npos)
+			{
+				std::cout << line << std::endl;
+				cl++;
+			}
+			if (op >= 1 && op == cl)
+				break ;
 		}
 	}
-
 	return 0;
 }
-*/
+
+int	main()
+{
+	std::vector<std::string>	arr
+	;
+
+	search("server", '{', '}', &arr);
+	std::cout << std::endl;
+	for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
+		std::cout << *first << std::endl;
+}
