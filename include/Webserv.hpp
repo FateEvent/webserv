@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 00:00:36 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/14 13:08:08 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <map>
 #include <vector>
 #include <exception>
+#include <list>
 
 struct	config
 {
@@ -43,10 +44,11 @@ class webserv
 	private:
 		webserv() {};
 		webserv(webserv &) {};
-		webserv& operator=(webserv const&);
-		std::vector<config>		servers;
-		unsigned int			*nbr_server;
-		void					close(std::vector<config>::iterator &); // close connexion
+		webserv&							operator=(webserv const&);
+		std::map<std::string, std::string>	mainconfig; // principal config
+		std::vector<config>					servers;
+		unsigned int						*nbr_server;
+		void								close(std::vector<config>::iterator &); // close connexion
 
 	public:
 		webserv(std::map<std::string, std::string> &);
@@ -56,6 +58,7 @@ class webserv
 		void				bind(std::vector<config>::iterator &);
 		void				stop(std::vector<config>::iterator &);
 		unsigned			get_nbr_server() const;
+		std::string			get_info_server() const;
 		std::string			get_info_on(std::vector<config>::iterator &) const;
 		void				bind_all(std::vector<config>::iterator);
 		void				stop_all(std::vector<config>::iterator);
