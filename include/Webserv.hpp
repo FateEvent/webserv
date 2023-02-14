@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 17:07:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/14 19:52:07 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ class webserv
 		void				add(std::vector<std::map<std::string, std::string> >::iterator const&);
 		void 				remove(std::vector<config>::iterator &);
 		void				bind(std::vector<config>::iterator &);
-		void				stop(std::vector<config>::iterator);
+		void				stop(std::vector<config>::iterator &);
 		unsigned			get_nbr_server() const;
 		std::string			get_info_server() const;
 		std::string			get_info_on(std::vector<config>::iterator &) const;

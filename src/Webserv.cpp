@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 17:09:06 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/14 19:52:17 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void webserv::add(std::vector<std::map<std::string, std::string> >::iterator con
  * 
  * @param stop The instance iterator to shutdown.
  */
-void webserv::stop(std::vector<config>::iterator server)
+void webserv::stop(std::vector<config>::iterator &server)
 {
 	if (server->active == true)
 	{
