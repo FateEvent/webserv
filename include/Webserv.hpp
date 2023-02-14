@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 17:07:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/14 23:54:16 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #define WEBSERV_HPP
 
 #include <iostream>
-#include <cstring>
+#include <string>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/fcntl.h>
@@ -50,20 +50,21 @@ class webserv
 		std::map<std::string, std::string>	mainconfig; // principal config
 		std::vector<config>					servers;
 		unsigned int						*nbr_server;
-		void								close(std::vector<config>::iterator &); // close connexion
 
 	public:
 		webserv(std::map<std::string, std::string> &);
 		~webserv();
-		void				add(std::vector<std::map<std::string, std::string> >::iterator const&);
+		void				add(std::vector<std::map<std::string, std::string> > &);
+		void				add(std::map<std::string, std::string>);
 		void 				remove(std::vector<config>::iterator &);
 		void				bind(std::vector<config>::iterator &);
-		void				stop(std::vector<config>::iterator);
+		void				stop(std::vector<config>::iterator &);
 		unsigned			get_nbr_server() const;
 		std::string			get_info_server() const;
 		std::string			get_info_on(std::vector<config>::iterator &) const;
 		void				bind_all(std::vector<config>::iterator);
 		void				stop_all(std::vector<config>::iterator);
+		void				close(std::vector<config>::iterator &); // close connexion qnd remove instance
 		class err_init : public std::exception
 		{
 			const char* what() const throw();

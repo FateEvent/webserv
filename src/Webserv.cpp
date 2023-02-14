@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 17:09:06 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/14 23:54:05 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,24 @@ webserv::~webserv()
 	this->created = false;
 }
 
-void webserv::add(std::vector<std::map<std::string, std::string> >::iterator const& server)
+void webserv::add(std::map<std::string, std::string> server)
 {
-	for (std::map<std::string,std::string>::iterator it = server->begin(); it != server->end(); it++)
+	for (std::map<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
+	}
+}
+
+void webserv::close(std::vector<config>::iterator &instance)
+{
+	try
+	{
+		this->stop(instance);
+		this->remove(instance);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
 	}
 }
 
@@ -50,12 +63,35 @@ void webserv::add(std::vector<std::map<std::string, std::string> >::iterator con
 
 
 
+
+
+
+
+
+
+
+
+void webserv::add(std::vector<std::map<std::string, std::string> > &server)
+{
+	for (std::vector<std::map<std::string, std::string> >::iterator it = server.begin(); it != server.end(); it++)
+	{
+		try
+		{
+			this->add(*it);
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << std::endl;
+		}
+	}
+}
+
 /**
  * @brief Stop and unbind a selected server given by iterator
  * 
  * @param stop The instance iterator to shutdown.
  */
-void webserv::stop(std::vector<config>::iterator server)
+void webserv::stop(std::vector<config>::iterator &server)
 {
 	if (server->active == true)
 	{

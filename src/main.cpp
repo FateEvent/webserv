@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 13:25:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/14 23:44:19 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,23 +40,32 @@ int	main(int ac, char **av)
 	instance.push_back(server2);
 
 	std::cout << "Start" << std::endl;
+	std::cout << "Creating class webserv." << std::endl;
 	webserv test(config);
 	try {
+		std::cout << "Try create second class webserb." << std::endl;
 		webserv test1(config);
 	}
 	catch (std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
 	}
-	test.get_info_server();
+	std::cout << test.get_info_server() << std::endl;
+
+	std::cout << "Test add instance by map in vector (multi instance)" << std::endl;
 	for (std::vector<std::map<std::string, std::string> >::iterator it = instance.begin();
 			it != instance.end(); it++)
 	{
-		test.add(it);
+		test.add(*it);
 	}
 
+	std::cout << "Clear config" << std::endl;
 	config.clear();
 	
+	std::cout << "Add instance by vector" << std::endl;
+	test.add(instance);
+
+	std::cout << "Get info server." << std::endl;
 	std::cout << test.get_info_server() << std::endl;
 	(void)ac;
 	(void)av;
