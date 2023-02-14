@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/14 18:08:05 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/14 18:41:35 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,16 @@ int	search(std::string target, char opening, char closure, std::vector<std::stri
 	if (!inFlux)
 	{
 		std::cerr << "Error: impossible to open the config file." << std::endl;
-		return (1);
+		return (-1);
 	}
 	while (getline(inFlux, buffer))
 	{
 		std::string::size_type	t_pos = buffer.find(target);
 		line++;
 		if (t_pos != std::string::npos)
+		{
 			target_lookup = true;
+		}
 		if (target_lookup)
 		{
 			std::string::size_type	pos = buffer.find(opening);
@@ -46,9 +48,6 @@ int	search(std::string target, char opening, char closure, std::vector<std::stri
 			if (op >= 1)
 			{
 				arr->push_back(buffer);
-				for (std::vector<std::string>::iterator	first = arr->begin(); first != arr->end(); ++first)
-					std::cout << *first << std::endl;
-				
 			}
 			std::string::size_type	pos2 = buffer.find(closure);
 			if (pos2 != std::string::npos)
@@ -60,16 +59,16 @@ int	search(std::string target, char opening, char closure, std::vector<std::stri
 				break ;
 		}
 	}
-	return 0;
+	if (!target_lookup || arr->empty())
+		return 1;
+	return (0);
 }
 
 int	main()
 {
-	std::vector<std::string>	arr
-	;
+	std::vector<std::string>	arr;
 
-	search("server", '{', '}', &arr);
-	std::cout << std::endl;
+	std::cout << search("https", '{', '}', &arr) << std::endl;
 	for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
 		std::cout << *first << std::endl;
 }
