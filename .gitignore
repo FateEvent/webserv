@@ -1,6 +1,7 @@
 #Exec
 *.o
 *.out
+webserv
 
 .vscode
 *.json

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 00:00:56 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/14 13:25:40 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,16 @@ int	main(int ac, char **av)
 	{
 		std::cout << e.what() << std::endl;
 	}
-
+	test.get_info_server();
 	for (std::vector<std::map<std::string, std::string> >::iterator it = instance.begin();
 			it != instance.end(); it++)
 	{
 		test.add(it);
 	}
 
+	config.clear();
+	
+	std::cout << test.get_info_server() << std::endl;
 	(void)ac;
 	(void)av;
 	return (0);
