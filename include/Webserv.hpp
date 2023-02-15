@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/15 21:26:43 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/15 22:20:32 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ class webserv
 		// Operator
 		std::vector<config>::iterator	begin();
 		std::vector<config>::iterator	end();
-		std::vector<config>::iterator	operator[](int &);
+		config	*operator[](size_t &);
 
 	protected:
 		static bool			created;

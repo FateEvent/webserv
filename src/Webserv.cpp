@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/15 21:28:13 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/15 22:22:39 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,10 @@ std::vector<config>::iterator webserv::end()
 	return (this->servers.end());
 }
 
-std::vector<config>::iterator webserv::operator[](int &index)
+config *webserv::operator[](size_t &index)
 {
-	
+	config *ret = &this->servers[index];
+	return (ret);
 }
 
 void webserv::add(std::multimap<std::string, std::string> server)
