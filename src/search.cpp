@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/15 16:08:35 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/15 17:10:08 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,17 +97,15 @@ std::multimap<std::string, std::string>	split_string(std::vector<std::string> *a
 		}
 		else if ((*first).find("location") != std::string::npos)
 		{
-			std::string::size_type	pos = (*first).find('{');
-			key = (*first).erase(pos);
+			(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
+			key = (*first).substr(0, 8);
 			std::cout << "clé: " << key << "\\$" << std::endl;
-			arr->erase(first);
-			val = *first;
-			arr->erase(first);
+			val = (*first).substr(8);
 			while ((*first).find('}') == std::string::npos)
 			{
+				arr->erase(first);
 				val += '\n';
 				val += *first;
-				arr->erase(first);
 			}
 			arr->erase(first);
 			std::cout << "value: " << val << "\\$" << std::endl;
