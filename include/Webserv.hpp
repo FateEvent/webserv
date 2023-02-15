@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 23:54:16 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/15 12:18:22 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ struct	config
 	sockaddr_in					from;
 	int							domain;		//Type AF_INET, AF_LOCAL, AF_LINUX....
 	int							type;		// type TCP,UDP... SOCK_STREAM, SOCK_DGRAM
+	std::string					ip;
+	uint16_t					port;
 	std::string					root;
 	std::string					index;
 	std::map<int, std::string>	error_page;
@@ -47,15 +49,15 @@ class webserv
 		webserv() {};
 		webserv(webserv &) {};
 		webserv&							operator=(webserv const&);
-		std::map<std::string, std::string>	mainconfig; // principal config
+		std::multimap<std::string, std::string>	mainconfig; // principal config
 		std::vector<config>					servers;
 		unsigned int						*nbr_server;
 
 	public:
-		webserv(std::map<std::string, std::string> &);
+		webserv(std::multimap<std::string, std::string> &);
 		~webserv();
-		void				add(std::vector<std::map<std::string, std::string> > &);
-		void				add(std::map<std::string, std::string>);
+		void				add(std::vector<std::multimap<std::string, std::string> > &);
+		void				add(std::multimap<std::string, std::string>);
 		void 				remove(std::vector<config>::iterator &);
 		void				bind(std::vector<config>::iterator &);
 		void				stop(std::vector<config>::iterator &);

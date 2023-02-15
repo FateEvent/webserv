@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 23:44:19 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/15 11:51:19 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@ bool webserv::created = false;
 int	main(int ac, char **av)
 {
 	// Config webserb test - Not server instance!!
-	std::map<std::string, std::string> config;
+	std::multimap<std::string, std::string> config;
 	config.insert(std::pair<std::string, std::string>("BLOCK", "http"));
 	config.insert(std::pair<std::string, std::string>("max_connect", "1000"));
 	config.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
@@ -23,14 +23,14 @@ int	main(int ac, char **av)
 	config.insert(std::pair<std::string, std::string>("default", "127.0.0.1"));
 
 	// Config instance test
-	std::vector<std::map<std::string, std::string> > instance;
-	std::map<std::string, std::string> server1;
+	std::vector<std::multimap<std::string, std::string> > instance;
+	std::multimap<std::string, std::string> server1;
 	server1.insert(std::pair<std::string, std::string>("BLOCK", "server"));
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
 	server1.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
 	server1.insert(std::pair<std::string, std::string>("listen", "80"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
-	std::map<std::string, std::string> server2;
+	std::multimap<std::string, std::string> server2;
 	server2.insert(std::pair<std::string, std::string>("BLOCK", "server"));
 	server2.insert(std::pair<std::string, std::string>("name", "test server"));
 	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
@@ -53,7 +53,7 @@ int	main(int ac, char **av)
 	std::cout << test.get_info_server() << std::endl;
 
 	std::cout << "Test add instance by map in vector (multi instance)" << std::endl;
-	for (std::vector<std::map<std::string, std::string> >::iterator it = instance.begin();
+	for (std::vector<std::multimap<std::string, std::string> >::iterator it = instance.begin();
 			it != instance.end(); it++)
 	{
 		test.add(*it);

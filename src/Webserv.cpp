@@ -6,13 +6,13 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/14 23:54:05 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/15 13:08:53 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Webserv.hpp"
 
-webserv::webserv(std::map<std::string, std::string>& config)
+webserv::webserv(std::multimap<std::string, std::string>& config)
 {
 	if (this->created)
 		throw err_init();
@@ -26,10 +26,37 @@ webserv::~webserv()
 	this->created = false;
 }
 
-void webserv::add(std::map<std::string, std::string> server)
+void webserv::add(std::multimap<std::string, std::string> server)
 {
-	for (std::map<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
+	config	ret = {0};
+	int		type_inet, type_protocole;
+
+	for (std::multimap<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
+		switch (it->first)
+		{
+			case "host":
+			{		
+				unsigned int ip[4];
+				if (sscanf(it->second.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
+					throw ("IP bad host in config file");
+				ret.ip = it->second;
+				ret.addr.sin_addr.s_addr = (ip[0] % 256 << 0 | 0) | (ip[1] % 256 << 8 | 0) | (ip[2] % 256 << 16 | 0) | (ip[3] % 256 << 24 | 0);
+			}
+			case "port":
+			{
+				std::stoul(it->second);
+				ret.addr.sin_port = htons(ret.port);
+			}
+			case "type":
+			{
+				if (!it->second.compare("tcp"))
+					ret.type = SOCK_STREAM;
+				else
+					ret.type = SOCK_DGRAM;
+			}
+	
+		};
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
 }
@@ -71,9 +98,9 @@ void webserv::close(std::vector<config>::iterator &instance)
 
 
 
-void webserv::add(std::vector<std::map<std::string, std::string> > &server)
+void webserv::add(std::vector<std::multimap<std::string, std::string> > &server)
 {
-	for (std::vector<std::map<std::string, std::string> >::iterator it = server.begin(); it != server.end(); it++)
+	for (std::vector<std::multimap<std::string, std::string> >::iterator it = server.begin(); it != server.end(); it++)
 	{
 		try
 		{
@@ -208,7 +235,7 @@ std::string webserv::get_info_server() const
 {
 	std::string info;
 
-	for (std::map<std::string, std::string>::const_iterator it = mainconfig.begin(); it != mainconfig.end(); it++)
+	for (std::multimap<std::string, std::string>::const_iterator it = mainconfig.begin(); it != mainconfig.end(); it++)
 	{
 		info.append("\033[0;36m" + it->first + " | " + it->second + "\033[0m\n");
 	}
