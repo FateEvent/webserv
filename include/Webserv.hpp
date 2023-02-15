@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/15 12:18:22 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/15 15:41:55 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <map>
+#include <utility>
 #include <vector>
 #include <exception>
 #include <list>
@@ -36,6 +37,7 @@ struct	config
 	int							domain;		//Type AF_INET, AF_LOCAL, AF_LINUX....
 	int							type;		// type TCP,UDP... SOCK_STREAM, SOCK_DGRAM
 	std::string					ip;
+	int							max_client;
 	uint16_t					port;
 	std::string					root;
 	std::string					index;

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/15 13:08:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/15 16:52:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,27 +35,98 @@ void webserv::add(std::multimap<std::string, std::string> server)
 	{
 		switch (it->first)
 		{
+			case "name":
+			{
+				if (it->second.empty())
+					throw ("No instance name!");
+				ret.name = it->second;
+				break;
+			}
+			case "protocol":
+			{
+				if (it->second.empty())
+					throw ("Socket protocol invalid!");
+				else if (it->second.compare("IPV4") || it->second.compare("INET") || it->second.compare("AF_INET"))
+					ret.domain = AF_INET;
+				else if (it->second.compare("IPV6") || it->second.compare("INET6") || it->second.compare("AF_INET6"))
+					ret.domain = AF_INET6;
+				else if (it->second.compare("local") || it->second.compare("LOCAL"))
+					ret.domain = AF_LOCAL;
+				else
+					throw ("Socket protocol invalid!");
+				ret.addr.sin_family = ret.domain;
+			}
+
 			case "host":
 			{		
 				unsigned int ip[4];
 				if (sscanf(it->second.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
 					throw ("IP bad host in config file");
 				ret.ip = it->second;
-				ret.addr.sin_addr.s_addr = (ip[0] % 256 << 0 | 0) | (ip[1] % 256 << 8 | 0) | (ip[2] % 256 << 16 | 0) | (ip[3] % 256 << 24 | 0);
+				ret.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
+											(ip[1] % 256 << 8 | 0) |\
+											(ip[2] % 256 << 16 | 0) |\
+											(ip[3] % 256 << 24 | 0);
 			}
-			case "port":
+
+			case "listen":
 			{
-				std::stoul(it->second);
+				if (!std::stoul(it->second) > 0 && std::stoul(it->second) <= 0xFFFFFF)
+					throw ("Invalid port");
+				ret.port = std::stoul(it->second);
 				ret.addr.sin_port = htons(ret.port);
 			}
+
 			case "type":
 			{
 				if (!it->second.compare("tcp"))
 					ret.type = SOCK_STREAM;
-				else
+				else if (!it->second.compare("udp"))
 					ret.type = SOCK_DGRAM;
+				else
+					throw ("Type incorrect in config file!");
 			}
-	
+
+			case "max_client":
+			{
+				int max = std::stol(it->second);
+				if (!(max > 0 && max < 0xffffffff))
+					throw ("Max client incorrect in instance!");
+				ret.max_client = max;
+			}
+
+			case "root":
+			{
+				if (it->second.empty())
+					throw ("root destination empty!");
+				ret.root = it->second;
+			}
+
+			case "index_page":
+			{
+				if (it->second.empty())
+					throw ("no index referenced!");
+				ret.index = it->second;
+			}
+
+			case "error_page":
+			{
+				std::map<int, std::string> errnbr; // = ft::parse_err(it->second);
+				std::map<int, std::string>::iterator iterr = errnbr.begin();
+				for (; iterr != errnbr.end(); iterr++)
+				{
+					try
+					{
+						ret.error_page.insert(std::make_pair(iterr->first, iterr->second));
+					}
+					catch (std::exception &e)
+					{
+						throw ("Invalid error page in config file!");
+					}
+				}
+			}
+			default:
+				throw ("Unknow parameter in config file!");
 		};
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
