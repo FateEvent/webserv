@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/15 17:10:08 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/15 17:24:07 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,13 +64,13 @@ std::multimap<std::string, std::string>	clean_string(std::vector<std::string> *a
 	std::vector<std::string>::iterator	first = arr->begin();
 	while (first != arr->end())
 	{
-		arr->erase(first);
-		if ((*first).find('{') != std::string::npos)
-			arr->erase(first);
+//		arr->erase(first);
+//		if ((*first).find('{') != std::string::npos)
+//			arr->erase(first);
 		map->insert(string_parser(*first));
 		arr->erase(first);
-		if ((*first).find('}') != std::string::npos)
-			arr->erase(first);
+//		if ((*first).find('}') != std::string::npos)
+//			arr->erase(first);
 	}
 	return (*map);
 }
@@ -99,7 +99,6 @@ std::multimap<std::string, std::string>	split_string(std::vector<std::string> *a
 		{
 			(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
 			key = (*first).substr(0, 8);
-			std::cout << "clé: " << key << "\\$" << std::endl;
 			val = (*first).substr(8);
 			while ((*first).find('}') == std::string::npos)
 			{
@@ -108,7 +107,6 @@ std::multimap<std::string, std::string>	split_string(std::vector<std::string> *a
 				val += *first;
 			}
 			arr->erase(first);
-			std::cout << "value: " << val << "\\$" << std::endl;
 			map.insert(std::make_pair(key, val));
 		}
 		else
@@ -160,13 +158,14 @@ int	main()
 	std::multimap<std::string, std::string>	map;
 	std::vector<std::string>				arr;
 
-	if (search("server", '{', '}', &arr) == 1)
+	if (search("http", '{', '}', &arr) == 1)
 	{
 		map = split_string(&arr);
 		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
 			std::cout << *first << std::endl;
 		std::cout << std::endl << std::endl;
+		std::cout << "bam" << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
-			std::cout << first->first << ' ' << first->second << std::endl;
+			std::cout << first->first << ": " << first->second << std::endl;
 	}
 }
