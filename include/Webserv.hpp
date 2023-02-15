@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/15 15:41:55 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/15 21:26:43 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ class webserv
 		webserv&							operator=(webserv const&);
 		std::multimap<std::string, std::string>	mainconfig; // principal config
 		std::vector<config>					servers;
-		unsigned int						*nbr_server;
+		unsigned int						nbr_server;
 
 	public:
 		webserv(std::multimap<std::string, std::string> &);
@@ -69,10 +69,17 @@ class webserv
 		void				bind_all(std::vector<config>::iterator);
 		void				stop_all(std::vector<config>::iterator);
 		void				close(std::vector<config>::iterator &); // close connexion qnd remove instance
+
 		class err_init : public std::exception
 		{
 			const char* what() const throw();
 		};
+
+		// Operator
+		std::vector<config>::iterator	begin();
+		std::vector<config>::iterator	end();
+		std::vector<config>::iterator	operator[](int &);
+
 	protected:
 		static bool			created;
 };

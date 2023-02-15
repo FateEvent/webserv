@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/15 11:51:19 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/15 19:42:52 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ int	main(int ac, char **av)
 	std::multimap<std::string, std::string> server2;
 	server2.insert(std::pair<std::string, std::string>("BLOCK", "server"));
 	server2.insert(std::pair<std::string, std::string>("name", "test server"));
-	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
-	server2.insert(std::pair<std::string, std::string>("listen", "80"));
+	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.2"));
+	server2.insert(std::pair<std::string, std::string>("listen", "443"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	instance.push_back(server1);
 	instance.push_back(server2);
@@ -56,8 +56,18 @@ int	main(int ac, char **av)
 	for (std::vector<std::multimap<std::string, std::string> >::iterator it = instance.begin();
 			it != instance.end(); it++)
 	{
-		test.add(*it);
+		try
+		{
+			test.add(*it);
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << '\n';
+		}		
 	}
+
+	std::cout << "Number of instances: " << test.get_nbr_server() << std::endl;
+
 
 	std::cout << "Clear config" << std::endl;
 	config.clear();
