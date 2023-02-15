@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/15 14:08:42 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/15 14:53:41 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,17 +37,34 @@ std::multimap<std::string, std::string>	split_string(std::vector<std::string> *a
 	std::vector<std::string>::iterator	first = arr->begin();
 	while (first != arr->end())
 	{
-		size_t	pos = (*first).find("error_page");
-		if (pos != std::string::npos)
+		if ((*first).find("error_page") != std::string::npos)
 		{
 			(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
 			key = (*first).substr(0, 10);
-			std::cout << key << "\\n" << std::endl;
-			val = (*first).substr(10, 6);
+			std::cout << key << "\\$" << std::endl;
+			val = (*first).substr(10, 11);
 			val.insert(val.begin() + 3, ' ');
-			std::cout << val << "\\n" << std::endl;
+			std::cout << val << "\\$" << std::endl;
 			map.insert(std::make_pair(key, val));
 			arr->erase(first);
+		}
+		else if ((*first).find("location") != std::string::npos)
+		{
+			size_t	pos = (*first).find('{');
+			key = (*first).erase(pos);
+			std::cout << "clé: " << key << "\\$" << std::endl;
+			arr->erase(first);
+			val = *first;
+			arr->erase(first);
+			while ((*first).find('}') == std::string::npos)
+			{
+				val += '\n';
+				val += *first;
+				arr->erase(first);
+			}
+			arr->erase(first);
+			std::cout << "value: " << val << "\\$" << std::endl;
+			map.insert(std::make_pair(key, val));
 		}
 		else
 			++first;
