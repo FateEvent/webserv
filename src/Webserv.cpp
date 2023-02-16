@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/16 11:40:05 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/16 15:00:08 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,25 +17,11 @@ webserv::webserv(std::multimap<std::string, std::string>& config) : nbr_server(0
 	if (this->created)
 		throw err_init();
 	this->created = true;
-	this->mainconfig = config;
-	this->first = this->servers.begin();
-	this->last = this->servers.end();
-}
-
-webserv::~webserv()
-{
-	this->stop_all(this->servers.begin());
-	this->created = false;
-}
-
-std::vector<config>::iterator webserv::begin()
-{
-	return (this->first);
-}
-
-std::vector<config>::iterator webserv::end()
-{
-	return (this->last);
+	std::multimap<std::string, std::string>::iterator it = config.begin();
+	if (!it->first.compare("BLOCK") && !it->second.compare("http"))
+		this->mainconfig = config;
+	else
+		throw err_init();
 }
 
 config *webserv::operator[](size_t &index)
@@ -102,7 +88,7 @@ void webserv::add(std::multimap<std::string, std::string> server)
 		else if (!it->first.compare("max_client"))
 		{
 			int max = std::stol(it->second);
-			if (!(max > 0 && max < static_cast<int>(0xffffffff)))
+			if (!(max > 0 && max < static_cast<int>(0xFFFFFFFF)))
 				throw ("Max client incorrect in instance!");
 			ret.max_client = max;
 		}
@@ -140,9 +126,8 @@ void webserv::add(std::multimap<std::string, std::string> server)
 		}
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
+	this->servers.push_back(ret);
 	this->nbr_server++;
-	this->first = servers.begin();
-	this->last = servers.end();
 }
 
 void webserv::close(std::vector<config>::iterator &instance)
@@ -336,12 +321,44 @@ std::string webserv::get_info_on(std::vector<config>::iterator &other) const
 {
 	std::cout << "get info on part" << std::endl;
 	std::string	info;
-	info.append("FD:     " + std::to_string(other->sock_fd) +
-				"Name:   " + other->name +
-				"Address:" + other->ip +
-				"Port:   " + std::to_string(other->port) +
-				"Root:   " + other->root +
-				"Index:  " + other->index +
-				"Active: " + std::to_string(other->active));
+	info.append("FD:     " + std::to_string(other->sock_fd) + "\n" +
+				"Name:   " + other->name + "\n" +
+				"Address:" + other->ip + "\n" +
+				"Port:   " + std::to_string(other->port) + "\n" +
+				"Root:   " + other->root + "\n" +
+				"Index:  " + other->index + "\n" +
+				"Active: " + std::to_string(other->active) + "\n\n");
 	return (info);
+}
+
+std::string webserv::get_info_instance() const
+{
+	std::string	info;
+	for (std::vector<config>::const_iterator it = servers.begin(); it != servers.end(); it++)
+	{
+		info.append("FD:     " + std::to_string(it->sock_fd) + "\n" +
+					"Name:   " +  it->name + "\n" +
+					"Address:" + it->ip + "\n" +
+					"Port:   " + std::to_string(it->port) + "\n" +
+					"Root:   " + it->root + "\n" +
+					"Index:  " + it->index + "\n" +
+					"Active: " + std::to_string(it->active) + "\n\n");
+	}
+	return (info);
+}
+
+webserv::~webserv()
+{
+	this->stop_all(this->servers.begin());
+	this->created = false;
+}
+
+std::vector<config>::iterator webserv::begin()
+{
+	return (this->servers.begin());
+}
+
+std::vector<config>::iterator webserv::end()
+{
+	return (this->servers.end());
 }
