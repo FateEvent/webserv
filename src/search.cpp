@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/16 11:40:37 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/16 11:53:30 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,12 @@ std::pair<std::string, std::string>	string_parser(std::string str)
 		key += str[i];
 		++i;
 	}
-	while (str[i] && ::isspace(str[i]))
-		++i;
-	while (str[i] && !::isspace(str[i]))
+	while (str[i])
 	{
-		val += str[i];
+		if (!::isspace(str[i]))
+			val += str[i];
+		if (::isspace(str[i + 1]))
+			val += ' ';
 		++i;
 	}
 	pos = val.find(';');
@@ -209,9 +210,9 @@ int	main()
 	std::multimap<std::string, std::string>	block_map;
 	std::multimap<std::string, std::string>	map;
 	std::vector<std::string>				arr;
-	std::string target = "http";
+	std::string target = "server";
 
-	if (search(target, '{', '}', &arr) >= 0)
+	if (search(target, '{', '}', &arr, 24) >= 0)
 	{
 		std::cout << " --- the config file vector --- " << std::endl;
 		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
