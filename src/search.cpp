@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/16 11:53:30 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/16 13:10:01 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,18 +100,7 @@ std::multimap<std::string, std::string>	split_string(std::string target, std::ve
 	std::vector<std::string>::iterator	first = arr->begin();
 	while (first != arr->end())
 	{
-		if ((*first).find("error_page") != std::string::npos)
-		{
-			(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
-			key = (*first).substr(0, 10);
-
-			val = (*first).substr(10, 11);
-			val.insert(val.begin() + 3, ' ');
-
-			map.insert(std::make_pair(key, val));
-			arr->erase(first);
-		}
-		else if ((*first).find("location") != std::string::npos)
+		if ((*first).find("location") != std::string::npos)
 		{
 			(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
 			key = (*first).substr(0, 8);
@@ -141,7 +130,7 @@ std::multimap<std::string, std::string>	cut_block(std::string target, std::vecto
 	std::vector<std::string>::iterator	first = arr->begin();
 	(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
 	key = (*first).substr(0, target.length());
-	std::string::size_type	pos = key.find('{');
+	std::string::size_type	pos = (*first).find('{');
 	if (pos == std::string::npos)
 	{
 		++first;
@@ -212,7 +201,7 @@ int	main()
 	std::vector<std::string>				arr;
 	std::string target = "server";
 
-	if (search(target, '{', '}', &arr, 24) >= 0)
+	if (search(target, '{', '}', &arr) >= 0)
 	{
 		std::cout << " --- the config file vector --- " << std::endl;
 		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
