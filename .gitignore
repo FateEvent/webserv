@@ -2,6 +2,7 @@
 *.o
 *.out
 webserv
+test
 
 .vscode
 *.json
