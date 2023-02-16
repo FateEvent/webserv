@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/16 09:50:55 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/16 11:40:37 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,28 +28,18 @@
 #include <utility>
 #include <cctype>
 
-std::multimap<std::string, std::string>	cut_block(std::string target, std::vector<std::string> *arr)
+void	comments_cleaner(std::multimap<std::string, std::string> *map)
 {
-	std::multimap<std::string, std::string>	map;
-	std::string	key;
-	std::string	val;
-
-	std::vector<std::string>::iterator	first = arr->begin();
-	while (first != arr->end())
+	for (std::multimap<std::string, std::string>::iterator	first = map->begin();
+		first != map->end(); ++first)
 	{
-		(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
-		key = (*first).substr(0, target.length());
-		val = (*first).substr(target.length());
-		while ((*first).find('}') == std::string::npos)
+		std::string::size_type	pos = first->second.find('#');
+		if (pos != std::string::npos)
 		{
-			arr->erase(first);
-			val += '\n';
-			val += *first;
+			first->second.erase(pos);
+			std::cout << first->second << std::endl;
 		}
-		arr->erase(first);
-		map.insert(std::make_pair(key, val));
 	}
-	return (map);
 }
 
 std::pair<std::string, std::string>	string_parser(std::string str)
@@ -79,8 +69,8 @@ std::pair<std::string, std::string>	string_parser(std::string str)
 	return (std::make_pair(key, val));
 }
 
-std::multimap<std::string, std::string>	clean_string(std::vector<std::string> *arr,
-	std::multimap<std::string, std::string> *map)
+std::multimap<std::string, std::string>	clean_string(std::string target,
+	std::vector<std::string> *arr, std::multimap<std::string, std::string> *map)
 {
 	std::string	key;
 	std::string	val;
@@ -88,6 +78,8 @@ std::multimap<std::string, std::string>	clean_string(std::vector<std::string> *a
 	std::vector<std::string>::iterator	first = arr->begin();
 	while (first != arr->end())
 	{
+		if ((*first).find(target) != std::string::npos)
+			arr->erase(first);
 		if ((*first).find('{') != std::string::npos)
 			arr->erase(first);
 		map->insert(string_parser(*first));
@@ -98,7 +90,7 @@ std::multimap<std::string, std::string>	clean_string(std::vector<std::string> *a
 	return (*map);
 }
 
-std::multimap<std::string, std::string>	split_string(std::vector<std::string> *arr)
+std::multimap<std::string, std::string>	split_string(std::string target, std::vector<std::string> *arr)
 {
 	std::multimap<std::string, std::string>	map;
 	std::string	key;
@@ -135,28 +127,66 @@ std::multimap<std::string, std::string>	split_string(std::vector<std::string> *a
 		else
 			++first;
 	}
-	clean_string(arr, &map);
+	clean_string(target, arr, &map);
 	return (map);
 }
 
-int	search(std::string target, char opening, char closure, std::vector<std::string> *arr)
+std::multimap<std::string, std::string>	cut_block(std::string target, std::vector<std::string> *arr)
+{
+	std::multimap<std::string, std::string>	map;
+	std::string	key;
+	std::string	val;
+
+	std::vector<std::string>::iterator	first = arr->begin();
+	(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
+	key = (*first).substr(0, target.length());
+	std::string::size_type	pos = key.find('{');
+	if (pos == std::string::npos)
+	{
+		++first;
+		val = *first;
+	}
+	else
+		val = (*first).substr(target.length());
+	while (first != arr->end())
+	{
+		++first;
+		val += '\n';
+		val += *first;
+	}
+	++first;
+	map.insert(std::make_pair(key, val));
+	return (map);
+}
+
+ssize_t	search(std::string target, char opening, char closure, std::vector<std::string> *arr, ssize_t l = 0)
 {
 	std::ifstream	inFlux("config/local.conf");
 	std::string		buffer;
 	bool			target_lookup(false);
 	size_t			op(0);
 	size_t			cl(0);
+	ssize_t			line(0);
 
 	if (!inFlux)
 	{
 		std::cerr << "Error: impossible to open the config file." << std::endl;
 		return (-1);
 	}
+	while(line < l)
+	{
+		getline(inFlux, buffer);
+		++line;
+	}
 	while (getline(inFlux, buffer))
 	{
 		std::string::size_type	pos = buffer.find(target);
 		if (pos != std::string::npos)
+		{
 			target_lookup = true;
+			if (buffer.find(opening) == std::string::npos)
+				arr->push_back(buffer);
+		}
 		if (target_lookup)
 		{
 			pos = buffer.find(opening);
@@ -171,22 +201,28 @@ int	search(std::string target, char opening, char closure, std::vector<std::stri
 				break ;
 		}
 	}
-	if (!target_lookup || arr->empty())
-		return (0);
-	return (1);
+	return (line);
 }
 
 int	main()
 {
+	std::multimap<std::string, std::string>	block_map;
 	std::multimap<std::string, std::string>	map;
 	std::vector<std::string>				arr;
+	std::string target = "http";
 
-	if (search("http", '{', '}', &arr) == 1)
+	if (search(target, '{', '}', &arr) >= 0)
 	{
-//		map = split_string(&arr);
-		map = cut_block("http", &arr);
+		std::cout << " --- the config file vector --- " << std::endl;
 		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
 			std::cout << *first << std::endl;
+		block_map = cut_block(target, &arr);
+		std::cout << " --- the block --- " << std::endl;
+		for (std::multimap<std::string, std::string>::iterator	first = block_map.begin(); first != block_map.end(); ++first)
+			std::cout << first->first << ": " << first->second << std::endl;
+		map = split_string(target, &arr);
+		comments_cleaner(&map);
+		std::cout << " --- the result --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
 	}
