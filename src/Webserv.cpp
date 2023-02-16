@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/16 18:18:37 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/16 22:32:10 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,40 +42,25 @@ void	webserv::close(std::vector<config>::iterator &instance)
 	}
 }
 
+/**
+ * @brief Create a socket for the instance passed by iterator
+ * 
+ * @param instance Iterator of the instance to create a socket
+ */
 void	webserv::prepare(std::vector<config>::iterator &instance)
 {
-	std::cout << "Instance socket: " + std::to_string(instance->addr.sin_family) + "\n" << std::endl;
-	std::cout << "Instance socket: " + std::to_string(instance->type) + "\n" << std::endl;
-	std::cout << "Instance socket: " + std::to_string(instance->addr.sin_addr.s_addr) + "\n" << std::endl;
-	if (instance->prepare == false && (instance->sock_fd = socket(AF_INET, SOCK_STREAM, 0)))//socket(instance->addr.sin_family, instance->type, instance->addr.sin_addr.s_addr)))
+	if (instance->prepare == false && (instance->sock_fd = socket(instance->addr.sin_family, instance->type, 0)))
+	//socket(instance->addr.sin_family, instance->type, instance->addr.sin_addr.s_addr)))
 		instance->prepare = true;
 	else
 		std::cout << "Info: " + instance->name + " have already a socket!" << std::endl;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * @brief Add multiple instance by en vector of multimap<string, string>
+ * 
+ * @param server Iterator of vector of multimap<string, string>
+ */
 void	webserv::add(std::vector<std::multimap<std::string, std::string> > &server)
 {
 	for (std::vector<std::multimap<std::string, std::string> >::iterator it = server.begin(); it != server.end(); it++)
@@ -229,9 +214,8 @@ std::string	webserv::get_info_server() const
  * @param other The iterator of selected instance
  * @return std::string Returned information in en string.
  */
-std::string	webserv::get_info_on(std::vector<config>::iterator &other) const
+std::string	webserv::get_info_on(std::vector<config>::const_iterator &other) const
 {
-	std::cout << "get info on part" << std::endl;
 	std::string	info;
 	info.append("FD:     " + std::to_string(other->sock_fd) + "\n" +
 				"Name:   " + other->name + "\n" +
@@ -249,14 +233,7 @@ std::string	webserv::get_info_instance() const
 	std::string	info;
 	for (std::vector<config>::const_iterator it = servers.begin(); it != servers.end(); it++)
 	{
-		info.append("FD:     " + std::to_string(it->sock_fd) + "\n" +
-					"Name:   " +  it->name + "\n" +
-					"Address:" + it->ip + "\n" +
-					"Port:   " + std::to_string(it->port) + "\n" +
-					"Root:   " + it->root + "\n" +
-					"Index:  " + it->index + "\n" +
-					"Prepare:" + std::to_string(it->prepare) + "\n" +
-					"Active: " + std::to_string(it->active) + "\n\n");
+		info.append(get_info_on(it));
 	}
 	return (info);
 }
@@ -298,9 +275,7 @@ std::vector<config>::iterator	webserv::end()
 
 void	webserv::add(std::multimap<std::string, std::string> server)
 {
-	config	ret;
-	ret.active = false;
-	ret.prepare = false;
+	config	ret = {"","","","",{},{},0,0,0,0,0,0,0,{}};
 	for (std::multimap<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
 		if (!it->first.compare("BLOCK"))
@@ -310,7 +285,6 @@ void	webserv::add(std::multimap<std::string, std::string> server)
 			if (it->second.empty())
 				throw ("No instance name!");
 			ret.name = it->second;
-			break;
 		}
 		else if (!it->first.compare("protocol"))
 		{
@@ -394,6 +368,49 @@ void	webserv::add(std::multimap<std::string, std::string> server)
 		}
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
+//	std::multimap<std::string, std::string>::iterator check = server.begin();
+//	if (!check->first.compare("BLOCK") && check->second.compare("http"))
+		check_instance(ret);
 	this->servers.push_back(ret);
 	this->nbr_server++;
+}
+
+/**
+ * @brief Check if the instance have the right parameter
+ * if some non importante param is not present, then set
+ * as delfault value in mainconfig
+ * 
+ * @param conf Struct config to check
+ */
+void	webserv::check_instance(config &conf)
+{
+	std::multimap<std::string, std::string>::iterator main;
+	if (conf.name.empty())
+		throw ("Error in config file, miss server name.");
+	if (conf.root.empty())
+		throw ("Error in config file, miss root directory.");
+	if (conf.index.empty())
+	{
+		main = this->mainconfig.find("index");
+		conf.index = main->second;
+	}
+	if (conf.ip.empty())
+	{
+		main = this->mainconfig.find("ip");
+		conf.ip = main->second;
+	}
+	if (!conf.domain)
+	{
+		conf.domain = AF_INET;
+		conf.addr.sin_family = conf.domain;
+	}
+	if (!conf.type)
+		conf.type = SOCK_STREAM;
+	if (conf.max_client)
+	{
+		main = this->mainconfig.find("max_client");
+		conf.max_client = std::stoul(main->second);
+	}
+	if (!conf.port)
+		throw ("Error in config file, miss miss port on instance.");
 }
