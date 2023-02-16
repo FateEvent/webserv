@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/15 19:42:52 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/16 11:40:35 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,16 +67,18 @@ int	main(int ac, char **av)
 	}
 
 	std::cout << "Number of instances: " << test.get_nbr_server() << std::endl;
-
-
-	std::cout << "Clear config" << std::endl;
-	config.clear();
 	
-	std::cout << "Add instance by vector" << std::endl;
+	std::cout << "Add vector of instance" << std::endl;
 	test.add(instance);
 
-	std::cout << "Get info server." << std::endl;
-	std::cout << test.get_info_server() << std::endl;
+	std::cout << "Get instance info." << std::endl;
+	std::vector<struct config>::iterator ginfo = test.begin();
+	//std::cout << ginfo << std::endl;
+	for (; ginfo != test.end(); ginfo++)
+	{
+		std::cout << test.get_info_on(ginfo) << std::endl;;
+	}
+
 	(void)ac;
 	(void)av;
 	return (0);

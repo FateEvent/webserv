@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/16 09:34:54 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/16 13:11:18 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ webserv::webserv(std::multimap<std::string, std::string>& config) : nbr_server(0
 		throw err_init();
 	this->created = true;
 	this->mainconfig = config;
+	this->first = this->servers.begin();
+	this->last = this->servers.end();
 }
 
 webserv::~webserv()
@@ -28,12 +30,12 @@ webserv::~webserv()
 
 std::vector<config>::iterator webserv::begin()
 {
-	return (this->servers.begin());
+	return (this->first);
 }
 
 std::vector<config>::iterator webserv::end()
 {
-	return (this->servers.end());
+	return (this->last);
 }
 
 config *webserv::operator[](size_t &index)
@@ -139,6 +141,8 @@ void webserv::add(std::multimap<std::string, std::string> server)
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
 	this->nbr_server++;
+	this->first = servers.begin();
+	this->last = servers.end();
 }
 
 void webserv::close(std::vector<config>::iterator &instance)
@@ -330,6 +334,7 @@ std::string webserv::get_info_server() const
  */
 std::string webserv::get_info_on(std::vector<config>::iterator &other) const
 {
+	std::cout << "get info on part" << std::endl;
 	std::string	info;
 	info.append("FD:     " + std::to_string(other->sock_fd) +
 				"Name:   " + other->name +
