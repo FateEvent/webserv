@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/15 17:24:07 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/16 09:50:55 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,30 @@
 #include <map>
 #include <utility>
 #include <cctype>
+
+std::multimap<std::string, std::string>	cut_block(std::string target, std::vector<std::string> *arr)
+{
+	std::multimap<std::string, std::string>	map;
+	std::string	key;
+	std::string	val;
+
+	std::vector<std::string>::iterator	first = arr->begin();
+	while (first != arr->end())
+	{
+		(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
+		key = (*first).substr(0, target.length());
+		val = (*first).substr(target.length());
+		while ((*first).find('}') == std::string::npos)
+		{
+			arr->erase(first);
+			val += '\n';
+			val += *first;
+		}
+		arr->erase(first);
+		map.insert(std::make_pair(key, val));
+	}
+	return (map);
+}
 
 std::pair<std::string, std::string>	string_parser(std::string str)
 {
@@ -64,13 +88,12 @@ std::multimap<std::string, std::string>	clean_string(std::vector<std::string> *a
 	std::vector<std::string>::iterator	first = arr->begin();
 	while (first != arr->end())
 	{
-//		arr->erase(first);
-//		if ((*first).find('{') != std::string::npos)
-//			arr->erase(first);
+		if ((*first).find('{') != std::string::npos)
+			arr->erase(first);
 		map->insert(string_parser(*first));
 		arr->erase(first);
-//		if ((*first).find('}') != std::string::npos)
-//			arr->erase(first);
+		if ((*first).find('}') != std::string::npos)
+			arr->erase(first);
 	}
 	return (*map);
 }
@@ -160,11 +183,10 @@ int	main()
 
 	if (search("http", '{', '}', &arr) == 1)
 	{
-		map = split_string(&arr);
+//		map = split_string(&arr);
+		map = cut_block("http", &arr);
 		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
 			std::cout << *first << std::endl;
-		std::cout << std::endl << std::endl;
-		std::cout << "bam" << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
 	}
