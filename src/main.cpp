@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/16 11:40:35 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/16 15:02:31 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	main(int ac, char **av)
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
 	std::multimap<std::string, std::string> server2;
 	server2.insert(std::pair<std::string, std::string>("BLOCK", "server"));
-	server2.insert(std::pair<std::string, std::string>("name", "test server"));
+	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.2"));
 	server2.insert(std::pair<std::string, std::string>("listen", "443"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
@@ -71,14 +71,18 @@ int	main(int ac, char **av)
 	std::cout << "Add vector of instance" << std::endl;
 	test.add(instance);
 
+	std::cout << "Number of instances: " << test.get_nbr_server() << std::endl;
+	
 	std::cout << "Get instance info." << std::endl;
-	std::vector<struct config>::iterator ginfo = test.begin();
-	//std::cout << ginfo << std::endl;
-	for (; ginfo != test.end(); ginfo++)
+	for (std::vector<struct config>::iterator ginfo = test.begin(); ginfo != test.end(); ginfo++)
 	{
-		std::cout << test.get_info_on(ginfo) << std::endl;;
+		std::cout << test.get_info_on(ginfo) << std::endl;
 	}
 
+	std::cout << "Get all instances info." << std::endl;
+	std::cout << test.get_info_instance() << std::endl;
+
+	
 	(void)ac;
 	(void)av;
 	return (0);
