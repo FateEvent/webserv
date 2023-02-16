@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/16 13:10:01 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/16 14:35:40 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,40 @@
 #include <utility>
 #include <cctype>
 
+std::vector<std::string>	block_cleaner(std::string str)
+{
+	std::vector<std::string>	arr;
+	std::string::size_type		i(0);
+	std::string					buf;
+	std::string::size_type		pos(0);
+
+	while ((pos = str.find(';')) != std::string::npos)
+		str.erase(pos, 1);
+	while (str[i] && ::isspace(str[i]))
+		++i;
+	while (str[i] && !::isspace(str[i]) && str[i] != '{')
+	{
+		buf += str[i];
+		++i;
+	}
+	pos = str.find('{');
+	str.erase(pos, 1);
+	arr.push_back(buf);
+	buf.clear();
+	while (str[i] && str[i] != '}')
+	{
+		if (!::isspace(str[i]))
+			buf += str[i];
+		if (!::isspace(str[i]) && ::isspace(str[i + 1]))
+		{
+			arr.push_back(buf);
+			buf.clear();
+		}
+		++i;
+	}
+	return (arr);
+}
+
 void	comments_cleaner(std::multimap<std::string, std::string> *map)
 {
 	for (std::multimap<std::string, std::string>::iterator	first = map->begin();
@@ -35,10 +69,7 @@ void	comments_cleaner(std::multimap<std::string, std::string> *map)
 	{
 		std::string::size_type	pos = first->second.find('#');
 		if (pos != std::string::npos)
-		{
 			first->second.erase(pos);
-			std::cout << first->second << std::endl;
-		}
 	}
 }
 
@@ -100,9 +131,10 @@ std::multimap<std::string, std::string>	split_string(std::string target, std::ve
 	std::vector<std::string>::iterator	first = arr->begin();
 	while (first != arr->end())
 	{
-		if ((*first).find("location") != std::string::npos)
+		std::string::size_type	pos((*first).find("location"));
+		if (pos != std::string::npos)
 		{
-			(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
+			(*first).erase(std::remove_if((*first).begin(), (*first).begin() + pos, ::isspace), (*first).begin() + pos);
 			key = (*first).substr(0, 8);
 			val = (*first).substr(8);
 			while ((*first).find('}') == std::string::npos)
@@ -126,11 +158,12 @@ std::multimap<std::string, std::string>	cut_block(std::string target, std::vecto
 	std::multimap<std::string, std::string>	map;
 	std::string	key;
 	std::string	val;
-
 	std::vector<std::string>::iterator	first = arr->begin();
-	(*first).erase(std::remove_if((*first).begin(), (*first).end(), ::isspace), (*first).end());
+	std::string::size_type	pos((*first).find(target));
+
+	(*first).erase(std::remove_if((*first).begin(), (*first).begin() + pos, ::isspace), (*first).begin() + pos);
 	key = (*first).substr(0, target.length());
-	std::string::size_type	pos = (*first).find('{');
+	pos = (*first).find('{');
 	if (pos == std::string::npos)
 	{
 		++first;
@@ -215,5 +248,10 @@ int	main()
 		std::cout << " --- the result --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
+
+		std::multimap<std::string, std::string>::iterator	pos = map.find("location");
+		arr = block_cleaner(pos->second);
+		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
+			std::cout << *first << std::endl;
 	}
 }
