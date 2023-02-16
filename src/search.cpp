@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/16 14:35:40 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/16 16:17:25 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,26 @@
 ** The search() function looks for a target string in a file and pushes in a
 ** vector every line included between the opening and the closure characters.
 ** 
-** The search() function returns -1 in case the file can't be opened, 0 in case
-** the target string has not been found or the vector passed as a parameter has
-** not been filled, 1 in case of success.
+** Return value: the search() function returns -1 in case the file can't be
+** opened, and the number of the line of the config file where it stopped
+** otherwise.
+** 
+** The cut_block() function creates a multimap containing the block name as the
+** key and the block as a value.
+** 
+** The split_string() function (together with the clean_string() function)
+** creates a multimap from the vector containing every line of the config file.
+** 
+** The string_parser() function makes a key-value pair from a string.
+** 
+** The comments_cleaner() function takes out the comments (indicated by a '#'
+** character) from a string.
+** 
+** The block_cleaner() function makes a vector out of a string containing
+** a key and many key-value pairs.
 */
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <map>
-#include <utility>
-#include <cctype>
+#include "../include/search.hpp"
 
 std::vector<std::string>	block_cleaner(std::string str)
 {
@@ -223,6 +230,7 @@ ssize_t	search(std::string target, char opening, char closure, std::vector<std::
 			if (op >= 1 && op == cl)
 				break ;
 		}
+		++line;
 	}
 	return (line);
 }
@@ -234,7 +242,9 @@ int	main()
 	std::vector<std::string>				arr;
 	std::string target = "server";
 
-	if (search(target, '{', '}', &arr) >= 0)
+	int	i = search(target, '{', '}', &arr);
+	std::cout << "line: " << i << std::endl;
+	if (i >= 0)
 	{
 		std::cout << " --- the config file vector --- " << std::endl;
 		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
