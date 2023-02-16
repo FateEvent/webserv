@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/16 16:17:25 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/16 16:27:03 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,34 +109,34 @@ std::pair<std::string, std::string>	string_parser(std::string str)
 }
 
 std::multimap<std::string, std::string>	clean_string(std::string target,
-	std::vector<std::string> *arr, std::multimap<std::string, std::string> *map)
+	std::vector<std::string> &arr, std::multimap<std::string, std::string> *map)
 {
 	std::string	key;
 	std::string	val;
 
-	std::vector<std::string>::iterator	first = arr->begin();
-	while (first != arr->end())
+	std::vector<std::string>::iterator	first = arr.begin();
+	while (first != arr.end())
 	{
 		if ((*first).find(target) != std::string::npos)
-			arr->erase(first);
+			arr.erase(first);
 		if ((*first).find('{') != std::string::npos)
-			arr->erase(first);
+			arr.erase(first);
 		map->insert(string_parser(*first));
-		arr->erase(first);
+		arr.erase(first);
 		if ((*first).find('}') != std::string::npos)
-			arr->erase(first);
+			arr.erase(first);
 	}
 	return (*map);
 }
 
-std::multimap<std::string, std::string>	split_string(std::string target, std::vector<std::string> *arr)
+std::multimap<std::string, std::string>	split_string(std::string target, std::vector<std::string> &arr)
 {
 	std::multimap<std::string, std::string>	map;
 	std::string	key;
 	std::string	val;
 
-	std::vector<std::string>::iterator	first = arr->begin();
-	while (first != arr->end())
+	std::vector<std::string>::iterator	first = arr.begin();
+	while (first != arr.end())
 	{
 		std::string::size_type	pos((*first).find("location"));
 		if (pos != std::string::npos)
@@ -146,11 +146,11 @@ std::multimap<std::string, std::string>	split_string(std::string target, std::ve
 			val = (*first).substr(8);
 			while ((*first).find('}') == std::string::npos)
 			{
-				arr->erase(first);
+				arr.erase(first);
 				val += '\n';
 				val += *first;
 			}
-			arr->erase(first);
+			arr.erase(first);
 			map.insert(std::make_pair(key, val));
 		}
 		else
@@ -160,12 +160,12 @@ std::multimap<std::string, std::string>	split_string(std::string target, std::ve
 	return (map);
 }
 
-std::multimap<std::string, std::string>	cut_block(std::string target, std::vector<std::string> *arr)
+std::multimap<std::string, std::string>	cut_block(std::string target, std::vector<std::string> &arr)
 {
 	std::multimap<std::string, std::string>	map;
 	std::string	key;
 	std::string	val;
-	std::vector<std::string>::iterator	first = arr->begin();
+	std::vector<std::string>::iterator	first = arr.begin();
 	std::string::size_type	pos((*first).find(target));
 
 	(*first).erase(std::remove_if((*first).begin(), (*first).begin() + pos, ::isspace), (*first).begin() + pos);
@@ -178,7 +178,7 @@ std::multimap<std::string, std::string>	cut_block(std::string target, std::vecto
 	}
 	else
 		val = (*first).substr(target.length());
-	while (first != arr->end())
+	while (first != arr.end())
 	{
 		++first;
 		val += '\n';
@@ -189,7 +189,7 @@ std::multimap<std::string, std::string>	cut_block(std::string target, std::vecto
 	return (map);
 }
 
-ssize_t	search(std::string target, char opening, char closure, std::vector<std::string> *arr, ssize_t l = 0)
+ssize_t	search(std::string target, char opening, char closure, std::vector<std::string> &arr, ssize_t l = 0)
 {
 	std::ifstream	inFlux("config/local.conf");
 	std::string		buffer;
@@ -215,7 +215,7 @@ ssize_t	search(std::string target, char opening, char closure, std::vector<std::
 		{
 			target_lookup = true;
 			if (buffer.find(opening) == std::string::npos)
-				arr->push_back(buffer);
+				arr.push_back(buffer);
 		}
 		if (target_lookup)
 		{
@@ -223,7 +223,7 @@ ssize_t	search(std::string target, char opening, char closure, std::vector<std::
 			if (pos != std::string::npos)
 				op++;
 			if (op >= 1)
-				arr->push_back(buffer);
+				arr.push_back(buffer);
 			std::string::size_type	pos2 = buffer.find(closure);
 			if (pos2 != std::string::npos)
 				cl++;
@@ -242,26 +242,29 @@ int	main()
 	std::vector<std::string>				arr;
 	std::string target = "server";
 
-	int	i = search(target, '{', '}', &arr);
+	int	i = search(target, '{', '}', arr);
 	std::cout << "line: " << i << std::endl;
 	if (i >= 0)
 	{
 		std::cout << " --- the config file vector --- " << std::endl;
 		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
 			std::cout << *first << std::endl;
-		block_map = cut_block(target, &arr);
+		block_map = cut_block(target, arr);
 		std::cout << " --- the block --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = block_map.begin(); first != block_map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
-		map = split_string(target, &arr);
+		map = split_string(target, arr);
 		comments_cleaner(&map);
 		std::cout << " --- the result --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
 
-		std::multimap<std::string, std::string>::iterator	pos = map.find("location");
-		arr = block_cleaner(pos->second);
-		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
-			std::cout << *first << std::endl;
+		if (target == "server")
+		{
+			std::multimap<std::string, std::string>::iterator	pos = map.find("location");
+			arr = block_cleaner(pos->second);
+			for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
+				std::cout << *first << std::endl;
+		}
 	}
 }
