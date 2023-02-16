@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/16 16:27:03 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/16 16:38:07 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,10 +69,10 @@ std::vector<std::string>	block_cleaner(std::string str)
 	return (arr);
 }
 
-void	comments_cleaner(std::multimap<std::string, std::string> *map)
+void	comments_cleaner(std::multimap<std::string, std::string> &map)
 {
-	for (std::multimap<std::string, std::string>::iterator	first = map->begin();
-		first != map->end(); ++first)
+	for (std::multimap<std::string, std::string>::iterator	first = map.begin();
+		first != map.end(); ++first)
 	{
 		std::string::size_type	pos = first->second.find('#');
 		if (pos != std::string::npos)
@@ -109,7 +109,7 @@ std::pair<std::string, std::string>	string_parser(std::string str)
 }
 
 std::multimap<std::string, std::string>	clean_string(std::string target,
-	std::vector<std::string> &arr, std::multimap<std::string, std::string> *map)
+	std::vector<std::string> &arr, std::multimap<std::string, std::string> &map)
 {
 	std::string	key;
 	std::string	val;
@@ -121,12 +121,12 @@ std::multimap<std::string, std::string>	clean_string(std::string target,
 			arr.erase(first);
 		if ((*first).find('{') != std::string::npos)
 			arr.erase(first);
-		map->insert(string_parser(*first));
+		map.insert(string_parser(*first));
 		arr.erase(first);
 		if ((*first).find('}') != std::string::npos)
 			arr.erase(first);
 	}
-	return (*map);
+	return (map);
 }
 
 std::multimap<std::string, std::string>	split_string(std::string target, std::vector<std::string> &arr)
@@ -156,7 +156,7 @@ std::multimap<std::string, std::string>	split_string(std::string target, std::ve
 		else
 			++first;
 	}
-	clean_string(target, arr, &map);
+	clean_string(target, arr, map);
 	return (map);
 }
 
@@ -254,7 +254,7 @@ int	main()
 		for (std::multimap<std::string, std::string>::iterator	first = block_map.begin(); first != block_map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
 		map = split_string(target, arr);
-		comments_cleaner(&map);
+		comments_cleaner(map);
 		std::cout << " --- the result --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
