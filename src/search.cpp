@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/17 14:04:06 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/17 15:43:23 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,12 +52,42 @@ std::pair<std::string, std::string>	block_parser(std::string str, std::string::s
 	std::string				val;
 	std::string::size_type	pos(0);
 
+	while (str[i] && ::isspace(str[i]))
+		++i;
 	while (str[i] && !::isspace(str[i]))
 	{
 		key += str[i];
 		++i;
 	}
-	while (str[i] && str[i] != '}')
+	pos = str.find_last_of('}');
+	while (str[i] && i < pos)
+	{
+		if (!::isspace(str[i]))
+			val += str[i];
+		if (str[i] == '\n')
+			val += '\n';
+		if (::isspace(str[i]) && !::isspace(str[i + 1]))
+			val += ' ';
+		++i;
+	}
+	return (std::make_pair(key, val));
+}
+
+std::pair<std::string, std::string>	string_parser(std::string str, std::string::size_type i)
+{
+	std::string				key;
+	std::string				val;
+	std::string::size_type	pos(0);
+
+	while (str[i] && ::isspace(str[i]))
+		++i;
+	while (str[i] && !::isspace(str[i]))
+	{
+		key += str[i];
+		++i;
+	}
+	pos = str.find_last_of('}');
+	while (str[i] && i < pos)
 	{
 		if (!::isspace(str[i]))
 			val += str[i];
@@ -65,6 +95,9 @@ std::pair<std::string, std::string>	block_parser(std::string str, std::string::s
 			val += ' ';
 		++i;
 	}
+	pos = val.find(';');
+	if (pos != std::string::npos)
+		val.erase(pos);
 	return (std::make_pair(key, val));
 }
 
@@ -82,44 +115,6 @@ std::string::size_type	find_char(std::string str, char c, std::string::size_type
 	return (std::string::npos);
 }
 
-std::pair<std::string, std::string>	string_parser(std::string str, std::string::size_type i)
-{
-	std::string				key;
-	std::string				val;
-	std::string::size_type	pos(0);
-
-	while (str[i] && ::isspace(str[i]))
-		++i;
-	pos = find_char(str, '{', i);
-	if (pos != std::string::npos)
-	{
-		std::cout << "ciao" << std::endl;
-		return (block_parser(str, i));
-	}
-	else
-	{	
-		while (str[i] && !::isspace(str[i]))
-		{
-			key += str[i];
-			++i;
-		}
-		std::string::size_type	pos(str.find_last_of('}'));
-		std::cout << i << "pos " << pos << std::endl;
-		while (str[i] && i < pos)
-		{
-			if (!::isspace(str[i]))
-				val += str[i];
-			if (::isspace(str[i + 1]))
-				val += ' ';
-			++i;
-		}
-	}
-	pos = val.find(';');
-	if (pos != std::string::npos)
-		val.erase(pos);
-	return (std::make_pair(key, val));
-}
-
 std::multimap<std::string, std::string>	split_block(std::string str)
 {
 	std::multimap<std::string, std::string>	map;
@@ -127,6 +122,7 @@ std::multimap<std::string, std::string>	split_block(std::string str)
 	std::string								val;
 	std::string::size_type					i(0);
 	std::string::size_type					line_length(0);
+	std::string::size_type					pos(0);
 
 	while (str[i] && ::isspace(str[i]))
 		++i;
@@ -137,10 +133,20 @@ std::multimap<std::string, std::string>	split_block(std::string str)
 			++i;
 		while (str[i])
 		{
-			if (str[i] == '\n')
+			std::string::size_type	pos = find_char(str, '{', i);
+			if (pos != std::string::npos)
+			{
+				map.insert(block_parser(str, i));
+			}
+			else if (str[i] == '\n')
 			{
 				map.insert(string_parser(str, i - line_length));
 				line_length = 0;
+			}
+			if (str[i] == '}')
+			{
+				++i;
+				++line_length;
 			}
 			++i;
 			++line_length;
@@ -148,16 +154,21 @@ std::multimap<std::string, std::string>	split_block(std::string str)
 	}
 	else
 	{
+		while (str[i] && ::isspace(str[i]))
+		++i;
 		while (str[i] && !::isspace(str[i]))
 		{
 			key += str[i];
 			++i;
 		}
-		while (str[i])
+		pos = str.find_last_of('}');
+		while (str[i] && i <= pos)
 		{
 			if (!::isspace(str[i]))
 				val += str[i];
-			if (::isspace(str[i + 1]))
+			if (str[i] == '\n')
+				val += '\n';
+			if (::isspace(str[i]) && !::isspace(str[i + 1]))
 				val += ' ';
 			++i;
 		}
@@ -193,6 +204,32 @@ std::multimap<std::string, std::string>	cut_block(std::string target, std::vecto
 	++first;
 	map.insert(std::make_pair(key, val));
 	return (map);
+}
+
+int	bracket_parse(char opening, char closure)
+{
+	std::ifstream	inFlux("config/local.conf");
+	std::string		buffer;
+	size_t			op(0);
+	size_t			cl(0);
+
+	if (!inFlux)
+	{
+		std::cerr << "Error: impossible to open the config file." << std::endl;
+		return (1);
+	}
+	while (getline(inFlux, buffer))
+	{
+		std::string::size_type	pos = buffer.find(opening);
+		if (pos != std::string::npos)
+			op++;
+		std::string::size_type	pos2 = buffer.find(closure);
+		if (pos2 != std::string::npos)
+			cl++;
+	}
+	if (op >= 1 && op == cl)
+		return (0);
+	return (1);
 }
 
 ssize_t	search(std::string target, char opening, char closure, std::vector<std::string> &arr, ssize_t l = 0)
@@ -248,7 +285,9 @@ int	main()
 	std::vector<std::string>				arr;
 	std::string target = "server";
 
-	int	i = search(target, '{', '}', arr);
+	int i = bracket_parse('{', '}');
+	std::cout << "brackets: " << i << std::endl;
+	i = search(target, '{', '}', arr);
 	std::cout << "line: " << i << std::endl;
 	if (i >= 0)
 	{
@@ -259,20 +298,19 @@ int	main()
 		std::cout << " --- the block --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = block_map.begin(); first != block_map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
-		map = split_block(block_map.find("server")->second);
-//		comments_cleaner(map);
+		map = split_block(block_map.find(target)->second);
+		comments_cleaner(map);
 		std::cout << " --- the result --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
-			std::cout << first->first << ": " << first->second << std::endl;
+			std::cout << first->first << ": " << first->second << '$' << std::endl;
 
-/*
 		if (target == "server")
 		{
+			std::cout << " --- mais encore --- " << std::endl;
 			std::multimap<std::string, std::string>::iterator	pos = map.find("location");
-			arr = block_cleaner(pos->second);
-			for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
-				std::cout << *first << std::endl;
+			map = split_block(pos->second);
+			for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
+				std::cout << first->first << ": " << first->second << '$' << std::endl;
 		}
-*/
 	}
 }
