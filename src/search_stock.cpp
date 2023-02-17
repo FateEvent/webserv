@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/17 11:48:06 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/17 15:47:57 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 ** The search() function looks for a target string in a file and pushes in a
 ** vector every line included between the opening and the closure characters.
 ** 
-** Return value: the search() function returns -1 in case the file can't be
+** Return value: The search() function returns -1 in case the file can't be
 ** opened, and the number of the line of the config file where it stopped
 ** otherwise.
 ** 
