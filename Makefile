@@ -1,6 +1,6 @@
 NAME		=	webserv
 CC			=	c++
-FLAGS		=	-Wall -Werror -Wextra -std=c++98
+FLAGS		=	-Wall -Werror -Wextra -std=c++11
 INCLUDES	=	./include/Webserv.hpp
 FILES		=	Webserv.cpp \
 				main.cpp
