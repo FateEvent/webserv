@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/16 22:16:49 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/17 09:46:06 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ int	main(int ac, char **av)
 	server2.insert(std::pair<std::string, std::string>("listen", "443"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
+
 	instance.push_back(server1);
 	instance.push_back(server2);
 
@@ -87,10 +88,14 @@ int	main(int ac, char **av)
 	}
 
 	std::cout << "Prepare instance." << std::endl;
-	for (std::vector<struct config>::iterator ginfo = test.begin(); ginfo != test.end(); ginfo++)
-	{
-		test.prepare(ginfo);
-	}
+//	for (std::vector<struct config>::iterator ginfo = test.begin(); ginfo != test.end(); ginfo++)
+//	{
+		std::vector<struct config>::iterator ginfo = test.begin();
+		test.prepare_all(ginfo);
+//	}
+
+	ginfo = test.begin();
+	test.bind_all(ginfo);
 
 	std::cout << "Get all instances info." << std::endl;
 	std::cout << test.get_info_instance() << std::endl;
@@ -104,6 +109,9 @@ int	main(int ac, char **av)
 	{
 		std::cout << e.what() << std::endl;
 	}
+
+	ginfo = test.begin();
+	test.stop_all(ginfo);
 
 	std::cout << ac << av[0] << std::endl;
 	return (0);

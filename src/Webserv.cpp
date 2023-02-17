@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/16 22:32:10 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/17 12:00:09 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,13 @@ void	webserv::close(std::vector<config>::iterator &instance)
 	{
 		std::cerr << e.what() << std::endl;
 	}
+}
+
+
+void	webserv::prepare_all(std::vector<config>::iterator &instance)
+{
+	for (; instance != this->servers.end(); instance++)
+		prepare(instance);
 }
 
 /**
@@ -87,10 +94,10 @@ void	webserv::stop(std::vector<config>::iterator &server)
 	{
 		if (!::close(server->sock_fd))
 			throw ("intern problem.");
-		
+		std::cout << "Closed..." << std::endl;
 	}
 	else
-		std::cout << "Closed..." << std::endl;
+		std::cout << "Not active, not need to close..." << std::endl;
 //		throw ("Server was already shutdown.");
 }
 
@@ -99,9 +106,9 @@ void	webserv::stop(std::vector<config>::iterator &server)
  * 
  * @param server The iterator of vector stocked all instance
  */
-void	webserv::stop_all(std::vector<config>::iterator server)
+void	webserv::stop_all(std::vector<config>::iterator &server)
 {
-	while (server != this->servers.end())
+	for (;server != this->servers.end(); server++)
 	{
 		try
 		{
@@ -113,7 +120,6 @@ void	webserv::stop_all(std::vector<config>::iterator server)
 			std::cout << "\033[0;31mServer " << server->name << "was stopped not correctly!\033[0m" << std::endl;
 			std::cerr << e.what() << std::endl;
 		}
-		server++;
 	}
 	std::cout << "All server stopped!" << std::endl;
 }
@@ -129,12 +135,22 @@ void	webserv::bind(std::vector<config>::iterator &bind)
 
 	if (bind->sock_fd)
 	{
+		//struct in_addr addr;
+		bind->addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);//inet_addr("127.0.0.1");
+		std::cout << "AFFICHE LE VALEUR INT DE L'IP ET DE INADDR_ANY: " + std::to_string(bind->addr.sin_addr.s_addr) + " = " + std::to_string(INADDR_LOOPBACK) + " - " + bind->ip.data() << std::endl;
+		//bind->addr.sin_addr.s_addr = htonl(INADDR_ANY); /* nous sommes un serveur, nous acceptons n'importe quelle adresse */
+		
+		//bind->addr.sin_family = AF_INET;
+		//bind->addr.sin_port = htons(80);
 		res = ::bind(bind->sock_fd, reinterpret_cast<sockaddr *>(&bind->addr), sizeof(bind->addr));
+		std::cout << errno << std::endl;
 		if (res)
 		{
+			std::cout << "IIIIIII -> " + std::to_string(res) << std::endl;
 			bind->active = false;
 			throw ("Error: instance " + bind->name + " not initialized!");
 		}
+		std::cout << "\033[0;31mBINDED\033[0m" << std::endl;
 		bind->active = true;
 	}
 	else
@@ -149,7 +165,7 @@ void	webserv::bind(std::vector<config>::iterator &bind)
  * 
  * @param server  The iterator of vector stocked all instance
  */
-void	webserv::bind_all(std::vector<config>::iterator server)
+void	webserv::bind_all(std::vector<config>::iterator &server)
 {
 	for (; server != this->servers.end(); server++)
 	{
@@ -240,7 +256,7 @@ std::string	webserv::get_info_instance() const
 
 webserv::~webserv()
 {
-	this->stop_all(this->servers.begin());
+	//this->stop_all(this->servers.begin());
 	this->created = false;
 }
 
@@ -275,7 +291,7 @@ std::vector<config>::iterator	webserv::end()
 
 void	webserv::add(std::multimap<std::string, std::string> server)
 {
-	config	ret = {"","","","",{},{},0,0,0,0,0,0,0,{}};
+	config	ret = {"","","","",{},{},0,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
 	for (std::multimap<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
 		if (!it->first.compare("BLOCK"))
@@ -396,7 +412,7 @@ void	webserv::check_instance(config &conf)
 	}
 	if (conf.ip.empty())
 	{
-		main = this->mainconfig.find("ip");
+		main = this->mainconfig.find("default");
 		conf.ip = main->second;
 	}
 	if (!conf.domain)

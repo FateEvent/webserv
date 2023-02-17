@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/16 22:22:16 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/17 11:29:46 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 #include <vector>
 #include <exception>
 #include <list>
+#include <arpa/inet.h>
 
 struct	config
 {
@@ -64,11 +65,6 @@ class webserv
 		void				add(std::multimap<std::string, std::string>);
 		void 				remove(std::vector<config>::iterator &);
 
-		void				bind(std::vector<config>::iterator &);
-		void				stop(std::vector<config>::iterator &);
-		void				bind_all(std::vector<config>::iterator);
-		void				stop_all(std::vector<config>::iterator);
-
 		// INFO
 		unsigned			get_nbr_server() const;
 		std::string			get_info_server() const;
@@ -76,8 +72,13 @@ class webserv
 		std::string			get_info_on(std::vector<config>::const_iterator &) const;
 
 		// SOCKET
+		void				prepare_all(std::vector<config>::iterator &);
 		void				prepare(std::vector<config>::iterator &);
+		void				bind_all(std::vector<config>::iterator &);
+		void				bind(std::vector<config>::iterator &);
 		void				close(std::vector<config>::iterator &); // close connexion qnd remove instance
+		void				stop(std::vector<config>::iterator &);
+		void				stop_all(std::vector<config>::iterator &);
 
 		// TRHOW
 		class err_init : public std::exception
