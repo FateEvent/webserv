@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/17 12:36:32 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/17 14:04:06 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,20 @@ std::pair<std::string, std::string>	block_parser(std::string str, std::string::s
 	return (std::make_pair(key, val));
 }
 
+std::string::size_type	find_char(std::string str, char c, std::string::size_type i)
+{
+	std::string::size_type	count(0);
+
+	while (str[i] != '\n')
+	{
+		if (str[i] == c)
+			return (count);
+		++i;
+		++count;
+	}
+	return (std::string::npos);
+}
+
 std::pair<std::string, std::string>	string_parser(std::string str, std::string::size_type i)
 {
 	std::string				key;
@@ -76,18 +90,29 @@ std::pair<std::string, std::string>	string_parser(std::string str, std::string::
 
 	while (str[i] && ::isspace(str[i]))
 		++i;
-	while (str[i] && !::isspace(str[i]))
+	pos = find_char(str, '{', i);
+	if (pos != std::string::npos)
 	{
-		key += str[i];
-		++i;
+		std::cout << "ciao" << std::endl;
+		return (block_parser(str, i));
 	}
-	while (str[i] && str[i] != '\n')
-	{
-		if (!::isspace(str[i]))
-			val += str[i];
-		if (::isspace(str[i + 1]))
-			val += ' ';
-		++i;
+	else
+	{	
+		while (str[i] && !::isspace(str[i]))
+		{
+			key += str[i];
+			++i;
+		}
+		std::string::size_type	pos(str.find_last_of('}'));
+		std::cout << i << "pos " << pos << std::endl;
+		while (str[i] && i < pos)
+		{
+			if (!::isspace(str[i]))
+				val += str[i];
+			if (::isspace(str[i + 1]))
+				val += ' ';
+			++i;
+		}
 	}
 	pos = val.find(';');
 	if (pos != std::string::npos)
@@ -107,24 +132,16 @@ std::multimap<std::string, std::string>	split_block(std::string str)
 		++i;
 	if (str[i] == '{')
 	{
-		std::cout << str[i] << std::endl;
 		++i;
 		while (str[i] && ::isspace(str[i]))
 			++i;
-		while (str[i] && str[i] != '}')
+		while (str[i])
 		{
-			if (str[i] == '{')
-			{
-				map.insert(block_parser(str, i));
-				line_length = 0;
-			}
-			else if (str[i] == '\n')
+			if (str[i] == '\n')
 			{
 				map.insert(string_parser(str, i - line_length));
 				line_length = 0;
 			}
-			if (str[i] == '}')
-				break ;
 			++i;
 			++line_length;
 		}
