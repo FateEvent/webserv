@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/17 12:00:09 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/17 15:04:39 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void	webserv::stop(std::vector<config>::iterator &server)
 	if (server->active == true)
 	{
 		if (!::close(server->sock_fd))
-			throw ("intern problem.");
+			return; //throw ("intern problem.");
 		std::cout << "Closed..." << std::endl;
 	}
 	else
@@ -112,7 +112,7 @@ void	webserv::stop_all(std::vector<config>::iterator &server)
 	{
 		try
 		{
-			std::cout << "Stopping server...." << std::endl;
+			std::cout << "Stopping server " << server->name << "...." << std::endl;
 			this->stop(server);
 		}
 		catch (std::exception &e)
@@ -135,23 +135,21 @@ void	webserv::bind(std::vector<config>::iterator &bind)
 
 	if (bind->sock_fd)
 	{
-		//struct in_addr addr;
-		bind->addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);//inet_addr("127.0.0.1");
-		std::cout << "AFFICHE LE VALEUR INT DE L'IP ET DE INADDR_ANY: " + std::to_string(bind->addr.sin_addr.s_addr) + " = " + std::to_string(INADDR_LOOPBACK) + " - " + bind->ip.data() << std::endl;
-		//bind->addr.sin_addr.s_addr = htonl(INADDR_ANY); /* nous sommes un serveur, nous acceptons n'importe quelle adresse */
-		
-		//bind->addr.sin_family = AF_INET;
-		//bind->addr.sin_port = htons(80);
+		bind->addr.sin_addr.s_addr = 0;
+		//htonl(INADDR_LOOPBACK);
+		//inet_addr("127.0.0.1");
+		//bind->addr.sin_addr.s_addr = htonl(INADDR_ANY);
 		res = ::bind(bind->sock_fd, reinterpret_cast<sockaddr *>(&bind->addr), sizeof(bind->addr));
-		std::cout << errno << std::endl;
 		if (res)
 		{
-			std::cout << "IIIIIII -> " + std::to_string(res) << std::endl;
 			bind->active = false;
-			throw ("Error: instance " + bind->name + " not initialized!");
+			if (errno == 48)
+				std::cout << "\033[0;31mAddress and protocol already in use. Can't bind " << bind->name << "\033[0m" << std::endl;
+			else
+				throw ("Error: instance " + bind->name + " not initialized!");
 		}
-		std::cout << "\033[0;31mBINDED\033[0m" << std::endl;
-		bind->active = true;
+		else
+			bind->active = true;
 	}
 	else
 	{
