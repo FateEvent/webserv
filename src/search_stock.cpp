@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   search.cpp                                         :+:      :+:    :+:   */
+/*   search_stock.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/17 12:36:32 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/17 11:48:06 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,41 @@
 
 #include "../include/search.hpp"
 
+// disons que je pars de block_cleaner pour sortir des pairs key-value
+std::vector<std::string>	block_cleaner(std::string str)
+{
+	std::vector<std::string>	arr;
+	std::string::size_type		i(0);
+	std::string					buf;
+	std::string::size_type		pos(0);
+
+	while ((pos = str.find(';')) != std::string::npos)
+		str.erase(pos, 1);
+	while (str[i] && ::isspace(str[i]))
+		++i;
+	while (str[i] && !::isspace(str[i]) && str[i] != '{')
+	{
+		buf += str[i];
+		++i;
+	}
+	pos = str.find('{');
+	str.erase(pos, 1);
+	arr.push_back(buf);
+	buf.clear();
+	while (str[i] && str[i] != '}')
+	{
+		if (!::isspace(str[i]))
+			buf += str[i];
+		if (!::isspace(str[i]) && ::isspace(str[i + 1]))
+		{
+			arr.push_back(buf);
+			buf.clear();
+		}
+		++i;
+	}
+	return (arr);
+}
+
 void	comments_cleaner(std::multimap<std::string, std::string> &map)
 {
 	for (std::multimap<std::string, std::string>::iterator	first = map.begin();
@@ -46,32 +81,11 @@ void	comments_cleaner(std::multimap<std::string, std::string> &map)
 	}
 }
 
-std::pair<std::string, std::string>	block_parser(std::string str, std::string::size_type &i)
+std::pair<std::string, std::string>	string_parser(std::string str)
 {
-	std::string				key;
-	std::string				val;
-	std::string::size_type	pos(0);
-
-	while (str[i] && !::isspace(str[i]))
-	{
-		key += str[i];
-		++i;
-	}
-	while (str[i] && str[i] != '}')
-	{
-		if (!::isspace(str[i]))
-			val += str[i];
-		if (::isspace(str[i + 1]))
-			val += ' ';
-		++i;
-	}
-	return (std::make_pair(key, val));
-}
-
-std::pair<std::string, std::string>	string_parser(std::string str, std::string::size_type i)
-{
-	std::string				key;
-	std::string				val;
+	std::string::size_type	i(0);
+	std::string	key;
+	std::string	val;
 	std::string::size_type	pos(0);
 
 	while (str[i] && ::isspace(str[i]))
@@ -81,7 +95,7 @@ std::pair<std::string, std::string>	string_parser(std::string str, std::string::
 		key += str[i];
 		++i;
 	}
-	while (str[i] && str[i] != '\n')
+	while (str[i])
 	{
 		if (!::isspace(str[i]))
 			val += str[i];
@@ -95,57 +109,55 @@ std::pair<std::string, std::string>	string_parser(std::string str, std::string::
 	return (std::make_pair(key, val));
 }
 
-std::multimap<std::string, std::string>	split_block(std::string str)
+std::multimap<std::string, std::string>	clean_string(std::string target,
+	std::vector<std::string> &arr, std::multimap<std::string, std::string> &map)
+{
+	std::string	key;
+	std::string	val;
+
+	std::vector<std::string>::iterator	first = arr.begin();
+	while (first != arr.end())
+	{
+		if ((*first).find(target) != std::string::npos)
+			arr.erase(first);
+		if ((*first).find('{') != std::string::npos)
+			arr.erase(first);
+		map.insert(string_parser(*first));
+		arr.erase(first);
+		if ((*first).find('}') != std::string::npos)
+			arr.erase(first);
+	}
+	return (map);
+}
+
+std::multimap<std::string, std::string>	split_string(std::string target, std::vector<std::string> &arr)
 {
 	std::multimap<std::string, std::string>	map;
-	std::string								key;
-	std::string								val;
-	std::string::size_type					i(0);
-	std::string::size_type					line_length(0);
+	std::string	key;
+	std::string	val;
 
-	while (str[i] && ::isspace(str[i]))
-		++i;
-	if (str[i] == '{')
+	std::vector<std::string>::iterator	first = arr.begin();
+	while (first != arr.end())
 	{
-		std::cout << str[i] << std::endl;
-		++i;
-		while (str[i] && ::isspace(str[i]))
-			++i;
-		while (str[i] && str[i] != '}')
+		std::string::size_type	pos((*first).find("location"));
+		if (pos != std::string::npos)
 		{
-			if (str[i] == '{')
+			(*first).erase(std::remove_if((*first).begin(), (*first).begin() + pos, ::isspace), (*first).begin() + pos);
+			key = (*first).substr(0, 8);
+			val = (*first).substr(8);
+			while ((*first).find('}') == std::string::npos)
 			{
-				map.insert(block_parser(str, i));
-				line_length = 0;
+				arr.erase(first);
+				val += '\n';
+				val += *first;
 			}
-			else if (str[i] == '\n')
-			{
-				map.insert(string_parser(str, i - line_length));
-				line_length = 0;
-			}
-			if (str[i] == '}')
-				break ;
-			++i;
-			++line_length;
+			arr.erase(first);
+			map.insert(std::make_pair(key, val));
 		}
+		else
+			++first;
 	}
-	else
-	{
-		while (str[i] && !::isspace(str[i]))
-		{
-			key += str[i];
-			++i;
-		}
-		while (str[i])
-		{
-			if (!::isspace(str[i]))
-				val += str[i];
-			if (::isspace(str[i + 1]))
-				val += ' ';
-			++i;
-		}
-		map.insert(std::make_pair(key, val));
-	}
+	clean_string(target, arr, map);
 	return (map);
 }
 
@@ -242,13 +254,12 @@ int	main()
 		std::cout << " --- the block --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = block_map.begin(); first != block_map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
-		map = split_block(block_map.find("server")->second);
-//		comments_cleaner(map);
+/*		map = split_string(target, arr);
+		comments_cleaner(map);
 		std::cout << " --- the result --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << std::endl;
 
-/*
 		if (target == "server")
 		{
 			std::multimap<std::string, std::string>::iterator	pos = map.find("location");
