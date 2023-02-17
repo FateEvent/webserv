@@ -30,7 +30,7 @@ int	main(int ac, char **av)
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
 	server1.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
 	server1.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server1.insert(std::pair<std::string, std::string>("listen", "80"));
+	server1.insert(std::pair<std::string, std::string>("listen", "800"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server1.insert(std::pair<std::string, std::string>("root", "/web1/"));
 
@@ -38,8 +38,8 @@ int	main(int ac, char **av)
 	server2.insert(std::pair<std::string, std::string>("BLOCK", "server"));
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.2"));
-	server2.insert(std::pair<std::string, std::string>("listen", "443"));
+	server2.insert(std::pair<std::string, std::string>("host", "192.168.1.99"));
+	server2.insert(std::pair<std::string, std::string>("listen", "8080"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
 
@@ -49,17 +49,17 @@ int	main(int ac, char **av)
 	std::cout << "Start" << std::endl;
 	std::cout << "Creating class webserv." << std::endl;
 	webserv test(config);
-	try {
+/* 	try {
 		std::cout << "Try create second class webserb." << std::endl;
 		webserv test1(config);
 	}
 	catch (std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
-	}
-	std::cout << test.get_info_server() << std::endl;
+	} */
+//	std::cout << test.get_info_server() << std::endl;
 
-	std::cout << "Test add instance by map in vector (multi instance)" << std::endl;
+/* 	std::cout << "Test add instance by map in vector (multi instance)" << std::endl;
 	for (std::vector<std::multimap<std::string, std::string> >::iterator it = instance.begin();
 			it != instance.end(); it++)
 	{
@@ -75,17 +75,17 @@ int	main(int ac, char **av)
 
 	std::cout << "Number of instances: " << test.get_nbr_server() << std::endl;
 	
-
+ */
 	std::cout << "Add vector of instance" << std::endl;
 	test.add(instance);
 
 	std::cout << "Number of instances: " << test.get_nbr_server() << std::endl;
 	
-	std::cout << "Get instance info." << std::endl;
+/* 	std::cout << "Get instance info." << std::endl;
 	for (std::vector<struct config>::const_iterator ginfo = test.begin(); ginfo != test.end(); ginfo++)
 	{
 		std::cout << test.get_info_on(ginfo) << std::endl;
-	}
+	} */
 
 	std::cout << "Prepare instance." << std::endl;
 //	for (std::vector<struct config>::iterator ginfo = test.begin(); ginfo != test.end(); ginfo++)
@@ -94,13 +94,16 @@ int	main(int ac, char **av)
 		test.prepare_all(ginfo);
 //	}
 
+/* 	std::cout << "Get all instances info." << std::endl;
+	std::cout << test.get_info_instance() << std::endl; */
+
 	ginfo = test.begin();
 	test.bind_all(ginfo);
 
 	std::cout << "Get all instances info." << std::endl;
 	std::cout << test.get_info_instance() << std::endl;
 	
-	std::cout << "Name of instance 1 passed by operator[]: ";
+/* 	std::cout << "Name of instance 1 passed by operator[]: ";
 	try
 	{
 		std::cout << test[0].name << std::endl;
@@ -108,11 +111,12 @@ int	main(int ac, char **av)
 	catch (std::exception &e)
 	{
 		std::cout << e.what() << std::endl;
-	}
+	} */
 
 	ginfo = test.begin();
 	test.stop_all(ginfo);
 
-	std::cout << ac << av[0] << std::endl;
+	(void) ac;
+	(void) av;
 	return (0);
 }

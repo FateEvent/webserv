@@ -15,10 +15,8 @@
 
 #include <iostream>
 #include <string>
-#include <unistd.h>
+#include <unistd.h> // for close()
 #include <sys/socket.h>
-#include <sys/fcntl.h>
-#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -27,7 +25,10 @@
 #include <vector>
 #include <exception>
 #include <list>
-#include <arpa/inet.h>
+
+//#include <sys/fcntl.h>
+//#include <sys/ioctl.h>
+//#include <arpa/inet.h>
 
 struct	config
 {

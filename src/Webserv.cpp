@@ -135,7 +135,7 @@ void	webserv::bind(std::vector<config>::iterator &bind)
 
 	if (bind->sock_fd)
 	{
-		bind->addr.sin_addr.s_addr = 0;
+		//bind->addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // OK ON MY SERVER (MULTI NETWORK CARD) NOT OK WITH MY LABTOP (MAYBE ONLY WIFI??!)
 		//htonl(INADDR_LOOPBACK);
 		//inet_addr("127.0.0.1");
 		//bind->addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -143,13 +143,18 @@ void	webserv::bind(std::vector<config>::iterator &bind)
 		if (res)
 		{
 			bind->active = false;
-			if (errno == 48)
-				std::cout << "\033[0;31mAddress and protocol already in use. Can't bind " << bind->name << "\033[0m" << std::endl;
+			if (errno == 48 || errno == 98)
+				std::cout << "\033[0;31mAddress and protocol already used. Can't bind " << bind->name << "\033[0m" << std::endl;
+			else if (errno == 13)
+				std::cout << "\033[0;31mAcces denied. Can't bind " << bind->name << "\033[0m" << std::endl;
 			else
-				throw ("Error: instance " + bind->name + " not initialized!");
+				std::cout << "\033[0;31mError: instance " + bind->name + " not initialized!\033[0m" << std::endl;
 		}
 		else
+		{
 			bind->active = true;
+			std::cout << "Instance \033[0;33m" + bind->name + "\033[0m on port \033[0;33m" + std::to_string(bind->port)  + "\033[0m is now binded."<< std::endl;
+		}
 	}
 	else
 	{
@@ -176,7 +181,6 @@ void	webserv::bind_all(std::vector<config>::iterator &server)
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	std::cout << "Server name: " << server->name << " binded." << std::endl;
 }
 
 /**
