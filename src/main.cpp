@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/18 22:02:07 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/18 22:43:58 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,15 @@ int	main(int ac, char **av)
 		std::cout << std::to_string(test.get_greaterfd()) << std::endl;
 		if (recept)
 		{
+			/* In Webserv class
+				Search the fd as receipt data with FD_ISSET,
+				create a new class Client with the config of the instance with accept,
+				put the new fd in Client class,
+				Refer in this Client class the data I/O.		
+			*/
+
+			//if FD_ISSET(config.sock_fd iterator, &test.get_readfd()))
+			// Client->fd = accept(...)
 			std::cout << "Data recept: " << std::endl;
 		}
 	}
