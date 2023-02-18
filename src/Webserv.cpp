@@ -6,13 +6,13 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/17 15:04:39 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/18 01:13:27 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Webserv.hpp"
 
-webserv::webserv(std::multimap<std::string, std::string>& config) : nbr_server(0)
+Webserv::Webserv(std::multimap<std::string, std::string>& config) : nbr_server(0)
 {
 	if (this->created)
 		throw err_init();
@@ -24,12 +24,12 @@ webserv::webserv(std::multimap<std::string, std::string>& config) : nbr_server(0
 		throw err_init();
 }
 
-config	webserv::operator[](size_t index)
+config	Webserv::operator[](size_t index)
 {
 	return (this->servers.at(index));
 }
 
-void	webserv::close(std::vector<config>::iterator &instance)
+void	Webserv::close(std::vector<config>::iterator &instance)
 {
 	try
 	{
@@ -43,7 +43,7 @@ void	webserv::close(std::vector<config>::iterator &instance)
 }
 
 
-void	webserv::prepare_all(std::vector<config>::iterator &instance)
+void	Webserv::prepare_all(std::vector<config>::iterator &instance)
 {
 	for (; instance != this->servers.end(); instance++)
 		prepare(instance);
@@ -54,7 +54,7 @@ void	webserv::prepare_all(std::vector<config>::iterator &instance)
  * 
  * @param instance Iterator of the instance to create a socket
  */
-void	webserv::prepare(std::vector<config>::iterator &instance)
+void	Webserv::prepare(std::vector<config>::iterator &instance)
 {
 	if (instance->prepare == false && (instance->sock_fd = socket(instance->addr.sin_family, instance->type, 0)))
 	//socket(instance->addr.sin_family, instance->type, instance->addr.sin_addr.s_addr)))
@@ -68,7 +68,7 @@ void	webserv::prepare(std::vector<config>::iterator &instance)
  * 
  * @param server Iterator of vector of multimap<string, string>
  */
-void	webserv::add(std::vector<std::multimap<std::string, std::string> > &server)
+void	Webserv::add(std::vector<std::multimap<std::string, std::string> > &server)
 {
 	for (std::vector<std::multimap<std::string, std::string> >::iterator it = server.begin(); it != server.end(); it++)
 	{
@@ -88,7 +88,7 @@ void	webserv::add(std::vector<std::multimap<std::string, std::string> > &server)
  * 
  * @param stop The instance iterator to shutdown.
  */
-void	webserv::stop(std::vector<config>::iterator &server)
+void	Webserv::stop(std::vector<config>::iterator &server)
 {
 	if (server->active == true)
 	{
@@ -106,7 +106,7 @@ void	webserv::stop(std::vector<config>::iterator &server)
  * 
  * @param server The iterator of vector stocked all instance
  */
-void	webserv::stop_all(std::vector<config>::iterator &server)
+void	Webserv::stop_all(std::vector<config>::iterator &server)
 {
 	for (;server != this->servers.end(); server++)
 	{
@@ -129,7 +129,7 @@ void	webserv::stop_all(std::vector<config>::iterator &server)
  * 
  * @param bind The iterator of instance to bind
  */
-void	webserv::bind(std::vector<config>::iterator &bind)
+void	Webserv::bind(std::vector<config>::iterator &bind)
 {
 	int	res;
 
@@ -168,7 +168,7 @@ void	webserv::bind(std::vector<config>::iterator &bind)
  * 
  * @param server  The iterator of vector stocked all instance
  */
-void	webserv::bind_all(std::vector<config>::iterator &server)
+void	Webserv::bind_all(std::vector<config>::iterator &server)
 {
 	for (; server != this->servers.end(); server++)
 	{
@@ -188,7 +188,7 @@ void	webserv::bind_all(std::vector<config>::iterator &server)
  * 
  * @param old The iterator of select instance to remove
  */
-void	webserv::remove(std::vector<config>::iterator &old)
+void	Webserv::remove(std::vector<config>::iterator &old)
 {
 	if (old->active == true)
 		stop(old);
@@ -200,12 +200,12 @@ void	webserv::remove(std::vector<config>::iterator &old)
  * 
  * @return unsigned 
  */
-unsigned	webserv::get_nbr_server() const
+unsigned	Webserv::get_nbr_server() const
 {
 	return (this->nbr_server);
 }
 
-const char	*webserv::err_init::what() const throw()
+const char	*Webserv::err_init::what() const throw()
 {
 	return ("\033[0;31mInstance webserv already init!\033[0m");
 }
@@ -215,7 +215,7 @@ const char	*webserv::err_init::what() const throw()
  * 
  * @return std::string Returned information in a string
  */
-std::string	webserv::get_info_server() const
+std::string	Webserv::get_info_server() const
 {
 	std::string info;
 
@@ -232,7 +232,7 @@ std::string	webserv::get_info_server() const
  * @param other The iterator of selected instance
  * @return std::string Returned information in en string.
  */
-std::string	webserv::get_info_on(std::vector<config>::const_iterator &other) const
+std::string	Webserv::get_info_on(std::vector<config>::const_iterator &other) const
 {
 	std::string	info;
 	info.append("FD:     " + std::to_string(other->sock_fd) + "\n" +
@@ -246,7 +246,7 @@ std::string	webserv::get_info_on(std::vector<config>::const_iterator &other) con
 	return (info);
 }
 
-std::string	webserv::get_info_instance() const
+std::string	Webserv::get_info_instance() const
 {
 	std::string	info;
 	for (std::vector<config>::const_iterator it = servers.begin(); it != servers.end(); it++)
@@ -256,18 +256,18 @@ std::string	webserv::get_info_instance() const
 	return (info);
 }
 
-webserv::~webserv()
+Webserv::~Webserv()
 {
 	//this->stop_all(this->servers.begin());
 	this->created = false;
 }
 
-std::vector<config>::iterator	webserv::begin()
+std::vector<config>::iterator	Webserv::begin()
 {
 	return (this->servers.begin());
 }
 
-std::vector<config>::iterator	webserv::end()
+std::vector<config>::iterator	Webserv::end()
 {
 	return (this->servers.end());
 }
@@ -291,7 +291,7 @@ std::vector<config>::iterator	webserv::end()
 /*                                                                            */
 /* ************************************************************************** */
 
-void	webserv::add(std::multimap<std::string, std::string> server)
+void	Webserv::add(std::multimap<std::string, std::string> server)
 {
 	config	ret = {"","","","",{},{},0,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
 	for (std::multimap<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
@@ -400,7 +400,7 @@ void	webserv::add(std::multimap<std::string, std::string> server)
  * 
  * @param conf Struct config to check
  */
-void	webserv::check_instance(config &conf)
+void	Webserv::check_instance(config &conf)
 {
 	std::multimap<std::string, std::string>::iterator main;
 	if (conf.name.empty())

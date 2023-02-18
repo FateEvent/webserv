@@ -6,12 +6,12 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/17 09:46:06 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/18 01:14:53 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Webserv.hpp"
-bool webserv::created = false;
+bool Webserv::created = false;
 int	main(int ac, char **av)
 {
 	// Config webserb test - Not server instance!!
@@ -48,7 +48,7 @@ int	main(int ac, char **av)
 
 	std::cout << "Start" << std::endl;
 	std::cout << "Creating class webserv." << std::endl;
-	webserv test(config);
+	Webserv test(config);
 /* 	try {
 		std::cout << "Try create second class webserb." << std::endl;
 		webserv test1(config);

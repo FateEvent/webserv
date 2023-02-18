@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/17 11:29:46 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/18 01:11:27 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,38 +30,40 @@
 //#include <sys/ioctl.h>
 //#include <arpa/inet.h>
 
+#include "../include/Client.hpp"
+
 struct	config
 {
-	std::string					name;
-	std::string					root;
-	std::string					index;
-	std::string					ip;
-	sockaddr_in					addr;
-	sockaddr_in					from;
-	int							sock_fd;	// retour of socket()
-	int							domain;		//Type AF_INET, AF_LOCAL, AF_LINUX....
-	int							type;		// type TCP,UDP... SOCK_STREAM, SOCK_DGRAM
-	int							max_client;
-	uint16_t					port;
-	bool						active;
-	bool						prepare;
-	std::map<int, std::string>	error_page;
+	std::string						name;
+	std::string						root;
+	std::string						index;
+	std::string						ip;
+	sockaddr_in						addr;
+	std::map<int, Client>			from;
+	int								sock_fd;	// retour of socket()
+	int								domain;		//Type AF_INET, AF_LOCAL, AF_LINUX....
+	int								type;		// type TCP,UDP... SOCK_STREAM, SOCK_DGRAM
+	int								max_client;
+	uint16_t						port;
+	bool							active;
+	bool							prepare;
+	std::map<int, std::string>		error_page;
 };
 
-class webserv
+class Webserv
 {
 	private:
-		webserv() {};
-		webserv(webserv &) {};
-		webserv&								operator=(webserv const&);
+		Webserv() {};
+		Webserv(Webserv &) {};
+		Webserv&								operator=(Webserv const&);
 		std::multimap<std::string, std::string>	mainconfig; // principal config
 		std::vector<config>						servers;
 		unsigned int							nbr_server;
 		void									check_instance(config &);
 
 	public:
-		webserv(std::multimap<std::string, std::string> &);
-		~webserv();
+		Webserv(std::multimap<std::string, std::string> &);
+		~Webserv();
 		void				add(std::vector<std::multimap<std::string, std::string> > &);
 		void				add(std::multimap<std::string, std::string>);
 		void 				remove(std::vector<config>::iterator &);
