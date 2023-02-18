@@ -6,11 +6,11 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/18 23:08:41 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/18 23:13:41 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/**
+/*
 ** The bracket_parser() function verifies that opening and closing brackets
 ** are present.
 ** 
@@ -40,21 +40,21 @@
 ** The cut_multiple_blocks() function returns a map containing the structure
 ** blocks located in the config file.
 **
-** The string_parser() function makes a key-value pair from a string.
+** The string_parser() function makes a key-value pair from a string line.
 **
- * block_parser
- * 
- * The split_block() function makes a multimap out of the string block passed
- * as a parameter. It makes use of the string_parser() function and the
- * block_parser() function.
- *
- * The find_char() function looks for a character in a particular line of a
- * block of text; it takes as a parameter a string (containing the newline
- * character '\n'), the character to research and the line number.
- * 
- * Return value: The find_char() function returns a size_t indicating the
- * position of the character on the line or the npos character (defined in
- * the header <string>, the maximum size of a size_t).
+** The block_parser() function makes a key-value pair from a struct block.
+** 
+** The split_block() function makes a multimap out of the string block passed
+** as a parameter. It makes use of the string_parser() function and the
+** block_parser() function.
+**
+** The find_char() function looks for a character in a particular line of a
+** block of text; it takes as a parameter a string (containing the newline
+** character '\n'), the character to research and the line number.
+** 
+** Return value: The find_char() function returns a size_t indicating the
+** position of the character on the line or the npos character (defined in
+** the header <string>, the maximum size of a size_t).
 ** 
 ** The comments_cleaner() function takes out the comments (indicated by a
 ** '#' character) from a string.
