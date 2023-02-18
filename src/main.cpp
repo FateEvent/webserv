@@ -6,12 +6,16 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/18 01:14:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/18 22:02:07 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Webserv.hpp"
 bool Webserv::created = false;
+fd_set		Webserv::readfd;
+fd_set		Webserv::writefd;
+fd_set		Webserv::errfd;
+
 int	main(int ac, char **av)
 {
 	// Config webserb test - Not server instance!!
@@ -113,9 +117,24 @@ int	main(int ac, char **av)
 		std::cout << e.what() << std::endl;
 	} */
 
+	test.listen_all();
+
+
+	
+	while (1)
+	{	
+		test.fd_rst();
+		std::cout << "waitting..." << std::endl;
+		int recept = select(test.get_greaterfd(), &test.get_readfd(), &test.get_writefd(), NULL, &test.timeout());
+		std::cout << std::to_string(test.get_greaterfd()) << std::endl;
+		if (recept)
+		{
+			std::cout << "Data recept: " << std::endl;
+		}
+	}
 	ginfo = test.begin();
 	test.stop_all(ginfo);
-
+	
 	(void) ac;
 	(void) av;
 	return (0);

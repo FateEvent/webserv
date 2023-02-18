@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/18 01:13:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/18 22:01:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,8 @@ void	Webserv::bind(std::vector<config>::iterator &bind)
 		else
 		{
 			bind->active = true;
-			std::cout << "Instance \033[0;33m" + bind->name + "\033[0m on port \033[0;33m" + std::to_string(bind->port)  + "\033[0m is now binded."<< std::endl;
+			//FD_SET(bind->sock_fd, &this->readfd);
+			std::cout << "Instance \033[0;33m" + bind->name + "\033[0m on port \033[0;33m" + std::to_string(bind->port)  + "\033[0m is now bound."<< std::endl;
 		}
 	}
 	else
@@ -293,10 +294,10 @@ std::vector<config>::iterator	Webserv::end()
 
 void	Webserv::add(std::multimap<std::string, std::string> server)
 {
-	config	ret = {"","","","",{},{},0,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
+	config	ret = {"","","","",{},0,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
 	for (std::multimap<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
-		if (!it->first.compare("BLOCK"))
+		if (!it->first.compare("BLOCK") && !it->second.compare("server"))
 			continue;
 		if (!it->first.compare("name"))
 		{
@@ -348,7 +349,7 @@ void	Webserv::add(std::multimap<std::string, std::string> server)
 		else if (!it->first.compare("max_client"))
 		{
 			int max = std::stol(it->second);
-			if (!(max > 0 && max < static_cast<int>(0xFFFFFFFF)))
+			if (!(max > 0 && max < static_cast<int>(0x7FFFFFFF)))
 				throw ("Max client incorrect in instance!");
 			ret.max_client = max;
 		}
@@ -386,9 +387,7 @@ void	Webserv::add(std::multimap<std::string, std::string> server)
 		}
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
-//	std::multimap<std::string, std::string>::iterator check = server.begin();
-//	if (!check->first.compare("BLOCK") && check->second.compare("http"))
-		check_instance(ret);
+	check_instance(ret);
 	this->servers.push_back(ret);
 	this->nbr_server++;
 }
@@ -431,4 +430,69 @@ void	Webserv::check_instance(config &conf)
 	}
 	if (!conf.port)
 		throw ("Error in config file, miss miss port on instance.");
+}
+
+
+void	Webserv::listen_all()
+{
+	for (std::vector<config>::iterator it = this->servers.begin(); it != this->servers.end(); it++)
+	{
+		if (it->active && it->prepare)
+		{
+			try
+			{
+				listen(*it);
+			}
+			catch (std::exception &e)
+			{
+				std::cerr << e.what() << std::endl;
+			}
+		}
+		else
+			std::cout << "Instance " + it->name + " ignored. Not active or prepared." << std::endl;
+	}
+}
+
+void	Webserv::listen(config &instance)
+{
+	if (::listen(instance.sock_fd, instance.max_client) != 0)
+		throw ("Error on listen for " + instance.name + " with error " + std::to_string(errno));
+}
+
+int	Webserv::get_greaterfd() const
+{
+	int	nbr = 0;
+	std::vector<config>::const_iterator it = this->servers.begin();
+	for (; it != this->servers.end(); it++)
+		if (it->active && it->sock_fd > 0 && it->sock_fd >= nbr)
+			nbr = it->sock_fd + 1;
+	return (nbr);
+}
+
+void	Webserv::fd_rst()
+{
+	FD_ZERO(&this->writefd);
+	FD_ZERO(&this->readfd);
+	FD_ZERO(&this->errfd);
+	std::vector<config>::const_iterator it = this->servers.begin();
+	for (; it != this->servers.end(); it++)
+		if (it->active && it->sock_fd > 0)
+			FD_SET(it->sock_fd, &this->readfd);
+}
+
+fd_set&	Webserv::get_writefd()
+{
+	return (this->writefd);
+}
+
+fd_set&	Webserv::get_readfd()
+{
+	return (this->readfd);
+}
+
+timeval&	Webserv::timeout()
+{
+	this->_timeout.tv_sec = 1;
+	this->_timeout.tv_usec = 0;
+	return (this->_timeout);
 }
