@@ -6,11 +6,17 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/18 13:27:40 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/18 23:08:41 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/*
+/**
+** The bracket_parser() function verifies that opening and closing brackets
+** are present.
+** 
+** Return value: The bracket_parser() function returns 1 in case of error, 0
+** otherwise.
+** 
 ** The search() function looks for a target string in a file and pushes in a
 ** vector every line included between the opening and the closure characters.
 ** 
@@ -18,19 +24,40 @@
 ** opened, and the number of the line of the config file where it stopped
 ** otherwise.
 ** 
-** The cut_block() function creates a multimap containing the block name as the
-** key and the block as a value.
+** The config_file_reader() function reads the config file and fills the
+** vector passed as a parameter with a structure containing the target keys
+** and the number of the line in the file.
 ** 
-** The split_string() function (together with the clean_string() function)
-** creates a multimap from the vector containing every line of the config file.
+** Return value: The config_file_reader() function returns 1 in case of error,
+** 0 otherwise.
 ** 
+** The cut_block() function creates a multimap containing the block name as
+** the key and the block as a value.
+**
+** Return value: The cut_block() function returns a pair made up of the
+** block name as the key and the block as a value.
+** 
+** The cut_multiple_blocks() function returns a map containing the structure
+** blocks located in the config file.
+**
 ** The string_parser() function makes a key-value pair from a string.
+**
+ * block_parser
+ * 
+ * The split_block() function makes a multimap out of the string block passed
+ * as a parameter. It makes use of the string_parser() function and the
+ * block_parser() function.
+ *
+ * The find_char() function looks for a character in a particular line of a
+ * block of text; it takes as a parameter a string (containing the newline
+ * character '\n'), the character to research and the line number.
+ * 
+ * Return value: The find_char() function returns a size_t indicating the
+ * position of the character on the line or the npos character (defined in
+ * the header <string>, the maximum size of a size_t).
 ** 
-** The comments_cleaner() function takes out the comments (indicated by a '#'
-** character) from a string.
-** 
-** The block_cleaner() function makes a vector out of a string containing
-** a key and many key-value pairs.
+** The comments_cleaner() function takes out the comments (indicated by a
+** '#' character) from a string.
 */
 
 #include "../include/search.hpp"
@@ -204,52 +231,52 @@ std::pair<std::string, std::string>	cut_block(std::string target, std::vector<st
 	return (std::make_pair(key, val));
 }
 
-int	cut_multiple_blocks(std::multimap<std::string, std::string> &map)
+ssize_t	search(std::string target, char opening, char closure, std::vector<std::string> &arr, ssize_t l = 0)
 {
-	std::string								key;
-	std::string								val;
-	std::string								buffer;
-	std::string								str;
-	std::string::size_type					i(0);
-	std::ifstream							inFlux("config/local.conf");
+	std::ifstream	inFlux("config/local.conf");
+	std::string		buffer;
+	bool			target_lookup(false);
+	size_t			op(0);
+	size_t			cl(0);
+	ssize_t			line(0);
 
 	if (!inFlux)
 	{
 		std::cerr << "Error: impossible to open the config file." << std::endl;
 		return (-1);
 	}
+	while(line < l)
+	{
+		getline(inFlux, buffer);
+		++line;
+	}
 	while (getline(inFlux, buffer))
 	{
-		while (buffer[i] && ::isspace(buffer[i]))
-			++i;
-		while (buffer[i] && !::isspace(buffer[i]))
-			str += buffer[i];
+		std::string::size_type	pos = buffer.find(target);
+		if (pos != std::string::npos)
+		{
+			target_lookup = true;
+			if (buffer.find(opening) == std::string::npos)
+				arr.push_back(buffer);
+		}
+		if (target_lookup)
+		{
+			pos = buffer.find(opening);
+			if (pos != std::string::npos)
+				op++;
+			if (op >= 1)
+				arr.push_back(buffer);
+			std::string::size_type	pos2 = buffer.find(closure);
+			if (pos2 != std::string::npos)
+				cl++;
+			if (op >= 1 && op == cl)
+				break ;
+		}
+		++line;
 	}
-	/*
-	(*first).erase(std::remove_if((*first).begin(), (*first).begin() + pos, ::isspace), (*first).begin() + pos);
-	key = (*first).substr(0, target.length());
-	pos = (*first).find('{');
-	if (pos == std::string::npos)
-	{
-		++first;
-		val = *first;
-	}
-	else
-		val = (*first).substr(target.length());
-	while (first != arr.end())
-	{
-		++first;
-		val += '\n';
-		val += *first;
-	}
-	++first;
-	map.insert(std::make_pair(key, val));
-	*/
-	std::cout << str << std::endl;
-	return (0);
+	return (line);
 }
 
-// reads the config file and returns an array containing the target keys and the line numbers for each
 int	config_file_reader(std::vector<t_search> &arr)
 {
 	std::ifstream				inFlux("config/local.conf");
@@ -262,12 +289,11 @@ int	config_file_reader(std::vector<t_search> &arr)
 	if (!inFlux)
 	{
 		std::cerr << "Error: impossible to open the config file." << std::endl;
-		return (-1);
+		return (1);
 	}
 	while (getline(inFlux, buffer))
 	{
 		i = 0;
-		++s.line;
 		while (buffer[i])
 		{
 			if (buffer[i] == '{')
@@ -281,8 +307,28 @@ int	config_file_reader(std::vector<t_search> &arr)
 		if (s.target != "")
 			arr.push_back(s);
 		s.target.clear();
+		++s.line;
 	}
 	return (0);
+}
+
+int	cut_multiple_blocks(std::multimap<std::string, std::string> &map)
+{
+	std::vector<t_search>		arr;
+	std::vector<std::string>	str_arr;
+	std::string					key;
+	std::string					val;
+	if (config_file_reader(arr) == 0)
+	{
+		for (std::vector<t_search>::iterator	first = arr.begin(); first != arr.end(); ++first)
+		{
+			search(first->target, '{', '}', str_arr, first->line);
+			map.insert(cut_block(first->target, str_arr));
+			str_arr.clear();
+		}
+		return (0);
+	}
+	return (1);
 }
 
 int	bracket_parser(char opening, char closure)
@@ -311,52 +357,6 @@ int	bracket_parser(char opening, char closure)
 	return (1);
 }
 
-ssize_t	search(std::string target, char opening, char closure, std::vector<std::string> &arr, ssize_t l = 0)
-{
-	std::ifstream	inFlux("config/local.conf");
-	std::string		buffer;
-	bool			target_lookup(false);
-	size_t			op(0);
-	size_t			cl(0);
-	ssize_t			line(0);
-
-	if (!inFlux)
-	{
-		std::cerr << "Error: impossible to open the config file." << std::endl;
-		return (-1);
-	}
-	while(line < l)
-	{
-		getline(inFlux, buffer);
-		++line;
-	}
-	while (getline(inFlux, buffer))
-	{
-		++line;
-		std::string::size_type	pos = buffer.find(target);
-		if (pos != std::string::npos)
-		{
-			target_lookup = true;
-			if (buffer.find(opening) == std::string::npos)
-				arr.push_back(buffer);
-		}
-		if (target_lookup)
-		{
-			pos = buffer.find(opening);
-			if (pos != std::string::npos)
-				op++;
-			if (op >= 1)
-				arr.push_back(buffer);
-			std::string::size_type	pos2 = buffer.find(closure);
-			if (pos2 != std::string::npos)
-				cl++;
-			if (op >= 1 && op == cl)
-				break ;
-		}
-	}
-	return (line);
-}
-
 int	main()
 {
 	std::multimap<std::string, std::string>	block_map;
@@ -366,36 +366,22 @@ int	main()
 
 	int i = bracket_parser('{', '}');
 	std::cout << "brackets: " << i << std::endl;
-	i = search(target, '{', '}', arr);
-	std::cout << "line: " << i << std::endl;
 	if (i >= 0)
 	{
-		std::cout << " --- the config file vector --- " << std::endl;
-		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
-			std::cout << *first << std::endl;
-		block_map.insert(cut_block(target, arr));
-		std::cout << " --- the block --- " << std::endl;
-		for (std::multimap<std::string, std::string>::iterator	first = block_map.begin(); first != block_map.end(); ++first)
-			std::cout << first->first << ": " << first->second << std::endl;
-		map = split_block(block_map.find(target)->second);
+		std::cout << " --- the blocks --- " << std::endl;
+		cut_multiple_blocks(block_map);
+		for (std::map<std::string, std::string>::iterator	first = block_map.begin(); first != block_map.end(); ++first)
+			std::cout << first->first << ": " << first->second << '$' << std::endl;
+		map = split_block(block_map.find("server")->second);
 		comments_cleaner(map);
 		std::cout << " --- the result --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
 
-		if (target == "server")
-		{
-			std::cout << " --- mais encore --- " << std::endl;
-			std::multimap<std::string, std::string>::iterator	pos = map.find("location");
-			map = split_block(pos->second);
-			for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
-				std::cout << first->first << ": " << first->second << '$' << std::endl;
-		}
-
-		std::vector<t_search>	vec;
-
-		config_file_reader(vec);
-		for (std::vector<t_search>::iterator	first = vec.begin(); first != vec.end(); ++first)
-			std::cout << first->target << " & " << first->line << std::endl;
+		std::cout << " --- mais encore --- " << std::endl;
+		std::multimap<std::string, std::string>::iterator	pos = map.find("location");
+		map = split_block(pos->second);
+		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
+			std::cout << first->first << ": " << first->second << '$' << std::endl;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/17 15:47:57 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/18 23:09:50 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,6 @@
 
 #include "../include/search.hpp"
 
-// disons que je pars de block_cleaner pour sortir des pairs key-value
 std::vector<std::string>	block_cleaner(std::string str)
 {
 	std::vector<std::string>	arr;
