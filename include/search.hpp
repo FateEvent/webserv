@@ -10,6 +10,11 @@
 # include <utility>
 # include <cctype>
 
+typedef struct search {
+	std::string	target;
+	std::size_t	line;
+}				t_search;
+
 namespace ft {
 	typedef std::vector<std::string>				string_vector;
 	typedef std::multimap<std::string, std::string>	string_map;

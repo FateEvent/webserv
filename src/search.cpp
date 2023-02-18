@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/17 17:21:02 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/18 13:27:40 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,15 +249,15 @@ int	cut_multiple_blocks(std::multimap<std::string, std::string> &map)
 	return (0);
 }
 
-// reads the config file and returns an array of strings containing the target keys
-int	config_file_reader(std::vector<std::string> &arr)
+// reads the config file and returns an array containing the target keys and the line numbers for each
+int	config_file_reader(std::vector<t_search> &arr)
 {
 	std::ifstream				inFlux("config/local.conf");
 	std::string					buffer;
-	std::string					target;
 	size_t						op(0);
 	size_t						cl(0);
 	std::string::size_type		i(0);
+	t_search					s = {"", 0};
 
 	if (!inFlux)
 	{
@@ -266,19 +266,21 @@ int	config_file_reader(std::vector<std::string> &arr)
 	}
 	while (getline(inFlux, buffer))
 	{
-		while (op == cl && !::isspace(buffer[i]))
+		i = 0;
+		++s.line;
+		while (buffer[i])
 		{
-			target += buffer[i];
+			if (buffer[i] == '{')
+				op++;
+			else if (buffer[i] == '}')
+				cl++;
+			else if (op == cl && !::isspace(buffer[i]))
+				s.target += buffer[i];
 			++i;
 		}
-		std::string::size_type	pos = buffer.find('{');
-		if (pos != std::string::npos)
-			op++;
-		std::string::size_type	pos2 = buffer.find('}');
-		if (pos2 != std::string::npos)
-			cl++;
-		arr.push_back(target);
-		target.clear();
+		if (s.target != "")
+			arr.push_back(s);
+		s.target.clear();
 	}
 	return (0);
 }
@@ -330,6 +332,7 @@ ssize_t	search(std::string target, char opening, char closure, std::vector<std::
 	}
 	while (getline(inFlux, buffer))
 	{
+		++line;
 		std::string::size_type	pos = buffer.find(target);
 		if (pos != std::string::npos)
 		{
@@ -350,7 +353,6 @@ ssize_t	search(std::string target, char opening, char closure, std::vector<std::
 			if (op >= 1 && op == cl)
 				break ;
 		}
-		++line;
 	}
 	return (line);
 }
@@ -390,9 +392,10 @@ int	main()
 				std::cout << first->first << ": " << first->second << '$' << std::endl;
 		}
 
-/*		config_file_reader(arr);
-		for (std::vector<std::string>::iterator	first = arr.begin(); first != arr.end(); ++first)
-			std::cout << *first << std::endl;
-*/
+		std::vector<t_search>	vec;
+
+		config_file_reader(vec);
+		for (std::vector<t_search>::iterator	first = vec.begin(); first != vec.end(); ++first)
+			std::cout << first->target << " & " << first->line << std::endl;
 	}
 }
