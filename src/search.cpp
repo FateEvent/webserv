@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/19 15:53:41 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/19 16:04:23 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,7 +277,7 @@ ssize_t	search(std::string target, char opening, char closure, std::vector<std::
 	return (line);
 }
 
-int	config_file_reader(std::vector<t_search> &arr)
+int	config_file_reader(std::vector<t_search> &arr, char opening, char closure)
 {
 	std::ifstream				inFlux("config/local.conf");
 	std::string					buffer;
@@ -296,9 +296,9 @@ int	config_file_reader(std::vector<t_search> &arr)
 		i = 0;
 		while (buffer[i])
 		{
-			if (buffer[i] == '{')
+			if (buffer[i] == opening)
 				op++;
-			else if (buffer[i] == '}')
+			else if (buffer[i] == closure)
 				cl++;
 			else if (op == cl && !::isspace(buffer[i]))
 				s.target += buffer[i];
@@ -319,7 +319,7 @@ int	cut_multiple_blocks(char opening, char closure, std::multimap<std::string, s
 	std::string					key;
 	std::string					val;
 
-	if (config_file_reader(conf_arr) == 0)
+	if (config_file_reader(conf_arr, opening, closure) == 0)
 	{
 		for (std::vector<t_search>::iterator	first = conf_arr.begin(); first != conf_arr.end(); ++first)
 		{
@@ -358,6 +358,7 @@ int	bracket_parser(char opening, char closure)
 	return (1);
 }
 
+// example of use
 int	main()
 {
 	std::multimap<std::string, std::string>	block_map;
@@ -372,15 +373,17 @@ int	main()
 		cut_multiple_blocks('{', '}', block_map);
 		for (std::map<std::string, std::string>::iterator	first = block_map.begin(); first != block_map.end(); ++first)
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
+
+		// here I split the block "server", for example
+		std::cout << " --- splitting the block 'server' --- " << std::endl;
 		map = split_block(block_map.find("server")->second, '{', '}');
 		comments_cleaner(map);
-		std::cout << " --- the result --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
 
-		std::cout << " --- mais encore --- " << std::endl;
-		std::multimap<std::string, std::string>::iterator	pos = map.find("location");
-		map = split_block(pos->second, '{', '}');
+		// with the same function I split the block "location"
+		std::cout << " --- splitting the block 'location' --- " << std::endl;
+		map = split_block(map.find("location")->second, '{', '}');
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
 	}
