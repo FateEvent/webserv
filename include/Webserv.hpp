@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/18 22:01:51 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/19 23:28:58 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,24 +31,8 @@
 //#include <sys/ioctl.h>
 //#include <arpa/inet.h>
 
+#include "../include/common.h"
 #include "../include/Client.hpp"
-
-struct	config
-{
-	std::string						name;
-	std::string						root;
-	std::string						index;
-	std::string						ip;
-	sockaddr_in						addr;
-	int								sock_fd;	// retour of socket()
-	int								domain;		//Type AF_INET, AF_LOCAL, AF_LINUX....
-	int								type;		// type TCP,UDP... SOCK_STREAM, SOCK_DGRAM
-	int								max_client;
-	uint16_t						port;
-	bool							active;
-	bool							prepare;
-	std::map<int, std::string>		error_page;
-};
 
 class Webserv
 {
@@ -91,6 +75,8 @@ class Webserv
 		fd_set&				get_writefd();
 		fd_set&				get_readfd();
 		timeval&			timeout();
+
+		Client				make_client();
 
 		// TRHOW
 		class err_init : public std::exception

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/18 22:01:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/19 23:19:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ void	Webserv::stop(std::vector<config>::iterator &server)
 	{
 		if (!::close(server->sock_fd))
 			return; //throw ("intern problem.");
+		server->sock_fd = -1;
 		std::cout << "Closed..." << std::endl;
 	}
 	else
@@ -294,7 +295,7 @@ std::vector<config>::iterator	Webserv::end()
 
 void	Webserv::add(std::multimap<std::string, std::string> server)
 {
-	config	ret = {"","","","",{},0,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
+	config	ret = {"","","","",{},-1,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
 	for (std::multimap<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
 		if (!it->first.compare("BLOCK") && !it->second.compare("server"))
@@ -495,4 +496,16 @@ timeval&	Webserv::timeout()
 	this->_timeout.tv_sec = 1;
 	this->_timeout.tv_usec = 0;
 	return (this->_timeout);
+}
+
+Client	Webserv::make_client()
+{
+	for (std::vector<config>::iterator it = this->servers.begin(); it != this->servers.end(); it++)
+	{
+		if (FD_ISSET(it->sock_fd, &this->readfd))
+		{
+			Client *ret = new Client(*it);
+			ret->set_sock(it->sock_fd);
+		}
+	}
 }

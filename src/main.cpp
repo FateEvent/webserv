@@ -6,11 +6,13 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/18 22:43:58 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/19 23:31:15 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+//#include "../include/common.h"
 #include "../include/Webserv.hpp"
+
 bool Webserv::created = false;
 fd_set		Webserv::readfd;
 fd_set		Webserv::writefd;
@@ -94,7 +96,7 @@ int	main(int ac, char **av)
 	std::cout << "Prepare instance." << std::endl;
 //	for (std::vector<struct config>::iterator ginfo = test.begin(); ginfo != test.end(); ginfo++)
 //	{
-		std::vector<struct config>::iterator ginfo = test.begin();
+		std::vector<::config>::iterator ginfo = test.begin();
 		test.prepare_all(ginfo);
 //	}
 
@@ -129,6 +131,7 @@ int	main(int ac, char **av)
 		std::cout << std::to_string(test.get_greaterfd()) << std::endl;
 		if (recept)
 		{
+			nsocket = accept(fd,&addr, len);
 			/* In Webserv class
 				Search the fd as receipt data with FD_ISSET,
 				create a new class Client with the config of the instance with accept,
