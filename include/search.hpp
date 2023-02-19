@@ -30,14 +30,6 @@ namespace ft {
 	int						config_file_reader(std::vector<t_search> &arr);
 	int						cut_multiple_blocks(string_map &map);
 	int						bracket_parser(char opening, char closure);
-
-	// old functions to delete
-	string_vector	block_cleaner(std::string str);
-	void			comments_cleaner(string_map &map);
-	string_pair		string_parser(std::string str);
-	string_map		clean_string(std::string target, string_vector &arr, string_map &map);
-	string_map		split_string(std::string target, string_vector &arr);
-//	string_map		cut_block(std::string target, string_vector &arr);
 }
 
 #endif

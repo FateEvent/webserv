@@ -6,44 +6,44 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/18 23:13:41 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/19 15:53:41 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /*
 ** The bracket_parser() function verifies that opening and closing brackets
 ** are present.
-** 
+**
 ** Return value: The bracket_parser() function returns 1 in case of error, 0
 ** otherwise.
-** 
+**
 ** The search() function looks for a target string in a file and pushes in a
 ** vector every line included between the opening and the closure characters.
-** 
+**
 ** Return value: The search() function returns -1 in case the file can't be
 ** opened, and the number of the line of the config file where it stopped
 ** otherwise.
-** 
+**
 ** The config_file_reader() function reads the config file and fills the
 ** vector passed as a parameter with a structure containing the target keys
 ** and the number of the line in the file.
-** 
+**
 ** Return value: The config_file_reader() function returns 1 in case of error,
 ** 0 otherwise.
-** 
+**
 ** The cut_block() function creates a multimap containing the block name as
 ** the key and the block as a value.
 **
 ** Return value: The cut_block() function returns a pair made up of the
 ** block name as the key and the block as a value.
-** 
+**
 ** The cut_multiple_blocks() function returns a map containing the structure
 ** blocks located in the config file.
 **
-** The string_parser() function makes a key-value pair from a string line.
+** The string_parser() function makes a key-value pair out of a string line.
 **
-** The block_parser() function makes a key-value pair from a struct block.
-** 
+** The block_parser() function makes a key-value pair out of a struct block.
+**
 ** The split_block() function makes a multimap out of the string block passed
 ** as a parameter. It makes use of the string_parser() function and the
 ** block_parser() function.
@@ -51,11 +51,11 @@
 ** The find_char() function looks for a character in a particular line of a
 ** block of text; it takes as a parameter a string (containing the newline
 ** character '\n'), the character to research and the line number.
-** 
+**
 ** Return value: The find_char() function returns a size_t indicating the
 ** position of the character on the line or the npos character (defined in
 ** the header <string>, the maximum size of a size_t).
-** 
+**
 ** The comments_cleaner() function takes out the comments (indicated by a
 ** '#' character) from a string.
 */
@@ -73,7 +73,7 @@ void	comments_cleaner(std::multimap<std::string, std::string> &map)
 	}
 }
 
-std::pair<std::string, std::string>	block_parser(std::string str, std::string::size_type &i)
+std::pair<std::string, std::string>	block_parser(std::string str, char closure, std::string::size_type &i)
 {
 	std::string				key;
 	std::string				val;
@@ -86,7 +86,7 @@ std::pair<std::string, std::string>	block_parser(std::string str, std::string::s
 		key += str[i];
 		++i;
 	}
-	pos = str.find_last_of('}');
+	pos = str.find_last_of(closure);
 	while (str[i] && i < pos)
 	{
 		if (!::isspace(str[i]))
@@ -100,7 +100,7 @@ std::pair<std::string, std::string>	block_parser(std::string str, std::string::s
 	return (std::make_pair(key, val));
 }
 
-std::pair<std::string, std::string>	string_parser(std::string str, std::string::size_type i)
+std::pair<std::string, std::string>	string_parser(std::string str, char closure, std::string::size_type i)
 {
 	std::string				key;
 	std::string				val;
@@ -113,7 +113,7 @@ std::pair<std::string, std::string>	string_parser(std::string str, std::string::
 		key += str[i];
 		++i;
 	}
-	pos = str.find('}');
+	pos = str.find(closure);
 	while (str[i] && i <= pos)
 	{
 		if (!::isspace(str[i]))
@@ -142,7 +142,7 @@ std::string::size_type	find_char(std::string str, char c, std::string::size_type
 	return (std::string::npos);
 }
 
-std::multimap<std::string, std::string>	split_block(std::string str)
+std::multimap<std::string, std::string>	split_block(std::string str, char opening, char closure)
 {
 	std::multimap<std::string, std::string>	map;
 	std::string								key;
@@ -153,24 +153,24 @@ std::multimap<std::string, std::string>	split_block(std::string str)
 
 	while (str[i] && ::isspace(str[i]))
 		++i;
-	if (str[i] == '{')
+	if (str[i] == opening)
 	{
 		++i;
 		while (str[i] && ::isspace(str[i]))
 			++i;
 		while (str[i])
 		{
-			std::string::size_type	pos = find_char(str, '{', i);
+			std::string::size_type	pos = find_char(str, opening, i);
 			if (pos != std::string::npos)
 			{
-				map.insert(block_parser(str, i));
+				map.insert(block_parser(str, closure, i));
 			}
 			else if (str[i] == '\n')
 			{
-				map.insert(string_parser(str, i - line_length));
+				map.insert(string_parser(str, closure, i - line_length));
 				line_length = 0;
 			}
-			if (str[i] == '}')
+			if (str[i] == closure)
 			{
 				++i;
 				++line_length;
@@ -188,7 +188,7 @@ std::multimap<std::string, std::string>	split_block(std::string str)
 			key += str[i];
 			++i;
 		}
-		pos = str.find('}');
+		pos = str.find(closure);
 		while (str[i] && i <= pos)
 		{
 			if (!::isspace(str[i]))
@@ -204,7 +204,7 @@ std::multimap<std::string, std::string>	split_block(std::string str)
 	return (map);
 }
 
-std::pair<std::string, std::string>	cut_block(std::string target, std::vector<std::string> &arr)
+std::pair<std::string, std::string>	cut_block(std::string target, char opening, std::vector<std::string> &arr)
 {
 	std::string	key;
 	std::string	val;
@@ -213,7 +213,7 @@ std::pair<std::string, std::string>	cut_block(std::string target, std::vector<st
 
 	(*first).erase(std::remove_if((*first).begin(), (*first).begin() + pos, ::isspace), (*first).begin() + pos);
 	key = (*first).substr(0, target.length());
-	pos = (*first).find('{');
+	pos = (*first).find(opening);
 	if (pos == std::string::npos)
 	{
 		++first;
@@ -312,18 +312,19 @@ int	config_file_reader(std::vector<t_search> &arr)
 	return (0);
 }
 
-int	cut_multiple_blocks(std::multimap<std::string, std::string> &map)
+int	cut_multiple_blocks(char opening, char closure, std::multimap<std::string, std::string> &map)
 {
-	std::vector<t_search>		arr;
+	std::vector<t_search>		conf_arr;
 	std::vector<std::string>	str_arr;
 	std::string					key;
 	std::string					val;
-	if (config_file_reader(arr) == 0)
+
+	if (config_file_reader(conf_arr) == 0)
 	{
-		for (std::vector<t_search>::iterator	first = arr.begin(); first != arr.end(); ++first)
+		for (std::vector<t_search>::iterator	first = conf_arr.begin(); first != conf_arr.end(); ++first)
 		{
-			search(first->target, '{', '}', str_arr, first->line);
-			map.insert(cut_block(first->target, str_arr));
+			search(first->target, opening, closure, str_arr, first->line);
+			map.insert(cut_block(first->target, opening, str_arr));
 			str_arr.clear();
 		}
 		return (0);
@@ -362,17 +363,16 @@ int	main()
 	std::multimap<std::string, std::string>	block_map;
 	std::multimap<std::string, std::string>	map;
 	std::vector<std::string>				arr;
-	std::string target = "http";
 
 	int i = bracket_parser('{', '}');
 	std::cout << "brackets: " << i << std::endl;
 	if (i >= 0)
 	{
 		std::cout << " --- the blocks --- " << std::endl;
-		cut_multiple_blocks(block_map);
+		cut_multiple_blocks('{', '}', block_map);
 		for (std::map<std::string, std::string>::iterator	first = block_map.begin(); first != block_map.end(); ++first)
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
-		map = split_block(block_map.find("server")->second);
+		map = split_block(block_map.find("server")->second, '{', '}');
 		comments_cleaner(map);
 		std::cout << " --- the result --- " << std::endl;
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
@@ -380,7 +380,7 @@ int	main()
 
 		std::cout << " --- mais encore --- " << std::endl;
 		std::multimap<std::string, std::string>::iterator	pos = map.find("location");
-		map = split_block(pos->second);
+		map = split_block(pos->second, '{', '}');
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
 	}
