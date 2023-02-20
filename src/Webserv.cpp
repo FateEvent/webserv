@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/19 23:19:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/20 20:31:37 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,29 @@ Webserv::Webserv(std::multimap<std::string, std::string>& config) : nbr_server(0
 	this->created = true;
 	std::multimap<std::string, std::string>::iterator it = config.begin();
 	if (!it->first.compare("BLOCK") && !it->second.compare("http"))
+	{
 		this->mainconfig = config;
+
+		// Convert IP to uint32 for sockaddr
+		unsigned int ip[4];
+		if (!sscanf(this->_base.ip.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
+			throw ("IP bad host in config file");
+		//Do sockaddr_in
+		this->_base.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
+									(ip[1] % 256 << 8 | 0) |\
+									(ip[2] % 256 << 16 | 0) |\
+									(ip[3] % 256 << 24 | 0);
+		this->_base.addr.sin_family = AF_INET;
+		this->_base.type = SOCK_STREAM;
+		this->_base.addr.sin_port = htons(this->_base.port);
+		// Do socket, bind and listen on general port (usualy on port 80)
+		this->_sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
+		::bind(this->_sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr));
+		::listen(this->_sock_fd, this->_base.max_client);
+		// Set prepare and active on true
+		this->_base.prepare = true;
+		this->_base.active = true;
+	}
 	else
 		throw err_init();
 }
@@ -56,10 +78,13 @@ void	Webserv::prepare_all(std::vector<config>::iterator &instance)
  */
 void	Webserv::prepare(std::vector<config>::iterator &instance)
 {
-	if (instance->prepare == false && (instance->sock_fd = socket(instance->addr.sin_family, instance->type, 0)))
-	//socket(instance->addr.sin_family, instance->type, instance->addr.sin_addr.s_addr)))
-		instance->prepare = true;
-	else
+	if (instance->prepare == false && instance->port != 80)
+	{
+		if (instance->sock_fd = socket(instance->addr.sin_family, instance->type, 0)))
+			//socket(instance->addr.sin_family, instance->type, instance->addr.sin_addr.s_addr)))
+			instance->prepare = true;
+	}
+		else
 		std::cout << "Info: " + instance->name + " have already a socket!" << std::endl;
 }
 
@@ -90,7 +115,7 @@ void	Webserv::add(std::vector<std::multimap<std::string, std::string> > &server)
  */
 void	Webserv::stop(std::vector<config>::iterator &server)
 {
-	if (server->active == true)
+	if (server->active == true && server->port != 80)
 	{
 		if (!::close(server->sock_fd))
 			return; //throw ("intern problem.");
@@ -132,7 +157,7 @@ void	Webserv::stop_all(std::vector<config>::iterator &server)
  */
 void	Webserv::bind(std::vector<config>::iterator &bind)
 {
-	int	res;
+	int	res = 0;
 
 	if (bind->sock_fd)
 	{
@@ -140,7 +165,8 @@ void	Webserv::bind(std::vector<config>::iterator &bind)
 		//htonl(INADDR_LOOPBACK);
 		//inet_addr("127.0.0.1");
 		//bind->addr.sin_addr.s_addr = htonl(INADDR_ANY);
-		res = ::bind(bind->sock_fd, reinterpret_cast<sockaddr *>(&bind->addr), sizeof(bind->addr));
+		if (bind->port != 80)
+			res = ::bind(bind->sock_fd, reinterpret_cast<sockaddr *>(&bind->addr), sizeof(bind->addr));
 		if (res)
 		{
 			bind->active = false;

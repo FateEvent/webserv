@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/19 23:28:58 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/20 20:31:38 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,14 @@ class Webserv
 	private:
 		Webserv() {};
 		Webserv(Webserv &) {};
+		int										_sock_fd;
 		Webserv&								operator=(Webserv const&);
 		std::multimap<std::string, std::string>	mainconfig; // principal config
 		std::vector<config>						servers;
 		unsigned int							nbr_server;
 		std::map<int, Client>			 	 	client;
 		void									check_instance(config &);
+		config									_base;
 		timeval									_timeout;
 
 	public:
