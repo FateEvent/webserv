@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/21 21:27:11 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/21 21:58:40 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,15 @@ int	main(int ac, char **av)
 	conf.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
 	conf.insert(std::pair<std::string, std::string>("time_out", "120"));
 	conf.insert(std::pair<std::string, std::string>("default", "10.12.3.16"));
-	conf.insert(std::pair<std::string, std::string>("listen", "80"));
+	// IF DONT WORK LIKE THIS MAYBE NEED ROOT USER TO LISTEN ON PORT 80
+	conf.insert(std::pair<std::string, std::string>("listen", "80")); // PORT 80 WITH A LOCALHOST ADDRESS (127.0.0.1) DONT WORK.
 	conf.insert(std::pair<std::string, std::string>("index", "index.html"));
 
 	std::map<std::string, std::string> server1;
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
 	server1.insert(std::pair<std::string, std::string>("host", "10.12.3.16"));
 	server1.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server1.insert(std::pair<std::string, std::string>("listen", "1205"));
+	server1.insert(std::pair<std::string, std::string>("listen", "1234"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server1.insert(std::pair<std::string, std::string>("root", "/web1/"));
 
@@ -43,7 +44,7 @@ int	main(int ac, char **av)
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
 	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
-	server2.insert(std::pair<std::string, std::string>("listen", "320"));
+	server2.insert(std::pair<std::string, std::string>("listen", "1024"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
 

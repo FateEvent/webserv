@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/21 21:25:23 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/21 21:40:15 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ Webserv::Webserv(std::multimap<std::string, std::map<std::string, std::string> >
 	this->_base.root.assign(it.find("root")->second);
 	this->_base.index.assign(it.find("index_page")->second);
 	this->_base.ip.assign(it.find("default")->second);
-	this->_base.port = std::strtoul(it.find("listen")->second.data(), NULL, 10);
+	this->_base.port = std::stoul(it.find("listen")->second.data(), NULL, 10);
 	{
 	unsigned int ip[4];
 	if (!sscanf(this->_base.ip.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
