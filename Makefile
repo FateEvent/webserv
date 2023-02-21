@@ -1,8 +1,10 @@
 NAME		=	webserv
 CC			=	c++
 FLAGS		=	-Wall -Werror -Wextra -std=c++11
-INCLUDES	=	./include/Webserv.hpp
+INCLUDES	=	./include/common.h \
+				./include/Webserv.hpp
 FILES		=	Webserv.cpp \
+				Client.cpp \
 				main.cpp
 RM			=	rm -rf
 SRCS		=	$(addprefix ./src/, $(FILES))
