@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/20 20:31:38 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/21 21:02:33 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,38 +39,36 @@ class Webserv
 	private:
 		Webserv() {};
 		Webserv(Webserv &) {};
-		int										_sock_fd;
-		Webserv&								operator=(Webserv const&);
-		std::multimap<std::string, std::string>	mainconfig; // principal config
-		std::vector<config>						servers;
-		unsigned int							nbr_server;
-		std::map<int, Client>			 	 	client;
-		void									check_instance(config &);
-		config									_base;
-		timeval									_timeout;
+		Webserv&										operator=(Webserv const&);
+		std::map<std::string, config>					_servers;
+		unsigned int									_nbr_server;
+		std::map<int, Client>			 	 			_client;
+		void											_check_instance(config &);
+		config											_base;
+		timeval											_timeout;
 
 	public:
-		Webserv(std::multimap<std::string, std::string> &);
+		Webserv(std::multimap<std::string, std::map<std::string, std::string> > &);
 		~Webserv();
-		void				add(std::vector<std::multimap<std::string, std::string> > &);
-		void				add(std::multimap<std::string, std::string>);
-		void 				remove(std::vector<config>::iterator &);
+		void				add(std::multimap<std::string, std::map<std::string, std::string> > &);
+		void				add(std::map<std::string, std::string> &);
+		void 				remove(std::map<std::string, config>::iterator &);
 
 		// INFO
 		unsigned			get_nbr_server() const;
 		std::string			get_info_server() const;
 		std::string			get_info_instance() const;
-		std::string			get_info_on(std::vector<config>::const_iterator &) const;
+		std::string			get_info_on(const config &) const;
 		int					get_greaterfd() const;
 
 		// SOCKET
-		void				prepare_all(std::vector<config>::iterator &);
-		void				prepare(std::vector<config>::iterator &);
-		void				bind_all(std::vector<config>::iterator &);
-		void				bind(std::vector<config>::iterator &);
-		void				close(std::vector<config>::iterator &); // close connexion qnd remove instance
-		void				stop(std::vector<config>::iterator &);
-		void				stop_all(std::vector<config>::iterator &);
+		void				prepare_all();
+		void				prepare(config &);
+		void				bind_all();
+		void				bind(config &);
+		void				close(std::map<std::string, config>::iterator &); // close connexion qnd remove instance
+		void				stop(config &);
+		void				stop_all();
 		void				listen(config &);
 		void				listen_all();
 		void				fd_rst();
@@ -78,7 +76,7 @@ class Webserv
 		fd_set&				get_readfd();
 		timeval&			timeout();
 
-		Client				make_client();
+		//Client				make_client();
 
 		// TRHOW
 		class err_init : public std::exception
@@ -87,9 +85,8 @@ class Webserv
 		};
 
 		// Operator
-		std::vector<config>::iterator begin();
-		std::vector<config>::iterator end();
-		config	operator[](size_t);
+		std::map<std::string, config>::iterator begin();
+		std::map<std::string, config>::iterator end();
 
 	protected:
 		static bool			created;

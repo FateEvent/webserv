@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/19 23:31:15 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/21 21:27:11 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,37 +20,36 @@ fd_set		Webserv::errfd;
 
 int	main(int ac, char **av)
 {
-	// Config webserb test - Not server instance!!
-	std::multimap<std::string, std::string> config;
-	config.insert(std::pair<std::string, std::string>("BLOCK", "http"));
-	config.insert(std::pair<std::string, std::string>("max_connect", "1000"));
-	config.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
-	config.insert(std::pair<std::string, std::string>("time_out", "120"));
-	config.insert(std::pair<std::string, std::string>("default", "127.0.0.1"));
-	config.insert(std::pair<std::string, std::string>("index", "index.html"));
 
-	// Config instance test
-	std::vector<std::multimap<std::string, std::string> > instance;
-	std::multimap<std::string, std::string> server1;
-	server1.insert(std::pair<std::string, std::string>("BLOCK", "server"));
+	std::multimap<std::string, std::map<std::string, std::string> > config;
+	// Config webserb test - Not server instance!!
+	std::map<std::string, std::string> conf;
+	conf.insert(std::pair<std::string, std::string>("max_client", "100"));
+	conf.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
+	conf.insert(std::pair<std::string, std::string>("time_out", "120"));
+	conf.insert(std::pair<std::string, std::string>("default", "10.12.3.16"));
+	conf.insert(std::pair<std::string, std::string>("listen", "80"));
+	conf.insert(std::pair<std::string, std::string>("index", "index.html"));
+
+	std::map<std::string, std::string> server1;
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
-	server1.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
+	server1.insert(std::pair<std::string, std::string>("host", "10.12.3.16"));
 	server1.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server1.insert(std::pair<std::string, std::string>("listen", "800"));
+	server1.insert(std::pair<std::string, std::string>("listen", "1205"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server1.insert(std::pair<std::string, std::string>("root", "/web1/"));
 
-	std::multimap<std::string, std::string> server2;
-	server2.insert(std::pair<std::string, std::string>("BLOCK", "server"));
+	std::map<std::string, std::string> server2;
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server2.insert(std::pair<std::string, std::string>("host", "192.168.1.99"));
-	server2.insert(std::pair<std::string, std::string>("listen", "8080"));
+	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
+	server2.insert(std::pair<std::string, std::string>("listen", "320"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
 
-	instance.push_back(server1);
-	instance.push_back(server2);
+	config.insert(std::make_pair("http", conf));
+	config.insert(std::make_pair("server", server1));
+	config.insert(std::make_pair("server", server2));
 
 	std::cout << "Start" << std::endl;
 	std::cout << "Creating class webserv." << std::endl;
@@ -83,7 +82,7 @@ int	main(int ac, char **av)
 	
  */
 	std::cout << "Add vector of instance" << std::endl;
-	test.add(instance);
+	test.add(config);
 
 	std::cout << "Number of instances: " << test.get_nbr_server() << std::endl;
 	
@@ -96,15 +95,13 @@ int	main(int ac, char **av)
 	std::cout << "Prepare instance." << std::endl;
 //	for (std::vector<struct config>::iterator ginfo = test.begin(); ginfo != test.end(); ginfo++)
 //	{
-		std::vector<::config>::iterator ginfo = test.begin();
-		test.prepare_all(ginfo);
+		test.prepare_all();
 //	}
 
 /* 	std::cout << "Get all instances info." << std::endl;
 	std::cout << test.get_info_instance() << std::endl; */
-
-	ginfo = test.begin();
-	test.bind_all(ginfo);
+	//std::map<std::string, config>::iterator ginfo = test.begin();
+	test.bind_all();
 
 	std::cout << "Get all instances info." << std::endl;
 	std::cout << test.get_info_instance() << std::endl;
@@ -131,7 +128,7 @@ int	main(int ac, char **av)
 		std::cout << std::to_string(test.get_greaterfd()) << std::endl;
 		if (recept)
 		{
-			nsocket = accept(fd,&addr, len);
+			//nsocket = accept(fd,&addr, len);
 			/* In Webserv class
 				Search the fd as receipt data with FD_ISSET,
 				create a new class Client with the config of the instance with accept,
@@ -144,8 +141,8 @@ int	main(int ac, char **av)
 			std::cout << "Data recept: " << std::endl;
 		}
 	}
-	ginfo = test.begin();
-	test.stop_all(ginfo);
+//	ginfo = test.begin();
+	test.stop_all();
 	
 	(void) ac;
 	(void) av;

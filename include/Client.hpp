@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/20 00:04:14 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/21 09:40:37 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ class Client
 		socklen_t		_socklen;
 		const config&	_ref_conf;
 		timeval			_timeout;
-		static fd_set	readfd;
-		static fd_set	writefd;
+		fd_set	_readfd;
+		fd_set	_writefd;
 
 	public:
 		Client(const config&);
