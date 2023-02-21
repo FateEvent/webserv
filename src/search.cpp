@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/19 16:04:23 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/21 16:04:35 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ std::string::size_type	find_char(std::string str, char c, std::string::size_type
 	return (std::string::npos);
 }
 
-std::multimap<std::string, std::string>	split_block(std::string str, char opening, char closure)
+std::multimap<std::string, std::string>	split_block(std::multimap<std::string, std::string>::iterator it, char opening, char closure)
 {
 	std::multimap<std::string, std::string>	map;
 	std::string								key;
@@ -150,7 +150,9 @@ std::multimap<std::string, std::string>	split_block(std::string str, char openin
 	std::string::size_type					i(0);
 	std::string::size_type					line_length(0);
 	std::string::size_type					pos(0);
+	std::string								str(it->second);
 
+	map.insert(std::make_pair(it->first, it->second));
 	while (str[i] && ::isspace(str[i]))
 		++i;
 	if (str[i] == opening)
@@ -367,7 +369,7 @@ int	main()
 
 	int i = bracket_parser('{', '}');
 	std::cout << "brackets: " << i << std::endl;
-	if (i >= 0)
+	if (i == 0)
 	{
 		std::cout << " --- the blocks --- " << std::endl;
 		cut_multiple_blocks('{', '}', block_map);
@@ -376,14 +378,14 @@ int	main()
 
 		// here I split the block "server", for example
 		std::cout << " --- splitting the block 'server' --- " << std::endl;
-		map = split_block(block_map.find("server")->second, '{', '}');
+		map = split_block(block_map.find("server"), '{', '}');
 		comments_cleaner(map);
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
 
 		// with the same function I split the block "location"
 		std::cout << " --- splitting the block 'location' --- " << std::endl;
-		map = split_block(map.find("location")->second, '{', '}');
+		map = split_block(map.find("location"), '{', '}');
 		for (std::multimap<std::string, std::string>::iterator	first = map.begin(); first != map.end(); ++first)
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
 	}
