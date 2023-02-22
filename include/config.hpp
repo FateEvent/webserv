@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 15:03:16 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/13 15:58:25 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/22 16:35:56 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 struct	import_config
 {
-	std::vector<std::map<std::string, std::string> >	raw;
+	std::vector<std::multimap<std::string, std::string> >	raw;
 };
 
 #endif

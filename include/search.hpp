@@ -20,15 +20,15 @@ namespace ft {
 	typedef std::multimap<std::string, std::string>	string_map;
 	typedef std::pair<std::string, std::string>		string_pair;
 
-	void					comments_cleaner(string_map &map);
-	string_pair				block_parser(std::string str, std::string::size_type &i);
-	string_pair				string_parser(std::string str, std::string::size_type i);
+	void					comments_cleaner(std::multimap<std::string, std::string> &map);
+	string_pair				block_parser(std::string str, char closure, std::string::size_type &i);
+	string_pair				string_parser(std::string str, char closure, std::string::size_type i);
 	std::string::size_type	find_char(std::string str, char c, std::string::size_type i);
-	string_map				split_block(std::multimap<std::string, std::string>::iterator it, char opening, char closure)
-	string_pair				cut_block(std::string target, std::vector<std::string> &arr);
+	string_map				split_block(std::multimap<std::string, std::string>::iterator it, char opening, char closure);
+	string_pair				cut_block(std::string target, char opening, std::vector<std::string> &arr);
 	ssize_t					search(std::string target, char opening, char closure, string_vector &arr, ssize_t l = 0);
-	int						config_file_reader(std::vector<t_search> &arr);
-	int						cut_multiple_blocks(string_map &map);
+	int						config_file_reader(std::vector<t_search> &arr, char opening, char closure);
+	int						cut_multiple_blocks(char opening, char closure, std::multimap<std::string, std::string> &map);
 	int						bracket_parser(char opening, char closure);
 }
 

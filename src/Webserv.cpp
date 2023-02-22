@@ -6,20 +6,20 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 10:35:45 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/22 17:12:31 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Webserv.hpp"
 
-Webserv::Webserv(std::multimap<std::string, std::map<std::string, std::string> >& config) : _nbr_server(0)
+Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::string> >& config) : _nbr_server(0)
 {
 	if (this->created)
 		throw err_init();
 	if (config.find("http") == config.end())
 		throw err_init(); //("No default configuration set in config file.");
-	std::multimap<std::string, std::map<std::string, std::string> >::iterator itconfig = config.find("http");
-	std::map<std::string, std::string> it = itconfig->second;
+	std::multimap<std::string, std::multimap<std::string, std::string> >::iterator itconfig = config.find("http");
+	std::multimap<std::string, std::string> it = itconfig->second;
 	//this->_mainconfig = config;
 		// Convert IP to uint32 for sockaddr
 	this->_base.name.assign("Default");
@@ -109,9 +109,9 @@ void	Webserv::prepare(config &instance)
  * 
  * @param server Iterator of vector of multimap<string, string>
  */
-void	Webserv::add(std::multimap<std::string, std::map<std::string, std::string> > &server)
+void	Webserv::add(std::multimap<std::string, std::multimap<std::string, std::string> > &server)
 {
-	for (std::multimap<std::string, std::map<std::string, std::string> >::iterator it = server.begin(); it != server.end(); it++)
+	for (std::multimap<std::string, std::multimap<std::string, std::string> >::iterator it = server.begin(); it != server.end(); it++)
 	{
 		if (it->first.compare("server") == 0)
 		{
@@ -337,7 +337,7 @@ std::map<std::string, config>::iterator	Webserv::end()
 /*                                                                            */
 /* ************************************************************************** */
 
-void	Webserv::add(std::map<std::string, std::string> &server)
+void	Webserv::add(std::multimap<std::string, std::string> &server)
 {
 	config	ret = {"","","","",{},-1,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
 	for (std::map<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
@@ -382,6 +382,7 @@ void	Webserv::add(std::map<std::string, std::string> &server)
 		}
 		else if (!it->first.compare("type"))
 		{
+			std::cout << it->second << '$' << std::endl;
 			if (!it->second.compare("tcp"))
 				ret.type = SOCK_STREAM;
 			else if (!it->second.compare("udp"))
@@ -426,7 +427,7 @@ void	Webserv::add(std::map<std::string, std::string> &server)
 		}
 		else
 		{
-			throw ("Unknow parameter in config file!");
+			throw ("Unknown parameter in config file!");
 		}
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}

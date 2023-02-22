@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/21 21:58:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/22 18:01:58 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,16 @@ fd_set		Webserv::errfd;
 
 int	main(int ac, char **av)
 {
+	std::multimap<std::string, std::string>	block_map;
+	std::pair<std::multimap<std::string, std::string>::iterator, std::multimap<std::string, std::string>::iterator>	ret;
 
-	std::multimap<std::string, std::map<std::string, std::string> > config;
+	ft::cut_multiple_blocks('{', '}', block_map);
+	ret = block_map.equal_range("server");
+
+	std::multimap<std::string, std::multimap<std::string, std::string> > config;
 	// Config webserb test - Not server instance!!
-	std::map<std::string, std::string> conf;
+	std::multimap<std::string, std::string> conf(ft::split_block(block_map.find("http"), '{', '}'));
+/*	
 	conf.insert(std::pair<std::string, std::string>("max_client", "100"));
 	conf.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
 	conf.insert(std::pair<std::string, std::string>("time_out", "120"));
@@ -31,23 +37,25 @@ int	main(int ac, char **av)
 	// IF DONT WORK LIKE THIS MAYBE NEED ROOT USER TO LISTEN ON PORT 80
 	conf.insert(std::pair<std::string, std::string>("listen", "80")); // PORT 80 WITH A LOCALHOST ADDRESS (127.0.0.1) DONT WORK.
 	conf.insert(std::pair<std::string, std::string>("index", "index.html"));
-
-	std::map<std::string, std::string> server1;
+*/
+	std::multimap<std::string, std::string> server1(ft::split_block(ret.first, '{', '}'));
+/*
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
 	server1.insert(std::pair<std::string, std::string>("host", "10.12.3.16"));
 	server1.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
 	server1.insert(std::pair<std::string, std::string>("listen", "1234"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server1.insert(std::pair<std::string, std::string>("root", "/web1/"));
-
-	std::map<std::string, std::string> server2;
+*/
+	std::multimap<std::string, std::string> server2(ft::split_block(++ret.first, '{', '}'));
+/*
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
 	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
 	server2.insert(std::pair<std::string, std::string>("listen", "1024"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
-
+*/
 	config.insert(std::make_pair("http", conf));
 	config.insert(std::make_pair("server", server1));
 	config.insert(std::make_pair("server", server2));
