@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 19:10:42 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/22 23:49:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,16 @@ int	Client::get_sockfd() const
 
 void	Client::test_client()
 {
-	//char buffer[this->_socklen];
-	char buffer[10000];
-	int charcount = read(this->_sock_fd, &buffer, 10000);
-	if (charcount)
-		std::cout << buffer << std::endl;
+	char buffer[4096];
+	std::string	header;
+	int i = -1;
+
+	while (i == -1 || i == 4095)
+	{
+		i = recv(this->_sock_fd, &buffer, 4095, 0);
+		header.append(buffer);
+		memset(buffer, 0, 4096);
+	}
+	std::cout << header << std::endl;
 	sendto(this->_sock_fd, "SALUT", 6, MSG_OOB, NULL, 0);
 }

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 12:07:06 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/22 22:15:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <cstring>
 #include <time.h>
 #include <sys/types.h>
+#include <string>
 #include <map>
 #include <vector>
 #include <list>

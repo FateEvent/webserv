@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 19:10:44 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/22 22:42:30 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,24 +21,25 @@ fd_set		Webserv::errfd;
 int	main(int ac, char **av)
 {
 
-	std::multimap<std::string, std::map<std::string, std::string> > config;
+	std::multimap<std::string, std::multimap<std::string, std::string> > config;
 	// Config webserb test - Not server instance!!
-	std::map<std::string, std::string> conf;
+	std::multimap<std::string, std::string> conf;
 	conf.insert(std::pair<std::string, std::string>("max_client", "100"));
 	conf.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
 	conf.insert(std::pair<std::string, std::string>("time_out", "120"));
-	conf.insert(std::pair<std::string, std::string>("listen", "80")); // LISTEN ON ALL IP.
-	conf.insert(std::pair<std::string, std::string>("index", "index.html"));
+	conf.insert(std::pair<std::string, std::string>("listen", "8080")); // LISTEN ON ALL IP.
+	conf.insert(std::pair<std::string, std::string>("root", "/www/"));
+	conf.insert(std::pair<std::string, std::string>("index_page", "index.html"));
 
-	std::map<std::string, std::string> server1;
+	std::multimap<std::string, std::string> server1;
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
-	server1.insert(std::pair<std::string, std::string>("host", "10.12.3.16"));
+	server1.insert(std::pair<std::string, std::string>("host", "192.168.1.99"));
 	server1.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
 	server1.insert(std::pair<std::string, std::string>("listen", "1234"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server1.insert(std::pair<std::string, std::string>("root", "/web1/"));
 
-	std::map<std::string, std::string> server2;
+	std::multimap<std::string, std::string> server2;
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
 	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
