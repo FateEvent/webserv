@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   search.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/21 16:04:35 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/22 10:48:03 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -390,3 +390,5 @@ int	main()
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
 	}
 }
+
+ft::
