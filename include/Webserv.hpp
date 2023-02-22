@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 10:35:41 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/22 16:34:36 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@
 
 #include "../include/common.h"
 #include "../include/Client.hpp"
+# include "../include/search.hpp"
 
 class Webserv
 {
@@ -48,10 +49,10 @@ class Webserv
 		timeval											_timeout;
 
 	public:
-		Webserv(std::multimap<std::string, std::map<std::string, std::string> > &);
+		Webserv(std::multimap<std::string, std::multimap<std::string, std::string> > &);
 		~Webserv();
-		void				add(std::multimap<std::string, std::map<std::string, std::string> > &);
-		void				add(std::map<std::string, std::string> &);
+		void				add(std::multimap<std::string, std::multimap<std::string, std::string> > &);
+		void				add(std::multimap<std::string, std::string> &);
 		void 				remove(std::map<std::string, config>::iterator &);
 
 		// INFO

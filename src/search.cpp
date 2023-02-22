@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/22 10:48:03 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/22 18:26:23 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@
 
 #include "../include/search.hpp"
 
-void	comments_cleaner(std::multimap<std::string, std::string> &map)
+void	ft::comments_cleaner(std::multimap<std::string, std::string> &map)
 {
 	for (std::multimap<std::string, std::string>::iterator	first = map.begin();
 		first != map.end(); ++first)
@@ -73,7 +73,7 @@ void	comments_cleaner(std::multimap<std::string, std::string> &map)
 	}
 }
 
-std::pair<std::string, std::string>	block_parser(std::string str, char closure, std::string::size_type &i)
+std::pair<std::string, std::string>	ft::block_parser(std::string str, char closure, std::string::size_type &i)
 {
 	std::string				key;
 	std::string				val;
@@ -100,7 +100,7 @@ std::pair<std::string, std::string>	block_parser(std::string str, char closure, 
 	return (std::make_pair(key, val));
 }
 
-std::pair<std::string, std::string>	string_parser(std::string str, char closure, std::string::size_type i)
+std::pair<std::string, std::string>	ft::string_parser(std::string str, char closure, std::string::size_type i)
 {
 	std::string				key;
 	std::string				val;
@@ -118,21 +118,22 @@ std::pair<std::string, std::string>	string_parser(std::string str, char closure,
 	{
 		if (!::isspace(str[i]))
 			val += str[i];
-		if (::isspace(str[i + 1]))
+		if (::isspace(str[i]) && !::isspace(str[i + 1]))
 			val += ' ';
 		++i;
 	}
 	pos = val.find(';');
 	if (pos != std::string::npos)
 		val.erase(pos);
+	std::cout << val << '$' << std::endl;
 	return (std::make_pair(key, val));
 }
 
-std::string::size_type	find_char(std::string str, char c, std::string::size_type i)
+std::string::size_type	ft::find_char(std::string str, char c, std::string::size_type i)
 {
 	std::string::size_type	count(0);
 
-	while (str[i] != '\n')
+	while (str[i] && str[i] != '\n')
 	{
 		if (str[i] == c)
 			return (count);
@@ -142,7 +143,7 @@ std::string::size_type	find_char(std::string str, char c, std::string::size_type
 	return (std::string::npos);
 }
 
-std::multimap<std::string, std::string>	split_block(std::multimap<std::string, std::string>::iterator it, char opening, char closure)
+std::multimap<std::string, std::string>	ft::split_block(std::multimap<std::string, std::string>::iterator it, char opening, char closure)
 {
 	std::multimap<std::string, std::string>	map;
 	std::string								key;
@@ -152,7 +153,7 @@ std::multimap<std::string, std::string>	split_block(std::multimap<std::string, s
 	std::string::size_type					pos(0);
 	std::string								str(it->second);
 
-	map.insert(std::make_pair(it->first, it->second));
+//	map.insert(std::make_pair(it->first, it->second));
 	while (str[i] && ::isspace(str[i]))
 		++i;
 	if (str[i] == opening)
@@ -165,11 +166,11 @@ std::multimap<std::string, std::string>	split_block(std::multimap<std::string, s
 			std::string::size_type	pos = find_char(str, opening, i);
 			if (pos != std::string::npos)
 			{
-				map.insert(block_parser(str, closure, i));
+				map.insert(ft::block_parser(str, closure, i));
 			}
 			else if (str[i] == '\n')
 			{
-				map.insert(string_parser(str, closure, i - line_length));
+				map.insert(ft::string_parser(str, closure, i - line_length));
 				line_length = 0;
 			}
 			if (str[i] == closure)
@@ -206,7 +207,7 @@ std::multimap<std::string, std::string>	split_block(std::multimap<std::string, s
 	return (map);
 }
 
-std::pair<std::string, std::string>	cut_block(std::string target, char opening, std::vector<std::string> &arr)
+std::pair<std::string, std::string>	ft::cut_block(std::string target, char opening, std::vector<std::string> &arr)
 {
 	std::string	key;
 	std::string	val;
@@ -233,7 +234,7 @@ std::pair<std::string, std::string>	cut_block(std::string target, char opening, 
 	return (std::make_pair(key, val));
 }
 
-ssize_t	search(std::string target, char opening, char closure, std::vector<std::string> &arr, ssize_t l = 0)
+ssize_t	ft::search(std::string target, char opening, char closure, std::vector<std::string> &arr, ssize_t l)
 {
 	std::ifstream	inFlux("config/local.conf");
 	std::string		buffer;
@@ -279,7 +280,7 @@ ssize_t	search(std::string target, char opening, char closure, std::vector<std::
 	return (line);
 }
 
-int	config_file_reader(std::vector<t_search> &arr, char opening, char closure)
+int	ft::config_file_reader(std::vector<t_search> &arr, char opening, char closure)
 {
 	std::ifstream				inFlux("config/local.conf");
 	std::string					buffer;
@@ -314,14 +315,14 @@ int	config_file_reader(std::vector<t_search> &arr, char opening, char closure)
 	return (0);
 }
 
-int	cut_multiple_blocks(char opening, char closure, std::multimap<std::string, std::string> &map)
+int	ft::cut_multiple_blocks(char opening, char closure, std::multimap<std::string, std::string> &map)
 {
 	std::vector<t_search>		conf_arr;
 	std::vector<std::string>	str_arr;
 	std::string					key;
 	std::string					val;
 
-	if (config_file_reader(conf_arr, opening, closure) == 0)
+	if (ft::config_file_reader(conf_arr, opening, closure) == 0)
 	{
 		for (std::vector<t_search>::iterator	first = conf_arr.begin(); first != conf_arr.end(); ++first)
 		{
@@ -334,7 +335,7 @@ int	cut_multiple_blocks(char opening, char closure, std::multimap<std::string, s
 	return (1);
 }
 
-int	bracket_parser(char opening, char closure)
+int	ft::bracket_parser(char opening, char closure)
 {
 	std::ifstream	inFlux("config/local.conf");
 	std::string		buffer;
@@ -361,11 +362,11 @@ int	bracket_parser(char opening, char closure)
 }
 
 // example of use
+/*
 int	main()
 {
 	std::multimap<std::string, std::string>	block_map;
 	std::multimap<std::string, std::string>	map;
-	std::vector<std::string>				arr;
 
 	int i = bracket_parser('{', '}');
 	std::cout << "brackets: " << i << std::endl;
@@ -390,5 +391,4 @@ int	main()
 			std::cout << first->first << ": " << first->second << '$' << std::endl;
 	}
 }
-
-ft::
+*/
