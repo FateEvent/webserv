@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/22 18:22:30 by averon            #+#    #+#             */
-/*   Updated: 2023/02/22 18:23:08 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/22 18:28:45 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int main ()
   int i;
 
   printf ("Enter your family name: ");
-  scanf ("%79s",str);  
+  scanf ("%s",str);  
   printf ("Enter your age: ");
   scanf ("%d",&i);
   printf ("Mr. %s , %d years old.\n",str,i);
