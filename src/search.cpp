@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/22 18:10:15 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/22 18:18:09 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ std::pair<std::string, std::string>	ft::string_parser(std::string str, char clos
 	{
 		if (!::isspace(str[i]))
 			val += str[i];
-		if (::isspace(str[i] && !::isspace(str[i + 1])))
+		if (::isspace(str[i]) && !::isspace(str[i + 1]))
 			val += ' ';
 		++i;
 	}
