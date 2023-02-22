@@ -24,7 +24,7 @@ namespace ft {
 	string_pair				block_parser(std::string str, std::string::size_type &i);
 	string_pair				string_parser(std::string str, std::string::size_type i);
 	std::string::size_type	find_char(std::string str, char c, std::string::size_type i);
-	string_map				split_block(std::string str);
+	string_map				split_block(std::multimap<std::string, std::string>::iterator it, char opening, char closure)
 	string_pair				cut_block(std::string target, std::vector<std::string> &arr);
 	ssize_t					search(std::string target, char opening, char closure, string_vector &arr, ssize_t l = 0);
 	int						config_file_reader(std::vector<t_search> &arr);
