@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/21 21:58:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/22 19:10:44 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,7 @@ int	main(int ac, char **av)
 	conf.insert(std::pair<std::string, std::string>("max_client", "100"));
 	conf.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
 	conf.insert(std::pair<std::string, std::string>("time_out", "120"));
-	conf.insert(std::pair<std::string, std::string>("default", "10.12.3.16"));
-	// IF DONT WORK LIKE THIS MAYBE NEED ROOT USER TO LISTEN ON PORT 80
-	conf.insert(std::pair<std::string, std::string>("listen", "80")); // PORT 80 WITH A LOCALHOST ADDRESS (127.0.0.1) DONT WORK.
+	conf.insert(std::pair<std::string, std::string>("listen", "80")); // LISTEN ON ALL IP.
 	conf.insert(std::pair<std::string, std::string>("index", "index.html"));
 
 	std::map<std::string, std::string> server1;
@@ -119,16 +117,17 @@ int	main(int ac, char **av)
 
 	test.listen_all();
 
-
+	std::map<int, Client>::iterator client;
 	
 	while (1)
 	{	
 		test.fd_rst();
-		std::cout << "waitting..." << std::endl;
+		std::cout << "\rwaitting..." << std::flush;
 		int recept = select(test.get_greaterfd(), &test.get_readfd(), &test.get_writefd(), NULL, &test.timeout());
-		std::cout << std::to_string(test.get_greaterfd()) << std::endl;
+		//std::cout << std::to_string(test.get_greaterfd()) << std::endl;
 		if (recept)
 		{
+			client = test.make_client();
 			//nsocket = accept(fd,&addr, len);
 			/* In Webserv class
 				Search the fd as receipt data with FD_ISSET,
@@ -139,7 +138,7 @@ int	main(int ac, char **av)
 
 			//if FD_ISSET(config.sock_fd iterator, &test.get_readfd()))
 			// Client->fd = accept(...)
-			std::cout << "Data recept: " << std::endl;
+			//std::cout << "Data recept: " << std::endl;
 		}
 	}
 //	ginfo = test.begin();
