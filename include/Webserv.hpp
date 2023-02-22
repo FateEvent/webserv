@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 10:35:41 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/22 12:07:27 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ class Webserv
 		fd_set&				get_readfd();
 		timeval&			timeout();
 
-		//Client				make_client();
+		std::map<int, Client>::iterator	make_client();
 
 		// TRHOW
 		class err_init : public std::exception
