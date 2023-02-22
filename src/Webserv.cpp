@@ -6,56 +6,72 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/21 12:16:08 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/22 10:35:45 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Webserv.hpp"
 
-Webserv::Webserv(std::multimap<std::string, std::string>& config) : nbr_server(0)
+Webserv::Webserv(std::multimap<std::string, std::map<std::string, std::string> >& config) : _nbr_server(0)
 {
 	if (this->created)
 		throw err_init();
-	this->created = true;
-	std::multimap<std::string, std::string>::iterator it = config.begin();
-	if (!it->first.compare("BLOCK") && !it->second.compare("http"))
-	{
-		this->mainconfig = config;
-
+	if (config.find("http") == config.end())
+		throw err_init(); //("No default configuration set in config file.");
+	std::multimap<std::string, std::map<std::string, std::string> >::iterator itconfig = config.find("http");
+	std::map<std::string, std::string> it = itconfig->second;
+	//this->_mainconfig = config;
 		// Convert IP to uint32 for sockaddr
-		unsigned int ip[4];
-		if (!sscanf(this->_base.ip.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
-			throw ("IP bad host in config file");
-		//Do sockaddr_in
-		this->_base.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
-									(ip[1] % 256 << 8 | 0) |\
-									(ip[2] % 256 << 16 | 0) |\
-									(ip[3] % 256 << 24 | 0);
-		this->_base.addr.sin_family = AF_INET;
-		this->_base.type = SOCK_STREAM;
-		this->_base.addr.sin_port = htons(this->_base.port);
-		// Do socket, bind and listen on general port (usualy on port 80)
-		this->_sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
-		::bind(this->_sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr));
-		::listen(this->_sock_fd, this->_base.max_client);
-		// Set prepare and active on true
-		this->_base.prepare = true;
-		this->_base.active = true;
+	this->_base.name.assign("Default");
+	this->_base.root.assign(it.find("root")->second);
+	this->_base.index.assign(it.find("index_page")->second);
+	this->_base.ip.assign(it.find("default")->second);
+	this->_base.port = std::stoul(it.find("listen")->second.data(), NULL, 10);
+	{
+	unsigned int ip[4];
+	if (!sscanf(this->_base.ip.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
+		throw ("IP bad host in it file");
+	//Do sockaddr_in
+	this->_base.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
+								(ip[1] % 256 << 8 | 0) |\
+								(ip[2] % 256 << 16 | 0) |\
+								(ip[3] % 256 << 24 | 0);
 	}
-	else
-		throw err_init();
+	this->_base.addr.sin_family = AF_INET;
+	this->_base.addr.sin_port = htons(this->_base.port);
+	this->_base.domain = AF_INET;
+	this->_base.type = SOCK_STREAM;
+	this->_base.max_client = std::strtoul(it.find("max_client")->second.data(), NULL, 10);
+	if (it.find("error_page") != it.end())
+		this->_base.error_page = {}; // parsse_error(config.find("error_page")); // Give iterator of error_page to parse end return a map<int, string>
+	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
+	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
+	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
+		std::cout << "BIND PROBLEM " + std::to_string(errno) << std::endl;
+	if (::listen(this->_base.sock_fd, this->_base.max_client) != 0)
+		std::cout << "LISTEN PROBLEM" << std::endl;
+	// Set prepare and active on true
+	this->_base.prepare = true;
+	this->_base.active = false;
+	this->created = true;
+
+
+//std::cout << _base.domain + " \n";
+std::cout << std::to_string(_base.sock_fd) + " \n";
+std::cout << _base.ip + " \n";
+std::cout << std::to_string(_base.port) + " \n";
+//std::cout << _base.domain + " \n";
+//std::cout << _base.domain + " \n";
+//std::cout << _base.domain + " \n";
+
+
 }
 
-config	Webserv::operator[](size_t index)
-{
-	return (this->servers.at(index));
-}
-
-void	Webserv::close(std::vector<config>::iterator &instance)
+void	Webserv::close(std::map<std::string, config>::iterator &instance)
 {
 	try
 	{
-		this->stop(instance);
+		this->stop(instance->second);
 		this->remove(instance);
 	}
 	catch(const std::exception& e)
@@ -65,10 +81,10 @@ void	Webserv::close(std::vector<config>::iterator &instance)
 }
 
 
-void	Webserv::prepare_all(std::vector<config>::iterator &instance)
+void	Webserv::prepare_all()
 {
-	for (; instance != this->servers.end(); instance++)
-		prepare(instance);
+	for (std::map<std::string, config>::iterator instance = this->_servers.begin(); instance != this->_servers.end(); instance++)
+		prepare(instance->second);
 }
 
 /**
@@ -76,16 +92,16 @@ void	Webserv::prepare_all(std::vector<config>::iterator &instance)
  * 
  * @param instance Iterator of the instance to create a socket
  */
-void	Webserv::prepare(std::vector<config>::iterator &instance)
+void	Webserv::prepare(config &instance)
 {
-	if (instance->prepare == false && instance->port != 80)
+	if (instance.prepare == false && instance.port != 80)
 	{
-		if (instance->sock_fd = socket(instance->addr.sin_family, instance->type, 0)))
-			//socket(instance->addr.sin_family, instance->type, instance->addr.sin_addr.s_addr)))
-			instance->prepare = true;
+		if ((instance.sock_fd = socket(instance.addr.sin_family, instance.type, 0)) != -1)
+			//socket(instance.addr.sin_family, instance.type, instance.addr.sin_addr.s_addr)))
+			instance.prepare = true;
 	}
 		else
-		std::cout << "Info: " + instance->name + " have already a socket!" << std::endl;
+		std::cout << "Info: " + instance.name + " have already a socket!" << std::endl;
 }
 
 /**
@@ -93,17 +109,20 @@ void	Webserv::prepare(std::vector<config>::iterator &instance)
  * 
  * @param server Iterator of vector of multimap<string, string>
  */
-void	Webserv::add(std::vector<std::multimap<std::string, std::string> > &server)
+void	Webserv::add(std::multimap<std::string, std::map<std::string, std::string> > &server)
 {
-	for (std::vector<std::multimap<std::string, std::string> >::iterator it = server.begin(); it != server.end(); it++)
+	for (std::multimap<std::string, std::map<std::string, std::string> >::iterator it = server.begin(); it != server.end(); it++)
 	{
-		try
+		if (it->first.compare("server") == 0)
 		{
-			this->add(*it);
-		}
-		catch(const std::exception& e)
-		{
-			std::cerr << e.what() << std::endl;
+			try
+			{
+				this->add(it->second);
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << std::endl;
+			}
 		}
 	}
 }
@@ -113,13 +132,13 @@ void	Webserv::add(std::vector<std::multimap<std::string, std::string> > &server)
  * 
  * @param stop The instance iterator to shutdown.
  */
-void	Webserv::stop(std::vector<config>::iterator &server)
+void	Webserv::stop(config &server)
 {
-	if (server->active == true && server->port != 80)
+	if (server.active == true && server.port != 80)
 	{
-		if (!::close(server->sock_fd))
+		if (!::close(server.sock_fd))
 			return; //throw ("intern problem.");
-		server->sock_fd = -1;
+		server.sock_fd = -1;
 		std::cout << "Closed..." << std::endl;
 	}
 	else
@@ -132,18 +151,18 @@ void	Webserv::stop(std::vector<config>::iterator &server)
  * 
  * @param server The iterator of vector stocked all instance
  */
-void	Webserv::stop_all(std::vector<config>::iterator &server)
+void	Webserv::stop_all()
 {
-	for (;server != this->servers.end(); server++)
+	for (std::map<std::string, config>::iterator it = this->_servers.begin() ; it != this->_servers.end(); it++)
 	{
 		try
 		{
-			std::cout << "Stopping server " << server->name << "...." << std::endl;
-			this->stop(server);
+			std::cout << "Stopping server " << it->second.name << "...." << std::endl;
+			this->stop(it->second);
 		}
 		catch (std::exception &e)
 		{
-			std::cout << "\033[0;31mServer " << server->name << "was stopped not correctly!\033[0m" << std::endl;
+			std::cout << "\033[0;31mServer " << it->second.name << "was stopped not correctly!\033[0m" << std::endl;
 			std::cerr << e.what() << std::endl;
 		}
 	}
@@ -151,43 +170,55 @@ void	Webserv::stop_all(std::vector<config>::iterator &server)
 }
 
 /**
+ * @brief Remove a selected instance passing by iterator
+ * 
+ * @param old The iterator of select instance to remove
+ */
+void	Webserv::remove(std::map<std::string, config>::iterator &old)
+{
+	if (old->second.active == true)
+		stop(old->second);
+	this->_servers.erase(old);
+}
+
+/**
  * @brief Bind the select instance by iterator to a port
  * 
  * @param bind The iterator of instance to bind
  */
-void	Webserv::bind(std::vector<config>::iterator &bind)
+void	Webserv::bind(config &bind)
 {
 	int	res = 0;
 
-	if (bind->sock_fd)
+	if (bind.sock_fd)
 	{
-		//bind->addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // OK ON MY SERVER (MULTI NETWORK CARD) NOT OK WITH MY LABTOP (MAYBE ONLY WIFI??!)
+		//bind.addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // OK ON MY SERVER (MULTI NETWORK CARD) NOT OK WITH MY LABTOP (MAYBE ONLY WIFI??!)
 		//htonl(INADDR_LOOPBACK);
 		//inet_addr("127.0.0.1");
-		//bind->addr.sin_addr.s_addr = htonl(INADDR_ANY);
-		if (bind->port != 80)
-			res = ::bind(bind->sock_fd, reinterpret_cast<sockaddr *>(&bind->addr), sizeof(bind->addr));
+		//bind.addr.sin_addr.s_addr = htonl(INADDR_ANY);
+		if (bind.port != 80)
+			res = ::bind(bind.sock_fd, reinterpret_cast<sockaddr *>(&bind.addr), sizeof(bind.addr));
 		if (res)
 		{
-			bind->active = false;
+			bind.active = false;
 			if (errno == 48 || errno == 98)
-				std::cout << "\033[0;31mAddress and protocol already used. Can't bind " << bind->name << "\033[0m" << std::endl;
+				std::cout << "\033[0;31mAddress and protocol already used. Can't bind " << bind.name << "\033[0m" << std::endl;
 			else if (errno == 13)
-				std::cout << "\033[0;31mAcces denied. Can't bind " << bind->name << "\033[0m" << std::endl;
+				std::cout << "\033[0;31mAcces denied. Can't bind " << bind.name << "\033[0m" << std::endl;
 			else
-				std::cout << "\033[0;31mError: instance " + bind->name + " not initialized!\033[0m" << std::endl;
+				std::cout << "\033[0;31mError: instance " + bind.name + " not initialized!\033[0m" << std::endl;
 		}
 		else
 		{
-			bind->active = true;
-			//FD_SET(bind->sock_fd, &this->readfd);
-			std::cout << "Instance \033[0;33m" + bind->name + "\033[0m on port \033[0;33m" + std::to_string(bind->port)  + "\033[0m is now bound."<< std::endl;
+			bind.active = true;
+			//FD_SET(bind.sock_fd, &this.readfd);
+			std::cout << "Instance \033[0;33m" + bind.name + "\033[0m on port \033[0;33m" + std::to_string(bind.port)  + "\033[0m is now bound."<< std::endl;
 		}
 	}
 	else
 	{
-		bind->active = false;
-		throw ("Error: instance " + bind->name + " not initialized!");
+		bind.active = false;
+		throw ("Error: instance " + bind.name + " not initialized!");
 	}
 }
 
@@ -196,31 +227,19 @@ void	Webserv::bind(std::vector<config>::iterator &bind)
  * 
  * @param server  The iterator of vector stocked all instance
  */
-void	Webserv::bind_all(std::vector<config>::iterator &server)
+void	Webserv::bind_all()
 {
-	for (; server != this->servers.end(); server++)
+	for (std::map<std::string, config>::iterator server = this->_servers.begin(); server != this->_servers.end(); server++)
 	{
 		try
 		{
-			this->bind(server);
+			this->bind(server->second);
 		}
 		catch (std::exception &e)
 		{
 			std::cerr << e.what() << std::endl;
 		}
 	}
-}
-
-/**
- * @brief Remove a selected instance passing by iterator
- * 
- * @param old The iterator of select instance to remove
- */
-void	Webserv::remove(std::vector<config>::iterator &old)
-{
-	if (old->active == true)
-		stop(old);
-	this->servers.erase(old);
 }
 
 /**
@@ -230,7 +249,7 @@ void	Webserv::remove(std::vector<config>::iterator &old)
  */
 unsigned	Webserv::get_nbr_server() const
 {
-	return (this->nbr_server);
+	return (this->_nbr_server);
 }
 
 const char	*Webserv::err_init::what() const throw()
@@ -247,10 +266,11 @@ std::string	Webserv::get_info_server() const
 {
 	std::string info;
 
-	for (std::multimap<std::string, std::string>::const_iterator it = mainconfig.begin(); it != mainconfig.end(); it++)
-	{
-		info.append("\033[0;36m" + it->first + " | " + it->second + "\033[0m\n");
-	}
+	info.append("\033[0;36mNom de domaine: " + _base.name + "\033[0m\n");
+	info.append("\033[0;36mAdresse IP: " + _base.ip + "\033[0m\n");
+	info.append("\033[0;36mPort: " + std::to_string(_base.port) + "\033[0m\n");
+	info.append("\033[0;36mRoot: " + _base.root + "\033[0m\n");
+	info.append("\033[0;36mIndex: " + _base.index + "\033[0m\n");
 	return (info);
 }
 
@@ -260,27 +280,25 @@ std::string	Webserv::get_info_server() const
  * @param other The iterator of selected instance
  * @return std::string Returned information in en string.
  */
-std::string	Webserv::get_info_on(std::vector<config>::const_iterator &other) const
+std::string	Webserv::get_info_on(const config &other) const
 {
 	std::string	info;
-	info.append("FD:     " + std::to_string(other->sock_fd) + "\n" +
-				"Name:   " + other->name + "\n" +
-				"Address:" + other->ip + "\n" +
-				"Port:   " + std::to_string(other->port) + "\n" +
-				"Root:   " + other->root + "\n" +
-				"Index:  " + other->index + "\n" +
-				"Prepare:" + std::to_string(other->prepare) + "\n" +
-				"Active: " + std::to_string(other->active) + "\n\n");
+	info.append("FD:     " + std::to_string(other.sock_fd) + "\n" +
+				"Name:   " + other.name + "\n" +
+				"Address:" + other.ip + "\n" +
+				"Port:   " + std::to_string(other.port) + "\n" +
+				"Root:   " + other.root + "\n" +
+				"Index:  " + other.index + "\n" +
+				"Prepare:" + std::to_string(other.prepare) + "\n" +
+				"Active: " + std::to_string(other.active) + "\n\n");
 	return (info);
 }
 
 std::string	Webserv::get_info_instance() const
 {
 	std::string	info;
-	for (std::vector<config>::const_iterator it = servers.begin(); it != servers.end(); it++)
-	{
-		info.append(get_info_on(it));
-	}
+	for (std::map<std::string, config>::const_iterator it = _servers.begin(); it != _servers.end(); it++)
+		info.append(get_info_on(it->second));
 	return (info);
 }
 
@@ -290,14 +308,14 @@ Webserv::~Webserv()
 	this->created = false;
 }
 
-std::vector<config>::iterator	Webserv::begin()
+std::map<std::string, config>::iterator	Webserv::begin()
 {
-	return (this->servers.begin());
+	return (this->_servers.begin());
 }
 
-std::vector<config>::iterator	Webserv::end()
+std::map<std::string, config>::iterator	Webserv::end()
 {
-	return (this->servers.end());
+	return (this->_servers.end());
 }
 
 
@@ -319,13 +337,11 @@ std::vector<config>::iterator	Webserv::end()
 /*                                                                            */
 /* ************************************************************************** */
 
-void	Webserv::add(std::multimap<std::string, std::string> server)
+void	Webserv::add(std::map<std::string, std::string> &server)
 {
 	config	ret = {"","","","",{},-1,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
-	for (std::multimap<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
+	for (std::map<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
-		if (!it->first.compare("BLOCK") && !it->second.compare("server"))
-			continue;
 		if (!it->first.compare("name"))
 		{
 			if (it->second.empty())
@@ -414,9 +430,9 @@ void	Webserv::add(std::multimap<std::string, std::string> server)
 		}
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
-	check_instance(ret);
-	this->servers.push_back(ret);
-	this->nbr_server++;
+	_check_instance(ret);
+	this->_servers.insert(std::make_pair(ret.name, ret));
+	this->_nbr_server++;
 }
 
 /**
@@ -426,7 +442,7 @@ void	Webserv::add(std::multimap<std::string, std::string> server)
  * 
  * @param conf Struct config to check
  */
-void	Webserv::check_instance(config &conf)
+void	Webserv::_check_instance(config &conf)
 {
 	std::multimap<std::string, std::string>::iterator main;
 	if (conf.name.empty())
@@ -434,15 +450,9 @@ void	Webserv::check_instance(config &conf)
 	if (conf.root.empty())
 		throw ("Error in config file, miss root directory.");
 	if (conf.index.empty())
-	{
-		main = this->mainconfig.find("index");
-		conf.index = main->second;
-	}
+		conf.index = this->_base.index;
 	if (conf.ip.empty())
-	{
-		main = this->mainconfig.find("default");
-		conf.ip = main->second;
-	}
+		conf.ip = this->_base.ip;
 	if (!conf.domain)
 	{
 		conf.domain = AF_INET;
@@ -451,10 +461,7 @@ void	Webserv::check_instance(config &conf)
 	if (!conf.type)
 		conf.type = SOCK_STREAM;
 	if (conf.max_client)
-	{
-		main = this->mainconfig.find("max_client");
-		conf.max_client = std::stoul(main->second);
-	}
+		conf.max_client = this->_base.max_client;
 	if (!conf.port)
 		throw ("Error in config file, miss miss port on instance.");
 }
@@ -462,13 +469,13 @@ void	Webserv::check_instance(config &conf)
 
 void	Webserv::listen_all()
 {
-	for (std::vector<config>::iterator it = this->servers.begin(); it != this->servers.end(); it++)
+	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 	{
-		if (it->active && it->prepare)
+		if (it->second.active && it->second.prepare)
 		{
 			try
 			{
-				listen(*it);
+				listen(it->second);
 			}
 			catch (std::exception &e)
 			{
@@ -476,7 +483,7 @@ void	Webserv::listen_all()
 			}
 		}
 		else
-			std::cout << "Instance " + it->name + " ignored. Not active or prepared." << std::endl;
+			std::cout << "Instance " + it->second.name + " ignored. Not active or prepared." << std::endl;
 	}
 }
 
@@ -488,11 +495,11 @@ void	Webserv::listen(config &instance)
 
 int	Webserv::get_greaterfd() const
 {
-	int	nbr = 0;
-	std::vector<config>::const_iterator it = this->servers.begin();
-	for (; it != this->servers.end(); it++)
-		if (it->active && it->sock_fd > 0 && it->sock_fd >= nbr)
-			nbr = it->sock_fd + 1;
+	int	nbr = this->_base.sock_fd + 1;
+	std::map<std::string, config>::const_iterator it = this->_servers.begin();
+	for (; it != this->_servers.end(); it++)
+		if (it->second.active && it->second.sock_fd > 0 && it->second.sock_fd >= nbr)
+			nbr = it->second.sock_fd + 1;
 	return (nbr);
 }
 
@@ -501,10 +508,12 @@ void	Webserv::fd_rst()
 	FD_ZERO(&this->writefd);
 	FD_ZERO(&this->readfd);
 	FD_ZERO(&this->errfd);
-	std::vector<config>::const_iterator it = this->servers.begin();
-	for (; it != this->servers.end(); it++)
-		if (it->active && it->sock_fd > 0)
-			FD_SET(it->sock_fd, &this->readfd);
+	
+	std::map<std::string, config>::const_iterator it = this->_servers.begin();
+	for (; it != this->_servers.end(); it++)
+		if (it->second.active && it->second.sock_fd > 0)
+			FD_SET(it->second.sock_fd, &this->readfd);
+	FD_SET(this->_base.sock_fd, &this->readfd);
 }
 
 fd_set&	Webserv::get_writefd()
@@ -524,7 +533,7 @@ timeval&	Webserv::timeout()
 	return (this->_timeout);
 }
 
-Client	Webserv::make_client()
+/* Client	Webserv::make_client()
 {
 	for (std::vector<config>::iterator it = this->servers.begin(); it != this->servers.end(); it++)
 	{
@@ -534,4 +543,4 @@ Client	Webserv::make_client()
 			ret->set_sock(it->sock_fd);
 		}
 	}
-}
+} */

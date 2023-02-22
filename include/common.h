@@ -6,12 +6,12 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/19 23:26:17 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/21 08:45:38 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef COMMON_H
-#define COMMIN_H
+#define COMMON_H
 
 #include <iostream>
 #include <string>
@@ -33,6 +33,6 @@ typedef struct	s_config
 	bool							active;
 	bool							prepare;
 	std::map<int, std::string>		error_page;
-} config;
+}	config;
 
 #endif
