@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 17:12:31 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/22 19:50:51 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -342,6 +342,7 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 	config	ret = {"","","","",{},-1,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
 	for (std::map<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
+		std::cout << it->first << " | " << it->second << std::endl;
 		if (!it->first.compare("name"))
 		{
 			if (it->second.empty())
@@ -359,14 +360,17 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 			else if (it->second.compare("local") || it->second.compare("LOCAL"))
 				ret.domain = AF_LOCAL;
 			else
-				throw ("Socket protocol invalid!");
+				ret.domain = AF_INET;
 			ret.addr.sin_family = ret.domain;
 		}
 		else if (!it->first.compare("host"))
 		{
 			unsigned int ip[4];
 			if (!sscanf(it->second.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
+			{
+				std::cout << "ICI LE PROBLEM!!!" << std::endl;
 				throw ("IP bad host in config file");
+			}
 			ret.ip = it->second;
 			ret.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
 										(ip[1] % 256 << 8 | 0) |\
@@ -388,7 +392,7 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 			else if (!it->second.compare("udp"))
 				ret.type = SOCK_DGRAM;
 			else
-				throw ("Type incorrect in config file!");
+				ret.type = SOCK_STREAM;
 		}
 		else if (!it->first.compare("max_client"))
 		{
@@ -427,7 +431,8 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		}
 		else
 		{
-			throw ("Unknown parameter in config file!");
+			std::cout << it->first << " | " << it->second << std::endl;
+			//throw ("Unknown parameter in config file!");
 		}
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
