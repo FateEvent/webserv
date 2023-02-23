@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/22 18:18:09 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/23 16:27:03 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,10 +62,60 @@
 
 #include "../include/search.hpp"
 
+void	ft::space_eraser(std::multimap<std::string, std::string> &map)
+{
+	std::multimap<std::string, std::string>::iterator	first(map.begin()), last(map.end());
+	std::string::size_type								i(0);
+
+	for (; first != last; ++first)
+	{
+		i = 0;
+		while (first->second[i])
+		{
+			if (::isspace(first->second[i]))
+				first->second.erase(i, i + 1);
+			++i;
+		}
+	}
+}
+
+void	ft::kärcherizer(std::multimap<std::string, std::string> &map)
+{
+	std::multimap<std::string, std::string>::iterator	first(map.begin()), last(map.end());
+	std::string											str;
+	std::string::size_type								i(0);
+
+	for (; first != last; ++first)
+	{
+		std::string::size_type	pos = first->second.find(':');
+		if (pos != std::string::npos)
+		{
+			i = pos + 1;
+			while (first->second[i])
+			{
+				if (!::isspace(first->second[i]))
+					str += first->second[i];
+				else if (::isspace(first->second[i]))
+				{
+					map.insert(std::make_pair("listen", str));
+					str.clear();
+				}
+				++i;
+			}
+			if (str == "tcp" || str == "udp")
+				map.insert(std::make_pair("type", str));
+			else
+				map.insert(std::make_pair(first->first, str));
+			first->second.erase(pos);
+		}
+	}
+}
+
 void	ft::comments_cleaner(std::multimap<std::string, std::string> &map)
 {
-	for (std::multimap<std::string, std::string>::iterator	first = map.begin();
-		first != map.end(); ++first)
+	std::multimap<std::string, std::string>::iterator first(map.begin()), last(map.end());
+
+	for (; first != last; ++first)
 	{
 		std::string::size_type	pos = first->second.find('#');
 		if (pos != std::string::npos)
@@ -125,7 +175,6 @@ std::pair<std::string, std::string>	ft::string_parser(std::string str, char clos
 	pos = val.find(';');
 	if (pos != std::string::npos)
 		val.erase(pos);
-	std::cout << val << '$' << std::endl;
 	return (std::make_pair(key, val));
 }
 

@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 18:01:58 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/23 16:23:20 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,12 @@ int	main(int ac, char **av)
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
 */
+	ft::kärcherizer(server1);
+	ft::kärcherizer(server2);
+	ft::space_eraser(server1);
+	ft::space_eraser(server2);
+	for (std::multimap<std::string, std::string>::iterator	one(server2.begin()); one != server2.end(); ++one)
+		std::cout << one->first << ": " << one->second << std::endl;
 	config.insert(std::make_pair("http", conf));
 	config.insert(std::make_pair("server", server1));
 	config.insert(std::make_pair("server", server2));
