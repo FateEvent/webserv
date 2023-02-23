@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/21 09:40:37 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/22 22:15:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <cstring>
 #include <time.h>
 #include <sys/types.h>
+#include <string>
 #include <map>
 #include <vector>
 #include <list>
@@ -30,17 +31,18 @@ class Client
 	private:
 		int				_sock_fd;
 		sockaddr_in		_addr;			// sockaddr_in is a internet socket
-		sockaddr_un		_addr_local;	// sockaddr_un is a local socket
+//		sockaddr_un		_addr_local;	// sockaddr_un is a local socket
 		socklen_t		_socklen;
 		const config&	_ref_conf;
-		timeval			_timeout;
+//		timeval			_timeout;
 		fd_set	_readfd;
-		fd_set	_writefd;
+//		fd_set	_writefd;
 
 	public:
 		Client(const config&);
 		~Client();
-		void	set_sock(int);
+		int			get_sockfd() const;
+		void		test_client();
 
 	protected:
 };
