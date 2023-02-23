@@ -6,3 +6,4 @@ test
 
 .vscode
 *.json
+.DS_Store
