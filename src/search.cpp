@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/22 18:26:23 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/23 15:18:25 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,8 @@
 
 void	ft::comments_cleaner(std::multimap<std::string, std::string> &map)
 {
-	for (std::multimap<std::string, std::string>::iterator	first = map.begin();
+	for (std::multimap<std::string, std::string>::iterator	first = map.begin(); // on peut aussi creer un last qui est egal a end
+	// attention l'iterateur eset limite a la boucle FOR !!!
 		first != map.end(); ++first)
 	{
 		std::string::size_type	pos = first->second.find('#');
