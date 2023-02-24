@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 12:24:37 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/24 18:58:06 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,17 @@ void	Client::_make_struct()
 		memset(buffer, 0, 4096);
 	}
 
-	//this->_header.
+	size_t i = 0;
+	if (!header.empty())
+	{
+		while (i < header.lenght())
+		{
+			i = header.found("\n");
+			if (i > 0)
+			{
+				
+			}
+		}
+	}
 
 }
