@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/24 11:18:29 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/24 11:59:40 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,6 +161,7 @@ std::pair<std::string, std::string>	ft::string_parser(std::string str, char clos
 	std::string				val;
 	std::string::size_type	pos(0);
 
+	std::cout << "str: " << str << std::endl;
 	while (str[i] && ::isspace(str[i]))
 		++i;
 	while (str[i] && !::isspace(str[i]))
@@ -180,6 +181,7 @@ std::pair<std::string, std::string>	ft::string_parser(std::string str, char clos
 	pos = val.find(';');
 	if (pos != std::string::npos)
 		val.erase(pos);
+	std::cout << "kv: " << key << ": " << val << std::endl;
 	return (std::make_pair(key, val));
 }
 
@@ -219,18 +221,11 @@ std::multimap<std::string, std::string>	ft::split_block(std::multimap<std::strin
 		{
 			std::string::size_type	pos = find_char(str, opening, i);
 			if (pos != std::string::npos)
-			{
 				map.insert(ft::block_parser(str, closure, i));
-			}
 			else if (str[i] == '\n')
 			{
 				map.insert(ft::string_parser(str, closure, i - line_length));
 				line_length = 0;
-			}
-			if (str[i] == closure)
-			{
-				++i;
-				++line_length;
 			}
 			++i;
 			++line_length;
@@ -258,8 +253,6 @@ std::multimap<std::string, std::string>	ft::split_block(std::multimap<std::strin
 		}
 		map.insert(std::make_pair(key, val));
 	}
-//	for (std::multimap<std::string, std::string>::iterator	first(map.begin()); first != map.end(); ++first)
-//		std::cout << "verif: " << first->first << ": " << first->second << std::endl;
 	return (map);
 }
 
@@ -273,8 +266,6 @@ std::pair<std::string, std::string>	ft::cut_block(std::string target, char openi
 	(*first).erase(std::remove_if((*first).begin(), (*first).begin() + pos, ::isspace), (*first).begin() + pos);
 	key = (*first).substr(0, target.length());
 	pos = (*first).find(opening);
-	for (std::vector<std::string>::iterator	first(arr.begin()); first != arr.end(); ++first)
-		std::cout << "verif: " << *first << std::endl;
 	if (pos == std::string::npos)
 	{
 		++first;
@@ -282,19 +273,11 @@ std::pair<std::string, std::string>	ft::cut_block(std::string target, char openi
 	}
 	else
 		val = (*first).substr(target.length());
-	while (++first != arr.end())
+	for (++first; first != arr.end(); first++)
 	{
-//		++first;
 		val += '\n';
 		val += *first;
-		std::cout << "problem" << std::endl;
-		std::cout << val << std::endl;
 	}
-	std::cout << "result" << std::endl;
-	std::cout << val << std::endl;
-	std::cout << "-- o --" << std::endl;
-	std::cout << *arr.end() << std::endl;
-	std::cout << "-- o --" << std::endl;
 	return (std::make_pair(key, val));
 }
 
