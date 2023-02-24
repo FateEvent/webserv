@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 10:13:11 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/24 17:10:34 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -501,14 +501,17 @@ std::map<int, Client>::iterator	Webserv::make_client()
 	{
 			std::cout << "SUR SERVEUR PRINCIPAL" << std::endl;
 	}
-	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+	else
 	{
-		if (it->second.active)
-			if (FD_ISSET(it->second.sock_fd, &this->readfd))
-			{
-				Client *ret = new Client(it->second);
-				this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
-			}
+		for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+		{
+			if (it->second.active)
+				if (FD_ISSET(it->second.sock_fd, &this->readfd))
+				{
+					Client *ret = new Client(it->second);
+					this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
+				}
+		}
 	}
 	for (std::map<int,Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
