@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/24 11:59:40 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/24 12:24:21 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,14 @@
 ** the header <string>, the maximum size of a size_t).
 **
 ** The comments_cleaner() function takes out the comments (indicated by a
-** '#' character) from a string.
+** '#' character) from a string. It is called by the split_block() function,
+** and it is useful in case a ';' character doesn't terminate the key-value
+** pairs in the config file.
+**
+** The kärcherizer() function splits a string line into key-value pairs.
+** 
+** The space_eraser() function deletes white spaces from the map values and
+** operates necessary key replacements.
 */
 
 #include "../include/search.hpp"
@@ -161,7 +168,6 @@ std::pair<std::string, std::string>	ft::string_parser(std::string str, char clos
 	std::string				val;
 	std::string::size_type	pos(0);
 
-	std::cout << "str: " << str << std::endl;
 	while (str[i] && ::isspace(str[i]))
 		++i;
 	while (str[i] && !::isspace(str[i]))
@@ -181,7 +187,6 @@ std::pair<std::string, std::string>	ft::string_parser(std::string str, char clos
 	pos = val.find(';');
 	if (pos != std::string::npos)
 		val.erase(pos);
-	std::cout << "kv: " << key << ": " << val << std::endl;
 	return (std::make_pair(key, val));
 }
 
@@ -253,6 +258,8 @@ std::multimap<std::string, std::string>	ft::split_block(std::multimap<std::strin
 		}
 		map.insert(std::make_pair(key, val));
 	}
+	ft::comments_cleaner(map);
+	ft::kärcherizer(map);
 	return (map);
 }
 

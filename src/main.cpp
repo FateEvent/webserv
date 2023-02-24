@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 09:51:23 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/24 12:28:38 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,6 @@ int	main(int ac, char **av)
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
 */
-	ft::kärcherizer(server1);
-	ft::kärcherizer(server2);
-	for (std::multimap<std::string, std::string>::iterator	one(server2.begin()); one != server2.end(); ++one)
-		std::cout << one->first << ": " << one->second << std::endl;
 	config.insert(std::make_pair("http", conf));
 	config.insert(std::make_pair("server", server1));
 	config.insert(std::make_pair("server", server2));
@@ -95,7 +91,12 @@ int	main(int ac, char **av)
 	
  */
 	std::cout << "Add vector of instance" << std::endl;
-	test.add(config);
+	try {
+		test.add(config);	
+	}
+	catch (std::exception &e) {
+		std::cerr <<  e.what() << std::endl;
+	}
 
 	std::cout << "Number of instances: " << test.get_nbr_server() << std::endl;
 	

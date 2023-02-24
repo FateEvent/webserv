@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 09:53:30 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/24 12:33:51 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	{
 	unsigned int ip[4];
 	if (!sscanf(this->_base.ip.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
-		throw ("IP bad host in it file");
+		throw std::length_error("IP bad host in it file");
 	//Do sockaddr_in
 	this->_base.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
 								(ip[1] % 256 << 8 | 0) |\
@@ -137,13 +137,13 @@ void	Webserv::stop(config &server)
 	if (server.active == true && server.port != 80)
 	{
 		if (!::close(server.sock_fd))
-			return; //throw ("intern problem.");
+			return; //throw std::length_error("intern problem.");
 		server.sock_fd = -1;
 		std::cout << "Closed..." << std::endl;
 	}
 	else
 		std::cout << "Not active, not need to close..." << std::endl;
-//		throw ("Server was already shutdown.");
+//		throw std::length_error("Server was already shutdown.");
 }
 
 /**
@@ -218,7 +218,7 @@ void	Webserv::bind(config &bind)
 	else
 	{
 		bind.active = false;
-		throw ("Error: instance " + bind.name + " not initialized!");
+		throw std::length_error("Error: instance " + bind.name + " not initialized!");
 	}
 }
 
@@ -345,13 +345,13 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		if (!it->first.compare("name"))
 		{
 			if (it->second.empty())
-				throw ("No instance name!");
+				throw std::length_error("No instance name!");
 			ret.name = it->second;
 		}
 		else if (!it->first.compare("protocol"))
 		{
 			if (it->second.empty())
-				throw ("Socket protocol invalid!");
+				throw std::length_error("Socket protocol invalid!");
 			else if (it->second.compare("IPV4") || it->second.compare("INET") || it->second.compare("AF_INET"))
 				ret.domain = AF_INET;
 			else if (it->second.compare("IPV6") || it->second.compare("INET6") || it->second.compare("AF_INET6"))
@@ -366,7 +366,7 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		{
 			unsigned int ip[4];
 			if (!sscanf(it->second.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
-				throw ("IP bad host in config file");
+				throw std::length_error("IP bad host in config file");
 			ret.ip = it->second;
 			ret.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
 										(ip[1] % 256 << 8 | 0) |\
@@ -376,7 +376,7 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		else if (!it->first.compare("listen"))
 		{
 			if ((std::stoul(it->second) < 1) && (std::stoul(it->second) >= 0xFFFFFF))
-				throw ("Invalid port");
+				throw std::length_error("Invalid port");
 			ret.port = std::stoul(it->second);
 			ret.addr.sin_port = htons(ret.port);
 		}
@@ -393,19 +393,19 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		{
 			int max = std::stol(it->second);
 			if (!(max > 0 && max < static_cast<int>(0x7FFFFFFF)))
-				throw ("Max client incorrect in instance!");
+				throw std::length_error("Max client incorrect in instance!");
 			ret.max_client = max;
 		}
 		else if (!it->first.compare("root"))
 		{
 			if (it->second.empty())
-				throw ("root destination empty!");
+				throw std::length_error("root destination empty!");
 			ret.root = it->second;
 		}
 		else if (!it->first.compare("index_page"))
 		{
 			if (it->second.empty())
-				throw ("no index referenced!");
+				throw std::length_error("no index referenced!");
 			ret.index = it->second;
 		}
 		else if (!it->first.compare("error_page"))
@@ -420,14 +420,14 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 				}
 				catch (std::exception &e)
 				{
-					throw ("Invalid error page in config file!");
+					throw std::length_error("Invalid error page in config file!");
 				}
 			}
 		}
 		else
 		{
 			std::cout << it->first << " | " << it->second << std::endl;
-			//throw ("Unknown parameter in config file!");
+			//throw std::length_error("Unknown parameter in config file!");
 		}
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
@@ -447,9 +447,9 @@ void	Webserv::_check_instance(config &conf)
 {
 	std::multimap<std::string, std::string>::iterator main;
 	if (conf.name.empty())
-		throw ("Error in config file, miss server name.");
+		throw std::length_error("Error in config file, miss server name.");
 	if (conf.root.empty())
-		throw ("Error in config file, miss root directory.");
+		throw std::length_error("Error in config file, miss root directory.");
 	if (conf.index.empty())
 		conf.index = this->_base.index;
 	if (conf.ip.empty())
@@ -464,7 +464,7 @@ void	Webserv::_check_instance(config &conf)
 	if (conf.max_client)
 		conf.max_client = this->_base.max_client;
 	if (!conf.port)
-		throw ("Error in config file, miss miss port on instance.");
+		throw std::length_error("Error in config file, miss miss port on instance.");
 }
 
 
@@ -478,7 +478,7 @@ void	Webserv::listen_all()
 			{
 				listen(it->second);
 			}
-			catch (std::exception &e)
+			catch (std::length_error &e)
 			{
 				std::cerr << e.what() << std::endl;
 			}
@@ -491,7 +491,7 @@ void	Webserv::listen_all()
 void	Webserv::listen(config &instance)
 {
 	if (::listen(instance.sock_fd, instance.max_client) != 0)
-		throw ("Error on listen for " + instance.name + " with error " + std::to_string(errno));
+		throw std::length_error("Error on listen for " + instance.name + " with error " + std::to_string(errno));
 }
 
 int	Webserv::get_greaterfd() const
