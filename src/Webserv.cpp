@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 22:49:24 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/24 10:13:11 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,9 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	std::multimap<std::string, std::string> it = itconfig->second;
 
 	this->_base.name.assign("Default");
-std::cout << "SSSSSSs" << std::endl;
 	this->_base.root.assign(it.find("root")->second);
-std::cout << "SSSSSSs" << std::endl;
 	this->_base.index.assign(it.find("index_page")->second);
-std::cout << "SSSSSSs" << std::endl;
 	this->_base.port = std::stoul(it.find("listen")->second.data(), NULL, 10);
-std::cout << "SSSSSSs" << std::endl;
 	this->_base.addr.sin_addr.s_addr = INADDR_ANY;
 	this->_base.addr.sin_family = AF_INET;
 	this->_base.addr.sin_port = htons(this->_base.port);

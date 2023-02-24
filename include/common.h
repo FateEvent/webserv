@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/21 08:45:38 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/24 10:09:41 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,5 +34,19 @@ typedef struct	s_config
 	bool							prepare;
 	std::map<int, std::string>		error_page;
 }	config;
+
+typedef struct s_header
+{
+	std::string					methode;
+	std::string					directory;
+	float						version;
+	std::string					host;
+	std::string					connexion;
+	std::string					cache-control;
+	std::string					user-agent;
+	std::vector<std::string>	accept;
+	unsigned long				lenght;
+	std::vector<std::string>	content-type;
+}	header;
 
 #endif
