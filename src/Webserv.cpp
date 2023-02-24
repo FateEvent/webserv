@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/23 14:36:30 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/24 09:53:30 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -342,7 +342,6 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 	config	ret = {"","","","",{},-1,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
 	for (std::map<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
-		std::cout << it->first << " | " << it->second << std::endl;
 		if (!it->first.compare("name"))
 		{
 			if (it->second.empty())
@@ -367,10 +366,7 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		{
 			unsigned int ip[4];
 			if (!sscanf(it->second.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
-			{
-				std::cout << "ICI LE PROBLEM!!!" << std::endl;
 				throw ("IP bad host in config file");
-			}
 			ret.ip = it->second;
 			ret.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
 										(ip[1] % 256 << 8 | 0) |\
@@ -386,7 +382,6 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		}
 		else if (!it->first.compare("type"))
 		{
-			std::cout << it->second << '$' << std::endl;
 			if (!it->second.compare("tcp"))
 				ret.type = SOCK_STREAM;
 			else if (!it->second.compare("udp"))

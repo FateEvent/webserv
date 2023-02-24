@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/23 16:23:20 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/24 09:51:23 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,6 @@ int	main(int ac, char **av)
 */
 	ft::kärcherizer(server1);
 	ft::kärcherizer(server2);
-	ft::space_eraser(server1);
-	ft::space_eraser(server2);
 	for (std::multimap<std::string, std::string>::iterator	one(server2.begin()); one != server2.end(); ++one)
 		std::cout << one->first << ": " << one->second << std::endl;
 	config.insert(std::make_pair("http", conf));

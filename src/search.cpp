@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/23 16:27:03 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/24 11:18:29 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,10 @@ void	ft::space_eraser(std::multimap<std::string, std::string> &map)
 				first->second.erase(i, i + 1);
 			++i;
 		}
+		if (first->second == "localhost")
+			first->second = "127.0.0.1";
+		if (first->second == ":")
+			first->second = "0.0.0.0";
 	}
 }
 
@@ -87,7 +91,7 @@ void	ft::kärcherizer(std::multimap<std::string, std::string> &map)
 
 	for (; first != last; ++first)
 	{
-		std::string::size_type	pos = first->second.find(':');
+		std::string::size_type	pos = first->second.find_last_of(':');
 		if (pos != std::string::npos)
 		{
 			i = pos + 1;
@@ -109,6 +113,7 @@ void	ft::kärcherizer(std::multimap<std::string, std::string> &map)
 			first->second.erase(pos);
 		}
 	}
+	ft::space_eraser(map);
 }
 
 void	ft::comments_cleaner(std::multimap<std::string, std::string> &map)
@@ -253,6 +258,8 @@ std::multimap<std::string, std::string>	ft::split_block(std::multimap<std::strin
 		}
 		map.insert(std::make_pair(key, val));
 	}
+//	for (std::multimap<std::string, std::string>::iterator	first(map.begin()); first != map.end(); ++first)
+//		std::cout << "verif: " << first->first << ": " << first->second << std::endl;
 	return (map);
 }
 
@@ -266,6 +273,8 @@ std::pair<std::string, std::string>	ft::cut_block(std::string target, char openi
 	(*first).erase(std::remove_if((*first).begin(), (*first).begin() + pos, ::isspace), (*first).begin() + pos);
 	key = (*first).substr(0, target.length());
 	pos = (*first).find(opening);
+	for (std::vector<std::string>::iterator	first(arr.begin()); first != arr.end(); ++first)
+		std::cout << "verif: " << *first << std::endl;
 	if (pos == std::string::npos)
 	{
 		++first;
@@ -273,13 +282,19 @@ std::pair<std::string, std::string>	ft::cut_block(std::string target, char openi
 	}
 	else
 		val = (*first).substr(target.length());
-	while (first != arr.end())
+	while (++first != arr.end())
 	{
-		++first;
+//		++first;
 		val += '\n';
 		val += *first;
+		std::cout << "problem" << std::endl;
+		std::cout << val << std::endl;
 	}
-	++first;
+	std::cout << "result" << std::endl;
+	std::cout << val << std::endl;
+	std::cout << "-- o --" << std::endl;
+	std::cout << *arr.end() << std::endl;
+	std::cout << "-- o --" << std::endl;
 	return (std::make_pair(key, val));
 }
 
