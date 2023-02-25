@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 18:58:06 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/25 17:44:45 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,29 +37,31 @@ void	Client::test_client()
 
 void	Client::_make_struct()
 {
-	char 			buffer[4096];
-	std::string		header;
-	std::string 	line;
-	int 			i = -1;
+	char 						buffer[4096];
+	std::string					tmp;
+	std::string					line;
+	std::vector<std::string>	header;
+	ssize_t						i = -1;
 
 	while (i == -1 || i == 4095)
 	{
 		i = recv(this->_sock_fd, &buffer, 4095, 0);
-		header.append(buffer);
+		tmp.append(buffer);
 		memset(buffer, 0, 4096);
 	}
-
-	size_t i = 0;
-	if (!header.empty())
+	i = 0;
+	for (std::string::iterator it = tmp.begin(); it != tmp.end(); it++)
 	{
-		while (i < header.lenght())
-		{
-			i = header.found("\n");
-			if (i > 0)
-			{
-				
-			}
-		}
+		for (; *it != '\n' && it != tmp.end(); it++)
+			line.push_back(*it);
+		header.push_back(line);
+		line.clear();
 	}
-
+	std::vector<std::string>::iterator it = header.begin();
+	if (it->find("HTTP/1.1"))
+	{
+		
+	}
+	for (; it != header.end(); it++)
+		std::cout << *it << std::endl;
 }

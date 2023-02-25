@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 10:09:41 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/25 11:52:04 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,11 @@ typedef struct s_header
 	float						version;
 	std::string					host;
 	std::string					connexion;
-	std::string					cache-control;
-	std::string					user-agent;
+	std::string					cache_control;
+	std::string					user_agent;
 	std::vector<std::string>	accept;
 	unsigned long				lenght;
-	std::vector<std::string>	content-type;
+	std::vector<std::string>	content_type;
 }	header;
 
 #endif

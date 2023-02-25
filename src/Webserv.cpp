@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 17:10:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/25 17:31:18 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -510,6 +510,7 @@ std::map<int, Client>::iterator	Webserv::make_client()
 				{
 					Client *ret = new Client(it->second);
 					this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
+					FD_CLR(it->second.sock_fd, &this->readfd);
 				}
 		}
 	}
