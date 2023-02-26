@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/25 11:52:04 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/26 18:41:41 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <string>
+#include <ctime>
 #include <map>
 #include <netinet/in.h>
 
@@ -37,16 +38,24 @@ typedef struct	s_config
 
 typedef struct s_header
 {
-	std::string					methode;
-	std::string					directory;
-	float						version;
-	std::string					host;
-	std::string					connexion;
-	std::string					cache_control;
-	std::string					user_agent;
-	std::vector<std::string>	accept;
-	unsigned long				lenght;
-	std::vector<std::string>	content_type;
+	std::string							methode;
+	std::string							directory;
+	std::string							host;
+	std::string							connexion;
+	std::string							cache_control;
+	std::string							user_agent;
+	std::vector<std::string>			accept;
+	std::map<std::string, std::string>	cookie; // change to a ref of cookie in instance
+	unsigned long						lenght;
+	std::vector<std::string>			content_type;
+	std::string							data; // Need change to a map<string, string>
 }	header;
+
+typedef struct s_cookie
+{
+//	timeval_t							created;
+//	timeval_t							alive;
+	std::map<std::string, std::string>	data;
+}	cookie;
 
 #endif

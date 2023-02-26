@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/25 17:22:18 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/26 18:41:39 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	main(int ac, char **av)
 	conf.insert(std::pair<std::string, std::string>("max_client", "100"));
 	conf.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
 	conf.insert(std::pair<std::string, std::string>("time_out", "120"));
-	conf.insert(std::pair<std::string, std::string>("listen", "8080")); // LISTEN ON ALL IP.
+	conf.insert(std::pair<std::string, std::string>("listen", "1234")); // LISTEN ON ALL IP.
 	conf.insert(std::pair<std::string, std::string>("root", "/www/"));
 	conf.insert(std::pair<std::string, std::string>("index_page", "index.html"));
 
@@ -35,7 +35,7 @@ int	main(int ac, char **av)
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
 	server1.insert(std::pair<std::string, std::string>("host", "192.168.1.99"));
 	server1.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server1.insert(std::pair<std::string, std::string>("listen", "1234"));
+	server1.insert(std::pair<std::string, std::string>("listen", "8080"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server1.insert(std::pair<std::string, std::string>("root", "/web1/"));
 
