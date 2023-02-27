@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/26 18:41:39 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/27 15:38:13 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ int	main(int ac, char **av)
 	test.listen_all();
 
 	std::map<int, Client>::iterator client;
-	
+
 	while (1)
 	{	
 		test.fd_rst();

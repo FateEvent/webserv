@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/26 18:41:38 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/27 15:36:34 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,26 +45,30 @@ void	Client::_make_struct()
 	size_t 						s_str;
 	size_t 						e_str;
 
+std::cout << std::endl;
+
 	while (i == -1 || i == 4095)
 	{
 		i = recv(this->_sock_fd, &buffer, 4095, 0);
 		tmp.append(buffer);
 		memset(buffer, 0, 4096);
 	}
+std::cout << "Socket " + std::to_string(_sock_fd) + " Connected" << std::endl;
+std::cout << "HEADER" << std::endl;
+std::cout << tmp << std::endl;
+std::cout << "END HEADER" << std::endl;
 	i = 0;
-	for (std::string::iterator it = tmp.begin(); it != tmp.end() - 1; it++)
+	for (std::string::iterator it = tmp.begin(); it != tmp.end() && *it != 0; it++)
 	{
-		// put a if about it 
-			for (; *it != '\n' && it != tmp.end(); it++) /// PROBLEM HERE
+			for (; *it != '\n' && it != tmp.end() && *it != 0; it++)
 				line.push_back(*it);
 			header.push_back(line);
 			line.clear();
-		// end of if, try like to see if segfault..
 	}
-for (std::vector<std::string>::iterator it = header.begin(); it != header.end(); it++)
+/* for (std::vector<std::string>::iterator it = header.begin(); it != header.end(); it++)
 {
 	std::cout << *it << std::endl;
-}
+} */
 
 	std::vector<std::string>::iterator it = header.begin();
 	if (it->find("HTTP/1.1"))
@@ -85,7 +89,8 @@ for (std::vector<std::string>::iterator it = header.begin(); it != header.end();
 	}
 	else
 	 throw ("505 HTTP Version Not Supported");
-	for (++it; it != header.end() && *it->data() != '\n'; it++)
+
+	for (++it; it != header.end() && *it->data() != '\r' && *it->data() != 0; it++)
 	{
 		// NO NEED BECAUSE ALREADY IN RIGHT SOCKET
 /* 		if (!it->find("Host:"))
@@ -100,30 +105,50 @@ for (std::vector<std::string>::iterator it = header.begin(); it != header.end();
 		
 		if (!it->find("Accept:"))
 		{
+			std::cout << "Accept" << std::endl;	
 			s_str = it->find_first_of(' ') + 1;
-			
+			std::cout << "Accept OK" << std::endl;	
 			// USE TO FABIO'S SPLIT (<MIME_type>/<MIME_subtype>, ....)
 		}
-		else if (!it->find("Cookie:"))
+		else if (!it->find("User-Agent:"))
 		{
+			std::cout << "User-Agent" << std::endl;
 			s_str = it->find_first_of(' ') + 1;
+			std::cout << "User-Agent OK" << std::endl;
+			// USE TO FABIO'S SPLIT (name=value; ....)
+		}
+		else if (!it->find("Host:"))
+		{
+			std::cout << "Host" << std::endl;
+			s_str = it->find_first_of(' ') + 1;
+			std::cout << "Host OK" << std::endl;
 			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
 		else if (!it->find("Cookie:"))
 		{
-			// PUT COOKIE DIRECTLY ON INSTANCE -> this->_ref_conf.cookie/map<id, struct cookie>
+			std::cout << "COOKIE" << std::endl;
+			s_str = it->find_first_of(' ') + 1;
+			std::cout << "COOKIE OK" << std::endl;
+			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
-		else if (!this->_header.methode.compare("POST"))
+		else if (it->find("Content-Length:") == 0)
 		{
-			if (!it->find("Content-Length:"))
-			{
-				this->_header.lenght = std::stoul(it[it->find(' ') + 1]);
-			}
+			std::cout << "Content-Length:" << std::endl;
+			this->_header.lenght = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
+			std::cout << "Content-Length OK" << std::endl;
+		}
+	}	
+
+/* else if (!this->_header.methode.compare("POST"))
+		{
+			std::cout << "TYPE POST" << std::endl;
+
 			else
 				this->_header.lenght = 0;
-		}
-	}
-std::cout << "END" << std::endl;
+			std::cout << "POST OK" << std::endl;
+		} */
+
+
 	if (!this->_header.methode.compare("POST") && this->_header.lenght > 0)
 	{
 		// NEED PARSE ELEMENT IN CONTENT AND PUT IN data, NEED TO CHANGE TYPE OF data TOO!
