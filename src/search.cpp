@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/24 12:24:21 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/28 13:53:34 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,7 @@ std::string::size_type	ft::find_char(std::string str, char c, std::string::size_
 {
 	std::string::size_type	count(0);
 
-	while (str[i] && str[i] != '\n')
+	while (str[i] && (str[i] != '\n' || str[i] != '\r'))
 	{
 		if (str[i] == c)
 			return (count);
