@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 12:33:51 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/28 10:23:23 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,28 +15,16 @@
 Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::string> >& config) : _nbr_server(0)
 {
 	if (this->created)
-		throw err_init();
+		throw err_init(); // Classe webserv already exist
 	if (config.find("http") == config.end())
 		throw err_init(); //("No default configuration set in config file.");
 	std::multimap<std::string, std::multimap<std::string, std::string> >::iterator itconfig = config.find("http");
 	std::multimap<std::string, std::string> it = itconfig->second;
-	//this->_mainconfig = config;
-		// Convert IP to uint32 for sockaddr
 	this->_base.name.assign("Default");
 	this->_base.root.assign(it.find("root")->second);
 	this->_base.index.assign(it.find("index_page")->second);
-	this->_base.ip.assign(it.find("default")->second);
 	this->_base.port = std::stoul(it.find("listen")->second.data(), NULL, 10);
-	{
-	unsigned int ip[4];
-	if (!sscanf(this->_base.ip.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
-		throw std::length_error("IP bad host in it file");
-	//Do sockaddr_in
-	this->_base.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
-								(ip[1] % 256 << 8 | 0) |\
-								(ip[2] % 256 << 16 | 0) |\
-								(ip[3] % 256 << 24 | 0);
-	}
+	this->_base.addr.sin_addr.s_addr = INADDR_ANY;
 	this->_base.addr.sin_family = AF_INET;
 	this->_base.addr.sin_port = htons(this->_base.port);
 	this->_base.domain = AF_INET;
@@ -47,24 +35,13 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
 	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
-		std::cout << "BIND PROBLEM " + std::to_string(errno) << std::endl;
+		throw err_init(); // ("Server bind error.");
 	if (::listen(this->_base.sock_fd, this->_base.max_client) != 0)
-		std::cout << "LISTEN PROBLEM" << std::endl;
+		throw err_init(); // ("Server listen error.");
 	// Set prepare and active on true
 	this->_base.prepare = true;
 	this->_base.active = false;
 	this->created = true;
-
-
-//std::cout << _base.domain + " \n";
-std::cout << std::to_string(_base.sock_fd) + " \n";
-std::cout << _base.ip + " \n";
-std::cout << std::to_string(_base.port) + " \n";
-//std::cout << _base.domain + " \n";
-//std::cout << _base.domain + " \n";
-//std::cout << _base.domain + " \n";
-
-
 }
 
 void	Webserv::close(std::map<std::string, config>::iterator &instance)
@@ -318,29 +295,10 @@ std::map<std::string, config>::iterator	Webserv::end()
 	return (this->_servers.end());
 }
 
-
-
-
-
-
-
-
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ADD INSTANCE                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   PART OF SHIT                                   +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*                                                     #+#    #+#             */
-/*                                                    ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 void	Webserv::add(std::multimap<std::string, std::string> &server)
 {
 	config	ret = {"","","","",{},-1,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
-	for (std::map<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
+	for (std::multimap<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
 	{
 		if (!it->first.compare("name"))
 		{
@@ -351,7 +309,7 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		else if (!it->first.compare("protocol"))
 		{
 			if (it->second.empty())
-				throw std::length_error("Socket protocol invalid!");
+				ret.domain = AF_INET;
 			else if (it->second.compare("IPV4") || it->second.compare("INET") || it->second.compare("AF_INET"))
 				ret.domain = AF_INET;
 			else if (it->second.compare("IPV6") || it->second.compare("INET6") || it->second.compare("AF_INET6"))
@@ -387,7 +345,7 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 			else if (!it->second.compare("udp"))
 				ret.type = SOCK_DGRAM;
 			else
-				ret.type = SOCK_STREAM;
+				ret.type = SOCK_STREAM;;
 		}
 		else if (!it->first.compare("max_client"))
 		{
@@ -410,7 +368,9 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		}
 		else if (!it->first.compare("error_page"))
 		{
-			std::map<int, std::string> errnbr; // = ft::parse_err(it->second);
+			// PAS BESOIN D ITERER ET ATTENTION A BIEN AJOUTER DIRECTEMENT DANS LA MAP
+			// L ITERATEUR DU MULTMAP PEUX CONTENIR PLUSIEURS FOIS LE "error_page"...
+			std::map<int, std::string> errnbr; // = ft::parse_err(it->second);s
 			std::map<int, std::string>::iterator iterr = errnbr.begin();
 			for (; iterr != errnbr.end(); iterr++)
 			{
@@ -426,8 +386,8 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 		}
 		else
 		{
-			std::cout << it->first << " | " << it->second << std::endl;
-			//throw std::length_error("Unknown parameter in config file!");
+			std::cout << "Unknown key " << it->first << " in config file" << std::endl;
+			//throw ("Unknow parameter in config file!");
 		}
 		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 	}
@@ -534,14 +494,30 @@ timeval&	Webserv::timeout()
 	return (this->_timeout);
 }
 
-/* Client	Webserv::make_client()
+std::map<int, Client>::iterator	Webserv::make_client()
 {
-	for (std::vector<config>::iterator it = this->servers.begin(); it != this->servers.end(); it++)
+	if (FD_ISSET(this->_base.sock_fd, &this->readfd))
 	{
-		if (FD_ISSET(it->sock_fd, &this->readfd))
+			std::cout << "SUR SERVEUR PRINCIPAL" << std::endl;
+	}
+	else
+	{
+		for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		{
-			Client *ret = new Client(*it);
-			ret->set_sock(it->sock_fd);
+			if (it->second.active)
+				if (FD_ISSET(it->second.sock_fd, &this->readfd))
+				{
+					Client *ret = new Client(it->second);
+					this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
+					FD_CLR(it->second.sock_fd, &this->readfd);
+				}
 		}
 	}
-} */
+	for (std::map<int,Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
+	{
+		std::cout << "Client with socket " + std::to_string(it->first) + " Connected" << std::endl;
+		it->second.test_client();
+		::close(it->second.get_sockfd());
+	}
+	return (this->_client.begin());
+}

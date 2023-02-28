@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/22 16:34:36 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/28 10:21:33 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ class Webserv
 		fd_set&				get_readfd();
 		timeval&			timeout();
 
-		//Client				make_client();
+		std::map<int, Client>::iterator	make_client();
 
 		// TRHOW
 		class err_init : public std::exception

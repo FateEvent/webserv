@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 12:28:38 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/28 10:22:02 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,39 +23,32 @@ int	main(int ac, char **av)
 	std::multimap<std::string, std::string>	block_map;
 	std::pair<std::multimap<std::string, std::string>::iterator, std::multimap<std::string, std::string>::iterator>	ret;
 
-	ft::cut_multiple_blocks('{', '}', block_map);
-	ret = block_map.equal_range("server");
-
 	std::multimap<std::string, std::multimap<std::string, std::string> > config;
 	// Config webserb test - Not server instance!!
-	std::multimap<std::string, std::string> conf(ft::split_block(block_map.find("http"), '{', '}'));
-/*	
+	std::multimap<std::string, std::string> conf;
 	conf.insert(std::pair<std::string, std::string>("max_client", "100"));
 	conf.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
 	conf.insert(std::pair<std::string, std::string>("time_out", "120"));
-	conf.insert(std::pair<std::string, std::string>("default", "10.12.3.16"));
-	// IF DONT WORK LIKE THIS MAYBE NEED ROOT USER TO LISTEN ON PORT 80
-	conf.insert(std::pair<std::string, std::string>("listen", "80")); // PORT 80 WITH A LOCALHOST ADDRESS (127.0.0.1) DONT WORK.
-	conf.insert(std::pair<std::string, std::string>("index", "index.html"));
-*/
-	std::multimap<std::string, std::string> server1(ft::split_block(ret.first, '{', '}'));
-/*
+	conf.insert(std::pair<std::string, std::string>("listen", "1234")); // LISTEN ON ALL IP.
+	conf.insert(std::pair<std::string, std::string>("root", "/www/"));
+	conf.insert(std::pair<std::string, std::string>("index_page", "index.html"));
+
+	std::multimap<std::string, std::string> server1;
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
-	server1.insert(std::pair<std::string, std::string>("host", "10.12.3.16"));
+	server1.insert(std::pair<std::string, std::string>("host", "192.168.1.99"));
 	server1.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server1.insert(std::pair<std::string, std::string>("listen", "1234"));
+	server1.insert(std::pair<std::string, std::string>("listen", "8080"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server1.insert(std::pair<std::string, std::string>("root", "/web1/"));
-*/
-	std::multimap<std::string, std::string> server2(ft::split_block(++ret.first, '{', '}'));
-/*
+
+	std::multimap<std::string, std::string> server2;
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
 	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
-	server2.insert(std::pair<std::string, std::string>("listen", "1024"));
+	server2.insert(std::pair<std::string, std::string>("listen", "1025"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
-*/
+
 	config.insert(std::make_pair("http", conf));
 	config.insert(std::make_pair("server", server1));
 	config.insert(std::make_pair("server", server2));
@@ -132,16 +125,17 @@ int	main(int ac, char **av)
 
 	test.listen_all();
 
+	std::map<int, Client>::iterator client;
 
-	
 	while (1)
 	{	
 		test.fd_rst();
-		std::cout << "waitting..." << std::endl;
+		std::cout << "\rwaitting..." << std::flush;
 		int recept = select(test.get_greaterfd(), &test.get_readfd(), &test.get_writefd(), NULL, &test.timeout());
-		std::cout << std::to_string(test.get_greaterfd()) << std::endl;
+		//std::cout << std::to_string(test.get_greaterfd()) << std::endl;
 		if (recept)
 		{
+			client = test.make_client();
 			//nsocket = accept(fd,&addr, len);
 			/* In Webserv class
 				Search the fd as receipt data with FD_ISSET,
@@ -152,7 +146,7 @@ int	main(int ac, char **av)
 
 			//if FD_ISSET(config.sock_fd iterator, &test.get_readfd()))
 			// Client->fd = accept(...)
-			std::cout << "Data recept: " << std::endl;
+			//std::cout << "Data recept: " << std::endl;
 		}
 	}
 //	ginfo = test.begin();
