@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/28 13:31:43 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/28 14:32:49 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,12 @@ int	main(int ac, char **av)
 	
  */
 	std::cout << "Add vector of instance" << std::endl;
-	test.add(config);
+	try {
+		test.add(config);	
+	}
+	catch (std::exception &e) {
+		std::cerr <<  e.what() << std::endl;
+	}
 
 	std::cout << "Number of instances: " << test.get_nbr_server() << std::endl;
 	

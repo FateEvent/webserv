@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/23 15:18:25 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/28 14:33:34 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,16 +57,77 @@
 ** the header <string>, the maximum size of a size_t).
 **
 ** The comments_cleaner() function takes out the comments (indicated by a
-** '#' character) from a string.
+** '#' character) from a string. It is called by the split_block() function,
+** and it is useful in case a ';' character doesn't terminate the key-value
+** pairs in the config file.
+**
+** The kärcherizer() function splits a string line into key-value pairs.
+** 
+** The space_eraser() function deletes white spaces from the map values and
+** operates necessary key replacements.
 */
 
 #include "../include/search.hpp"
 
+void	ft::space_eraser(std::multimap<std::string, std::string> &map)
+{
+	std::multimap<std::string, std::string>::iterator	first(map.begin()), last(map.end());
+	std::string::size_type								i(0);
+
+	for (; first != last; ++first)
+	{
+		i = 0;
+		while (first->second[i])
+		{
+			if (::isspace(first->second[i]))
+				first->second.erase(i, i + 1);
+			++i;
+		}
+		if (first->second == "localhost")
+			first->second = "127.0.0.1";
+		if (first->second == ":")
+			first->second = "0.0.0.0";
+	}
+}
+
+void	ft::kärcherizer(std::multimap<std::string, std::string> &map)
+{
+	std::multimap<std::string, std::string>::iterator	first(map.begin()), last(map.end());
+	std::string											str;
+	std::string::size_type								i(0);
+
+	for (; first != last; ++first)
+	{
+		std::string::size_type	pos = first->second.find_last_of(':');
+		if (pos != std::string::npos)
+		{
+			i = pos + 1;
+			while (first->second[i])
+			{
+				if (!::isspace(first->second[i]))
+					str += first->second[i];
+				else if (::isspace(first->second[i]))
+				{
+					map.insert(std::make_pair("listen", str));
+					str.clear();
+				}
+				++i;
+			}
+			if (str == "tcp" || str == "udp")
+				map.insert(std::make_pair("type", str));
+			else
+				map.insert(std::make_pair(first->first, str));
+			first->second.erase(pos);
+		}
+	}
+	ft::space_eraser(map);
+}
+
 void	ft::comments_cleaner(std::multimap<std::string, std::string> &map)
 {
-	for (std::multimap<std::string, std::string>::iterator	first = map.begin(); // on peut aussi creer un last qui est egal a end
-	// attention l'iterateur eset limite a la boucle FOR !!!
-		first != map.end(); ++first)
+	std::multimap<std::string, std::string>::iterator first(map.begin()), last(map.end());
+
+	for (; first != last; ++first)
 	{
 		std::string::size_type	pos = first->second.find('#');
 		if (pos != std::string::npos)
@@ -126,7 +187,6 @@ std::pair<std::string, std::string>	ft::string_parser(std::string str, char clos
 	pos = val.find(';');
 	if (pos != std::string::npos)
 		val.erase(pos);
-	std::cout << val << '$' << std::endl;
 	return (std::make_pair(key, val));
 }
 
@@ -166,18 +226,11 @@ std::multimap<std::string, std::string>	ft::split_block(std::multimap<std::strin
 		{
 			std::string::size_type	pos = find_char(str, opening, i);
 			if (pos != std::string::npos)
-			{
 				map.insert(ft::block_parser(str, closure, i));
-			}
 			else if (str[i] == '\n')
 			{
 				map.insert(ft::string_parser(str, closure, i - line_length));
 				line_length = 0;
-			}
-			if (str[i] == closure)
-			{
-				++i;
-				++line_length;
 			}
 			++i;
 			++line_length;
@@ -205,6 +258,8 @@ std::multimap<std::string, std::string>	ft::split_block(std::multimap<std::strin
 		}
 		map.insert(std::make_pair(key, val));
 	}
+	ft::comments_cleaner(map);
+	ft::kärcherizer(map);
 	return (map);
 }
 
@@ -225,13 +280,11 @@ std::pair<std::string, std::string>	ft::cut_block(std::string target, char openi
 	}
 	else
 		val = (*first).substr(target.length());
-	while (first != arr.end())
+	for (++first; first != arr.end(); first++)
 	{
-		++first;
 		val += '\n';
 		val += *first;
 	}
-	++first;
 	return (std::make_pair(key, val));
 }
 
