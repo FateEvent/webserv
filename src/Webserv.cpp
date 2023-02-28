@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/23 14:16:46 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/28 13:31:50 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,9 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	std::multimap<std::string, std::multimap<std::string, std::string> >::iterator itconfig = config.find("http");
 	std::multimap<std::string, std::string> it = itconfig->second;
 	this->_base.name.assign("Default");
-std::cout << "SSSSSSs" << std::endl;
 	this->_base.root.assign(it.find("root")->second);
-std::cout << "SSSSSSs" << std::endl;
 	this->_base.index.assign(it.find("index_page")->second);
-std::cout << "SSSSSSs" << std::endl;
 	this->_base.port = std::stoul(it.find("listen")->second.data(), NULL, 10);
-std::cout << "SSSSSSs" << std::endl;
 	this->_base.addr.sin_addr.s_addr = INADDR_ANY;
 	this->_base.addr.sin_family = AF_INET;
 	this->_base.addr.sin_port = htons(this->_base.port);
@@ -505,14 +501,18 @@ std::map<int, Client>::iterator	Webserv::make_client()
 	{
 			std::cout << "SUR SERVEUR PRINCIPAL" << std::endl;
 	}
-	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+	else
 	{
-		if (it->second.active)
-			if (FD_ISSET(it->second.sock_fd, &this->readfd))
-			{
-				Client *ret = new Client(it->second);
-				this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
-			}
+		for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+		{
+			if (it->second.active)
+				if (FD_ISSET(it->second.sock_fd, &this->readfd))
+				{
+					Client *ret = new Client(it->second);
+					this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
+					FD_CLR(it->second.sock_fd, &this->readfd);
+				}
+		}
 	}
 	for (std::map<int,Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
