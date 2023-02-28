@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/27 15:36:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/27 19:09:51 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,18 +45,12 @@ void	Client::_make_struct()
 	size_t 						s_str;
 	size_t 						e_str;
 
-std::cout << std::endl;
-
 	while (i == -1 || i == 4095)
 	{
 		i = recv(this->_sock_fd, &buffer, 4095, 0);
 		tmp.append(buffer);
 		memset(buffer, 0, 4096);
 	}
-std::cout << "Socket " + std::to_string(_sock_fd) + " Connected" << std::endl;
-std::cout << "HEADER" << std::endl;
-std::cout << tmp << std::endl;
-std::cout << "END HEADER" << std::endl;
 	i = 0;
 	for (std::string::iterator it = tmp.begin(); it != tmp.end() && *it != 0; it++)
 	{
@@ -65,11 +59,6 @@ std::cout << "END HEADER" << std::endl;
 			header.push_back(line);
 			line.clear();
 	}
-/* for (std::vector<std::string>::iterator it = header.begin(); it != header.end(); it++)
-{
-	std::cout << *it << std::endl;
-} */
-
 	std::vector<std::string>::iterator it = header.begin();
 	if (it->find("HTTP/1.1"))
 	{
@@ -92,8 +81,9 @@ std::cout << "END HEADER" << std::endl;
 
 	for (++it; it != header.end() && *it->data() != '\r' && *it->data() != 0; it++)
 	{
-		// NO NEED BECAUSE ALREADY IN RIGHT SOCKET
-/* 		if (!it->find("Host:"))
+// NO NEED BECAUSE ALREADY IN RIGHT SOCKET
+/*
+		if (!it->find("Host:"))
 		{
 			s_str = it->find_first_of(' ') + 1;
 			if (!it->find(":"))
@@ -101,8 +91,8 @@ std::cout << "END HEADER" << std::endl;
 				e_str = it->find_first_of(':');
 				
 			}
-		} */
-		
+		}
+*/
 		if (!it->find("Accept:"))
 		{
 			std::cout << "Accept" << std::endl;	
@@ -132,27 +122,21 @@ std::cout << "END HEADER" << std::endl;
 			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
 		else if (it->find("Content-Length:") == 0)
-		{
-			std::cout << "Content-Length:" << std::endl;
 			this->_header.lenght = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
-			std::cout << "Content-Length OK" << std::endl;
-		}
 	}	
-
-/* else if (!this->_header.methode.compare("POST"))
+/*
+	else if (!this->_header.methode.compare("POST"))
 		{
 			std::cout << "TYPE POST" << std::endl;
 
 			else
 				this->_header.lenght = 0;
 			std::cout << "POST OK" << std::endl;
-		} */
-
-
+		}
+*/
 	if (!this->_header.methode.compare("POST") && this->_header.lenght > 0)
 	{
 		// NEED PARSE ELEMENT IN CONTENT AND PUT IN data, NEED TO CHANGE TYPE OF data TOO!
 		this->_header.content_type.push_back((++it)->data());
 	}
-		std::cout << "DATA ARE ----->  " + this->_header.data << std::endl;
 }

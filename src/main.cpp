@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/27 15:38:13 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/27 19:09:27 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ fd_set		Webserv::errfd;
 
 int	main(int ac, char **av)
 {
-
 	std::multimap<std::string, std::multimap<std::string, std::string> > config;
 	// Config webserb test - Not server instance!!
 	std::multimap<std::string, std::string> conf;
@@ -125,24 +124,9 @@ int	main(int ac, char **av)
 		test.fd_rst();
 		std::cout << "\rwaitting..." << std::flush;
 		int recept = select(test.get_greaterfd(), &test.get_readfd(), &test.get_writefd(), NULL, &test.timeout());
-		//std::cout << std::to_string(test.get_greaterfd()) << std::endl;
 		if (recept)
-		{
 			client = test.make_client();
-			//nsocket = accept(fd,&addr, len);
-			/* In Webserv class
-				Search the fd as receipt data with FD_ISSET,
-				create a new class Client with the config of the instance with accept,
-				put the new fd in Client class,
-				Refer in this Client class the data I/O.		
-			*/
-
-			//if FD_ISSET(config.sock_fd iterator, &test.get_readfd()))
-			// Client->fd = accept(...)
-			//std::cout << "Data recept: " << std::endl;
-		}
 	}
-//	ginfo = test.begin();
 	test.stop_all();
 	
 	(void) ac;
