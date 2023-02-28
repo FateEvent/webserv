@@ -6,20 +6,20 @@ INCLUDES	=	./include/common.h \
 				./include/Client.hpp
 FILES		=	Webserv.cpp \
 				Client.cpp \
-				search.cpp \
 				main.cpp
 RM			=	rm -rf
 SRCS		=	$(addprefix ./src/, $(FILES))
-OBJS		=	$(SRCS:%.c=%.o)
+OBJS		=	$(SRCS:%.cpp=%.o)
 
 $(NAME)		:	$(OBJS)
 				$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
 all			:	$(NAME)
 
-clean		:	$(RM) $(OBJS)
+clean:
+	$(RM) $(OBJS)
 
-flcean		:	clean
+fclean		:	clean
 				$(RM) $(NAME)
 
 re			:	fclean all
