@@ -3,28 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/24 11:39:06 by stissera         ###   ########.fr       */
+/*   Updated: 2023/02/28 16:36:06 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
-#define CLIENT_HPP
+# define CLIENT_HPP
 
-#include <iostream>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <cstring>
-#include <string>
-#include <time.h>
-#include <sys/types.h>
-#include <map>
-#include <vector>
-#include <list>
-#include "../include/common.h"
-#include <sys/un.h>
+# include <iostream>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <cstring>
+# include <string>
+# include <time.h>
+# include <sys/types.h>
+# include <map>
+# include <vector>
+# include <list>
+# include "../include/common.h"
+# include "../include/search.hpp"
+# include <sys/un.h>
 
 class Client
 {
