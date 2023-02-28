@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/28 16:23:46 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/28 16:57:54 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void	Client::_make_struct()
 	std::string					tmp;
 	std::string					line;
 	std::vector<std::string>	header;
+	std::vector<std::string>	accept_vect;
 	ssize_t						i = -1;
 	size_t 						s_str;
 	size_t 						e_str;
@@ -96,9 +97,13 @@ void	Client::_make_struct()
 */
 		if (!it->find("Accept:"))
 		{
-			std::cout << "Accept" << std::endl;	
+			std::cout << "Accept" << std::endl;
 			s_str = it->find_first_of(' ') + 1;
-			std::cout << "Accept OK" << std::endl;	
+			std::cout << "Accept OK" << std::endl;
+			accept_vect = ft::str_to_vect(*it, ", ");
+			std::vector<std::string>::iterator	first = accept_vect.begin();
+			for (; first != accept_vect.end(); ++first)
+				std::cout << "it: " << *first << std::endl;
 			// USE TO FABIO'S SPLIT (<MIME_type>/<MIME_subtype>, ....)
 		}
 		else if (!it->find("User-Agent:"))
@@ -124,7 +129,14 @@ void	Client::_make_struct()
 		}
 		else if (it->find("Content-Length:") == 0)
 			this->_header.length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
-	}	
+		else if (it->find("Accept-Language:") == 0)
+		{
+			accept_vect = ft::str_to_vect(*it, ", ");
+			std::vector<std::string>::iterator	first = accept_vect.begin();
+			for (; first != accept_vect.end(); ++first)
+				std::cout << "it: " << *first << std::endl;
+		}
+	}
 /*
 	else if (!this->_header.methode.compare("POST"))
 		{
