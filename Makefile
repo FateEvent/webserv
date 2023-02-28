@@ -3,9 +3,11 @@ CC			=	c++
 FLAGS		=	-Wall -Werror -Wextra -std=c++11
 INCLUDES	=	./include/common.h \
 				./include/Webserv.hpp \
-				./include/Client.hpp
+				./include/Client.hpp \
+				./include/search.hpp
 FILES		=	Webserv.cpp \
 				Client.cpp \
+				search.cpp \
 				main.cpp
 RM			=	rm -rf
 SRCS		=	$(addprefix ./src/, $(FILES))
