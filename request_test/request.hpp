@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/24 16:24:08 by averon            #+#    #+#             */
-/*   Updated: 2023/02/28 10:10:26 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/28 15:10:13 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <cstdlib>
 # include <string>
 # include <map>
-
+# include <vector>
 class request
 {
 	private :

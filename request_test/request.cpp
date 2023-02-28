@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/27 15:06:43 by averon            #+#    #+#             */
-/*   Updated: 2023/02/28 10:10:26 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/28 15:31:08 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,3 +62,5 @@ void request::parse_first_line(std::string request_line)
 	request::headers[Key_Protocol] = tok;		
 	delete [] c_line;
 }
+
+

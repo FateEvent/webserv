@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   search.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/28 14:39:55 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/28 16:17:55 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,27 @@
 */
 
 #include "../include/search.hpp"
+
+
+std::vector<std::string> ft::str_to_vect(std::string str, char* sep)
+{
+	std::vector<std::string> accept_vect;
+	char* tmp = new char[str.length() +1];
+
+	std::strcpy(tmp, str.c_str());
+	char *tok = std::strtok(tmp, sep);
+
+	while (tok != NULL)
+	{
+		std::string(tok).erase(0, std::string(tok).find_first_not_of(" \t"));
+   		std::string(tok).erase(std::string(tok).find_last_not_of(" \t") + 1);
+		accept_vect.push_back(std::string(tok));
+		tok = std::strtok(NULL, sep);	
+	}
+
+	delete [] tmp;
+	return (accept_vect);
+}
 
 void	ft::space_eraser(std::multimap<std::string, std::string> &map)
 {
