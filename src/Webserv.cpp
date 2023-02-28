@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/28 13:05:22 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/28 14:10:46 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -499,6 +499,7 @@ std::map<int, Client>::iterator	Webserv::make_client()
 	if (FD_ISSET(this->_base.sock_fd, &this->readfd))
 	{
 			std::cout << "SUR SERVEUR PRINCIPAL" << std::endl;
+			FD_CLR(this->_base.sock_fd, &this->readfd);
 	}
 	else
 	{

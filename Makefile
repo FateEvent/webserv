@@ -12,7 +12,10 @@ SRCS		=	$(addprefix ./src/, $(FILES))
 OBJS		=	$(SRCS:%.cpp=%.o)
 
 $(NAME)		:	$(OBJS)
-				$(CC) $(FLAGS) $(OBJS) -o $(NAME)
+				$(CC) $(OBJS) -o $(NAME)
+
+.cpp.o		:
+	$(CC) $(FLAGS) -c $< -o ${<:.cpp=.o}
 
 all			:	$(NAME)
 

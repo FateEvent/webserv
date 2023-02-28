@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/28 13:05:32 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/28 14:04:49 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,13 @@ int	main(int ac, char **av)
 	conf.insert(std::pair<std::string, std::string>("max_client", "100"));
 	conf.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
 	conf.insert(std::pair<std::string, std::string>("time_out", "120"));
-	conf.insert(std::pair<std::string, std::string>("listen", "1234")); // LISTEN ON ALL IP.
+	conf.insert(std::pair<std::string, std::string>("listen", "80")); // LISTEN ON ALL IP.
 	conf.insert(std::pair<std::string, std::string>("root", "/www/"));
 	conf.insert(std::pair<std::string, std::string>("index_page", "index.html"));
 
 	std::multimap<std::string, std::string> server1;
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
-	server1.insert(std::pair<std::string, std::string>("host", "192.168.1.99"));
+	server1.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
 	server1.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
 	server1.insert(std::pair<std::string, std::string>("listen", "8080"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
@@ -41,7 +41,7 @@ int	main(int ac, char **av)
 	std::multimap<std::string, std::string> server2;
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server2.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
+	server2.insert(std::pair<std::string, std::string>("host", "10.12.3.13"));
 	server2.insert(std::pair<std::string, std::string>("listen", "1025"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
