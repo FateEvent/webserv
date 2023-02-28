@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/28 14:20:02 by faventur         ###   ########.fr       */
+/*   Updated: 2023/02/28 16:23:46 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void	Client::_make_struct()
 		s_str = it->find_first_of('/');
 		e_str = it->find_last_of(' ');
 		if (s_str == e_str)
-			throw ("unvailable header!"); // give maybe a error to the client!
+			throw ("unavailable header!"); // give maybe a error to the client!
 		this->_header.directory.append(*it, s_str, e_str - s_str);
 	}
 	else
@@ -81,6 +81,7 @@ void	Client::_make_struct()
 
 	for (++it; it != header.end() && *it->data() != '\r' && *it->data() != 0; it++)
 	{
+		std::cout << *it << std::endl;
 // NO NEED BECAUSE ALREADY IN RIGHT SOCKET
 /*
 		if (!it->find("Host:"))
@@ -122,7 +123,7 @@ void	Client::_make_struct()
 			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
 		else if (it->find("Content-Length:") == 0)
-			this->_header.lenght = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
+			this->_header.length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
 	}	
 /*
 	else if (!this->_header.methode.compare("POST"))
@@ -130,11 +131,11 @@ void	Client::_make_struct()
 			std::cout << "TYPE POST" << std::endl;
 
 			else
-				this->_header.lenght = 0;
+				this->_header.length = 0;
 			std::cout << "POST OK" << std::endl;
 		}
 */
-	if (!this->_header.methode.compare("POST") && this->_header.lenght > 0)
+	if (!this->_header.methode.compare("POST") && this->_header.length > 0)
 	{
 		// NEED PARSE ELEMENT IN CONTENT AND PUT IN data, NEED TO CHANGE TYPE OF data TOO!
 		this->_header.content_type.push_back((++it)->data());

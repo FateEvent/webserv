@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/28 16:17:55 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/28 16:25:35 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,7 +215,7 @@ std::string::size_type	ft::find_char(std::string str, char c, std::string::size_
 {
 	std::string::size_type	count(0);
 
-	while (str[i] && (str[i] != '\n' || str[i] != '\r'))
+	while (str[i] && str[i] != '\n')
 	{
 		if (str[i] == c)
 			return (count);
@@ -286,10 +286,10 @@ std::multimap<std::string, std::string>	ft::split_block(std::multimap<std::strin
 
 std::pair<std::string, std::string>	ft::cut_block(std::string target, char opening, std::vector<std::string> &arr)
 {
-	std::string	key;
-	std::string	val;
+	std::string							key;
+	std::string							val;
 	std::vector<std::string>::iterator	first = arr.begin();
-	std::string::size_type	pos((*first).find(target));
+	std::string::size_type				pos((*first).find(target));
 
 	(*first).erase(std::remove_if((*first).begin(), (*first).begin() + pos, ::isspace), (*first).begin() + pos);
 	key = (*first).substr(0, target.length());
