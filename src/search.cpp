@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   search.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/28 16:25:35 by averon           ###   ########.fr       */
+/*   Updated: 2023/02/28 16:27:30 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@
 #include "../include/search.hpp"
 
 
-std::vector<std::string> ft::str_to_vect(std::string str, char* sep)
+std::vector<std::string>	ft::str_to_vect(std::string str, char* sep)
 {
 	std::vector<std::string> accept_vect;
 	char* tmp = new char[str.length() +1];
