@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/01 14:10:10 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:26:42 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,17 +110,25 @@ void	Client::_make_struct()
 		{
 			std::cout << "User-Agent" << std::endl;
 			s_str = it->find_first_of(' ') + 1;
-			it->erase(0, s_str);
+			this->_header.user_agent = it->erase(0, s_str);
+			std::cout << "User-Agent: " << this->_header.user_agent << std::endl;
 			std::cout << "User-Agent OK" << std::endl;
-			// USE TO FABIO'S SPLIT (name=value; ....)
+		}
+		else if (!it->find("Connection:"))
+		{
+			std::cout << "Connection" << std::endl;
+			s_str = it->find_first_of(' ') + 1;
+			this->_header.connection = it->erase(0, s_str);
+			std::cout << "Connection: " << this->_header.connection << std::endl;
+			std::cout << "Connection OK" << std::endl;
 		}
 		else if (!it->find("Host:"))
 		{
 			std::cout << "Host" << std::endl;
 			s_str = it->find_first_of(' ') + 1;
-			it->erase(0, s_str);
+			this->_header.host = it->erase(0, s_str);
+			std::cout << "Host: " << this->_header.host << std::endl;
 			std::cout << "Host OK" << std::endl;
-			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
 		else if (!it->find("Cookie:"))
 		{
@@ -134,9 +142,20 @@ void	Client::_make_struct()
 			this->_header.length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
 		else if (it->find("Accept-Language:") == 0)
 		{
+			s_str = it->find_first_of(' ') + 1;
+			it->erase(0, s_str);
 			this->_header.language = ft::str_to_vect(*it, ", ");
 			std::vector<std::string>::iterator	first = this->_header.language.begin();
 			for (; first != this->_header.language.end(); ++first)
+				std::cout << "it: " << *first << std::endl;
+		}
+		else if (it->find("Accept-Encoding:") == 0)
+		{
+			s_str = it->find_first_of(' ') + 1;
+			it->erase(0, s_str);
+			this->_header.encoding = ft::str_to_vect(*it, ", ");
+			std::vector<std::string>::iterator	first = this->_header.encoding.begin();
+			for (; first != this->_header.encoding.end(); ++first)
 				std::cout << "it: " << *first << std::endl;
 		}
 	}
