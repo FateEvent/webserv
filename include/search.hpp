@@ -28,6 +28,7 @@ namespace ft {
 	string_map					split_block(std::multimap<std::string, std::string>::iterator it, char opening, char closure);
 	std::string::size_type		find_char(std::string str, char c, std::string::size_type i);
 	string_pair					string_parser(std::string str, char closure, std::string::size_type i);
+	string_pair					string_parser(std::string str, char sep);
 	string_pair					block_parser(std::string str, char closure, std::string::size_type &i);
 	void						comments_cleaner(std::multimap<std::string, std::string> &map);
 	void						kärcherizer(std::multimap<std::string, std::string> &map);

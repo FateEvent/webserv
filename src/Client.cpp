@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/01 14:26:42 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:52:49 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,7 @@ void	Client::_make_struct()
 			std::cout << "COOKIE" << std::endl;
 			s_str = it->find_first_of(' ') + 1;
 			it->erase(0, s_str);
+			string_parser
 			std::cout << "COOKIE OK" << std::endl;
 			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
