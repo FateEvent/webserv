@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/01 14:02:24 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:52:12 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,32 @@ std::pair<std::string, std::string>	ft::block_parser(std::string str, char closu
 			val += ' ';
 		++i;
 	}
+	return (std::make_pair(key, val));
+}
+
+std::pair<std::string, std::string>	ft::string_parser(std::string str, char sep)
+{
+	std::string				key;
+	std::string				val;
+	std::string::size_type	i(0);
+	std::string::size_type	pos(0);
+
+	while (str[i] && ::isspace(str[i]))
+		++i;
+	while (str[i] && (!::isspace(str[i]) && str[i] != sep))
+	{
+		key += str[i];
+		++i;
+	}
+	while (str[i])
+	{
+		if (!::isspace(str[i]) && str[i] != sep)
+			val += str[i];
+		++i;
+	}
+	pos = val.find(';');
+	if (pos != std::string::npos)
+		val.erase(pos);
 	return (std::make_pair(key, val));
 }
 
