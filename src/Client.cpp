@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/01 15:40:37 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/01 18:00:12 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ void	Client::_make_struct()
 	{
 		i = recv(this->_sock_fd, &buffer, 4095, 0);
 		tmp.append(buffer);
-		tmp.erase(tmp.length() - 2);	// on fait des bêtises
-		tmp.append("Cookie: stephane=guy_roux; chapeau=rouge; alex=se_debrouille\n");	// comme dit...
+		//tmp.erase(tmp.length() - 2);	// on fait des bêtises
+		//tmp.append("Cookie: stephane=guy_roux; chapeau=rouge; alex=se_debrouille\n");	// comme dit...
 		memset(buffer, 0, 4096);
 	}
 	i = 0;
@@ -81,6 +81,22 @@ void	Client::_make_struct()
 	}
 	else
 	 throw ("505 HTTP Version Not Supported");
+
+	if (!this->_header.method.compare("POST"))
+	{
+		std::cout << "POST" << std::endl;
+		std::size_t pos = _header.directory.find('?');
+		if(pos != std::string::npos)
+		{
+			pos += 1;
+			std::string temp = _header.directory.substr(pos);
+			this->_header.data = ft::str_to_map(temp, "&");
+			std::map<std::string, std::string>::iterator	first = this->_header.data.begin();
+			for (; first != this->_header.data.end(); ++first)
+				std::cout << "key: " << first->first << ", value: " << first->second << std::endl;
+		}
+		std::cout << "POST_VAR OK" << std::endl;
+	}
 
 	for (++it; it != header.end() && *it->data() != '\r' && *it->data() != 0; it++)
 	{
@@ -176,6 +192,8 @@ void	Client::_make_struct()
 			std::cout << "POST OK" << std::endl;
 		}
 */
+	
+		
 	if (!this->_header.method.compare("POST") && this->_header.length > 0)
 	{
 		// NEED PARSE ELEMENT IN CONTENT AND PUT IN data, NEED TO CHANGE TYPE OF data TOO!
