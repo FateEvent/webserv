@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   search.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/01 14:52:12 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/01 15:15:57 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,25 @@ std::vector<std::string>	ft::str_to_vect(std::string str, std::string sep)
 	}
 	return (accept_vect);
 }
+
+
+std::map<std::string, std::string>	ft::str_to_map(std::string str, std::string sep)
+{
+	std::map<std::string, std::string> 	map;
+	std::vector<std::string> 			vect;
+	ft::string_pair 					pair;	
+	
+	vect = ft::str_to_vect(str, sep);
+	
+	for(std::vector<std::string>::iterator it = vect.begin(); it != vect.end(); it++)
+	{
+		pair = ft::string_parser(*it ,"=");
+		map.insert(pair);
+	}
+	return (map);
+}
+
+
 
 void	ft::space_eraser(std::multimap<std::string, std::string> &map)
 {
