@@ -3,18 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/01 12:49:23 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/01 14:10:10 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Client.hpp"
 
-Client::Client(const config &config) : 	_ref_conf(config),
-										_user_agent(),_host(),_connection(),
-										_accept_vect(),_accept_lang_vect(),_accept_encod_vect(),_cookies_vect()
+Client::Client(const config &config) : 	_ref_conf(config)
 {
 	_socklen = sizeof(this->_addr);
 	FD_ZERO(&this->_readfd);
@@ -43,7 +41,6 @@ void	Client::_make_struct()
 	std::string					tmp;
 	std::string					line;
 	std::vector<std::string>	header;
-	std::vector<std::string>	accept_vect;
 	ssize_t						i = -1;
 	size_t 						s_str;
 	size_t 						e_str;
@@ -66,11 +63,11 @@ void	Client::_make_struct()
 	if (it->find("HTTP/1.1"))
 	{
 		if (!it->compare(0, 5, "GET /"))
-			this->_header.methode = "GET";
+			this->_header.method = "GET";
 		else if (!it->compare(0, 6, "POST /"))
-			this->_header.methode = "POST";
+			this->_header.method = "POST";
 		else if (!it->compare(0, 8, "DELETE /"))
-			this->_header.methode = "DELETE";
+			this->_header.method = "DELETE";
 		else
 			throw ("Only POST, GET and DELETE are available!"); // give maybe a error to the client!
 		s_str = it->find_first_of('/');
@@ -103,9 +100,9 @@ void	Client::_make_struct()
 			s_str = it->find_first_of(' ') + 1;
 			it->erase(0, s_str);
 			std::cout << "Accept OK" << std::endl;
-			this->_accept_vect = ft::str_to_vect(*it, ", ");
-			std::vector<std::string>::iterator	first = _accept_vect.begin();
-			for (; first != _accept_vect.end(); ++first)
+			this->_header.accept = ft::str_to_vect(*it, ", ");
+			std::vector<std::string>::iterator	first = this->_header.accept.begin();
+			for (; first != this->_header.accept.end(); ++first)
 				std::cout << "it: " << *first << std::endl;
 			// USE TO FABIO'S SPLIT (<MIME_type>/<MIME_subtype>, ....)
 		}
@@ -137,14 +134,14 @@ void	Client::_make_struct()
 			this->_header.length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
 		else if (it->find("Accept-Language:") == 0)
 		{
-			accept_vect = ft::str_to_vect(*it, ", ");
-			std::vector<std::string>::iterator	first = accept_vect.begin();
-			for (; first != accept_vect.end(); ++first)
+			this->_header.language = ft::str_to_vect(*it, ", ");
+			std::vector<std::string>::iterator	first = this->_header.language.begin();
+			for (; first != this->_header.language.end(); ++first)
 				std::cout << "it: " << *first << std::endl;
 		}
 	}
 /*
-	else if (!this->_header.methode.compare("POST"))
+	else if (!this->_header.method.compare("POST"))
 		{
 			std::cout << "TYPE POST" << std::endl;
 
@@ -153,7 +150,7 @@ void	Client::_make_struct()
 			std::cout << "POST OK" << std::endl;
 		}
 */
-	if (!this->_header.methode.compare("POST") && this->_header.length > 0)
+	if (!this->_header.method.compare("POST") && this->_header.length > 0)
 	{
 		// NEED PARSE ELEMENT IN CONTENT AND PUT IN data, NEED TO CHANGE TYPE OF data TOO!
 		this->_header.content_type.push_back((++it)->data());

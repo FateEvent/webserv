@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   common.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/01 12:49:23 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/01 14:04:46 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,15 @@ typedef struct	s_config
 
 typedef struct s_header
 {
-	std::string							methode;
+	std::string							method;
 	std::string							directory;
 	std::string							host;
-	std::string							connexion;
+	std::string							connection;
 	std::string							cache_control;
 	std::string							user_agent;
 	std::vector<std::string>			accept;
+	std::vector<std::string>			language;
+	std::vector<std::string>			encoding;
 	std::map<std::string, std::string>	cookie; // change to a ref of cookie in instance
 	unsigned long						length;
 	std::vector<std::string>			content_type;
