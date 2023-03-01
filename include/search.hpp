@@ -35,6 +35,7 @@ namespace ft {
 	void						kärcherizer(std::multimap<std::string, std::string> &map);
 	void						space_eraser(std::multimap<std::string, std::string> &map);
 	std::vector<std::string>	str_to_vect(std::string str, std::string sep);
+	std::map<std::string, std::string>	ft::str_to_map(std::string str, std::string sep);
 }
 
 #endif
