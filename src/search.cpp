@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/01 14:52:12 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/01 15:11:34 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,20 @@ std::pair<std::string, std::string>	ft::block_parser(std::string str, char closu
 	return (std::make_pair(key, val));
 }
 
-std::pair<std::string, std::string>	ft::string_parser(std::string str, char sep)
+int	ft::string_looper(char c, std::string str)
+{
+	std::string::size_type	i(0);
+
+	while (str[i])
+	{
+		if (str[i] == c)
+			return (1);
+		++i;
+	}
+	return (0);
+}
+
+std::pair<std::string, std::string>	ft::string_parser(std::string str, std::string sep)
 {
 	std::string				key;
 	std::string				val;
@@ -204,14 +217,14 @@ std::pair<std::string, std::string>	ft::string_parser(std::string str, char sep)
 
 	while (str[i] && ::isspace(str[i]))
 		++i;
-	while (str[i] && (!::isspace(str[i]) && str[i] != sep))
+	while (str[i] && (!::isspace(str[i]) && !ft::string_looper(str[i], sep)))
 	{
 		key += str[i];
 		++i;
 	}
 	while (str[i])
 	{
-		if (!::isspace(str[i]) && str[i] != sep)
+		if (!::isspace(str[i]) && !ft::string_looper(str[i], sep))
 			val += str[i];
 		++i;
 	}
