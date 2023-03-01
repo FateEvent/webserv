@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   search.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/02/28 17:15:58 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/01 12:40:51 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,8 @@ std::vector<std::string>	ft::str_to_vect(std::string str, std::string sep)
 
 	std::strcpy(tmp, str.c_str());
 	char	*tok = std::strtok(tmp, sep.data());
-
+	
+	//tok = std::strtok(tmp, sep.data());
 	while (tok != NULL)
 	{
 		std::string(tok).erase(0, std::string(tok).find_first_not_of(" \t"));

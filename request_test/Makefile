@@ -1,6 +1,6 @@
 NAME		=	serv1
 CC			=	c++
-FLAGS		=	-std=c++98
+FLAGS		=	-g -std=c++98
 INCLUDES	=	./request.hpp
 FILES		=	serv1.cpp \
 				request.cpp

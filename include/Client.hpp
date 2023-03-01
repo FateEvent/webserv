@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/28 16:36:06 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/01 12:20:04 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,17 @@ class Client
 		fd_set			_readfd;
 //		fd_set			_writefd;
 		header			_header;
+		std::string					_user_agent;
+		std::string					_host;
+		std::string					_connection;
+		std::vector<std::string>	_accept_vect;
+		std::vector<std::string>	_accept_lang_vect;
+		std::vector<std::string>	_accept_encod_vect;
+		std::vector<std::string>	_cookies_vect;
+			
 		void			_make_struct();
-
+		
+		
 	public:
 		Client(const config&);
 		~Client();

@@ -3,16 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/28 16:57:54 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/01 12:49:23 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/Client.hpp"
 
-Client::Client(const config &config) : _ref_conf(config)
+Client::Client(const config &config) : 	_ref_conf(config),
+										_user_agent(),_host(),_connection(),
+										_accept_vect(),_accept_lang_vect(),_accept_encod_vect(),_cookies_vect()
 {
 	_socklen = sizeof(this->_addr);
 	FD_ZERO(&this->_readfd);
@@ -99,10 +101,11 @@ void	Client::_make_struct()
 		{
 			std::cout << "Accept" << std::endl;
 			s_str = it->find_first_of(' ') + 1;
+			it->erase(0, s_str);
 			std::cout << "Accept OK" << std::endl;
-			accept_vect = ft::str_to_vect(*it, ", ");
-			std::vector<std::string>::iterator	first = accept_vect.begin();
-			for (; first != accept_vect.end(); ++first)
+			this->_accept_vect = ft::str_to_vect(*it, ", ");
+			std::vector<std::string>::iterator	first = _accept_vect.begin();
+			for (; first != _accept_vect.end(); ++first)
 				std::cout << "it: " << *first << std::endl;
 			// USE TO FABIO'S SPLIT (<MIME_type>/<MIME_subtype>, ....)
 		}
@@ -110,6 +113,7 @@ void	Client::_make_struct()
 		{
 			std::cout << "User-Agent" << std::endl;
 			s_str = it->find_first_of(' ') + 1;
+			it->erase(0, s_str);
 			std::cout << "User-Agent OK" << std::endl;
 			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
@@ -117,6 +121,7 @@ void	Client::_make_struct()
 		{
 			std::cout << "Host" << std::endl;
 			s_str = it->find_first_of(' ') + 1;
+			it->erase(0, s_str);
 			std::cout << "Host OK" << std::endl;
 			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
@@ -124,6 +129,7 @@ void	Client::_make_struct()
 		{
 			std::cout << "COOKIE" << std::endl;
 			s_str = it->find_first_of(' ') + 1;
+			it->erase(0, s_str);
 			std::cout << "COOKIE OK" << std::endl;
 			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
