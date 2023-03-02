@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/01 15:17:34 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/02 15:01:59 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,16 @@ std::map<std::string, std::string>	ft::str_to_map(std::string str, std::string s
 	return (map);
 }
 
-
+void	ft::space_eraser(std::string &str, std::string::size_type i)
+{
+	while (str[i])
+	{
+		if (::isspace(str[i]))
+			str.erase(i, i + 1);
+		else
+			++i;
+	}
+}
 
 void	ft::space_eraser(std::multimap<std::string, std::string> &map)
 {

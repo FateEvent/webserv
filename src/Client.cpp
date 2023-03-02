@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 15:11:54 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/02 15:12:26 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,6 @@ void	Client::_make_struct()
 	{
 		i = recv(this->_sock_fd, &buffer, 4095, 0);
 		tmp.append(buffer);
-//		tmp.erase(tmp.length() - 2);	// on fait des bêtises
-//		tmp.append("Cookie: stephane=guy_roux; chapeau=rouge; alex=se_debrouille\n");	// comme dit...
 		memset(buffer, 0, 4096);
 	}
 	i = 0;
@@ -59,7 +57,7 @@ void	Client::_make_struct()
 			for (; *it != '\n' && it != tmp.end() && *it != 0; it++)
 				line.push_back(*it);
 			header.push_back(line);
-//			std::cout << "line: " << line << std::endl;
+			std::cout << "line: " << line << std::endl;
 			line.clear();
 	}
 	std::vector<std::string>::iterator it = header.begin();
