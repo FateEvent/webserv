@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 15:10:46 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/02 15:11:50 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class Client
 //		sockaddr_un		_addr_local;	// sockaddr_un is a local socket
 		socklen_t		_socklen;
 		const config&	_ref_conf;
-//		time_t			_timeout; time(NULL) dans tous les cas .si keep-alive, chercher si temps existe puis add, sinon add valeur par defaut config 
+//		time_t			_timeout; time(NULL) dans tous les cas si keep-alive, chercher si temps existe puis add, sinon add valeur par defaut config 
 		fd_set			_readfd;
 //		fd_set			_writefd;
 		header			_header;
