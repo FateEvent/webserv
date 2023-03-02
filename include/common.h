@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/01 17:40:40 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/02 12:01:41 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ typedef struct s_header
 {
 	std::string							method;
 	std::string							directory;
+	std::pair<std::string, std::string>	file; //
 	std::string							host;
 	std::string							connection;
 	std::string							cache_control;

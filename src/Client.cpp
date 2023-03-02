@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/01 18:00:12 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/02 12:01:40 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,13 +78,15 @@ void	Client::_make_struct()
 		if (s_str == e_str)
 			throw ("unavailable header!"); // give maybe a error to the client!
 		this->_header.directory.append(*it, s_str, e_str - s_str);
+		std::cout << "Directory avant:" << _header.directory << std::endl;
 	}
 	else
 	 throw ("505 HTTP Version Not Supported");
 
-	if (!this->_header.method.compare("POST"))
+	//isoler les variables qui sont dans le directory
+	if (!this->_header.method.compare("GET"))
 	{
-		std::cout << "POST" << std::endl;
+		std::cout << "GET" << std::endl;
 		std::size_t pos = _header.directory.find('?');
 		if(pos != std::string::npos)
 		{
@@ -92,12 +94,32 @@ void	Client::_make_struct()
 			std::string temp = _header.directory.substr(pos);
 			this->_header.data = ft::str_to_map(temp, "&");
 			std::map<std::string, std::string>::iterator	first = this->_header.data.begin();
+			_header.directory.erase(pos -1);
 			for (; first != this->_header.data.end(); ++first)
-				std::cout << "key: " << first->first << ", value: " << first->second << std::endl;
+				std::cout << "data key: " << first->first << ", data value: " << first->second << std::endl;
 		}
-		std::cout << "POST_VAR OK" << std::endl;
+		std::cout << "recup variables OK" << std::endl;
 	}
-
+	
+	//recuperer le file dans une paire
+	if(this->_header.directory.find(".") != std::string::npos)
+	{
+		std::string				key;
+		std::string				val;
+		std::string::size_type pos = _header.directory.find(".");
+		val = _header.directory.substr(pos +1);
+		_header.directory.erase(pos);	
+		while (_header.directory[pos] != '/')
+			pos--;
+		key = _header.directory.substr(pos +1);
+		_header.directory.erase(pos);	
+		_header.file = std::make_pair(key, val);
+		std::cout << "file key: " << key << std::endl;
+		std::cout << "file value: " << val << std::endl;
+	}
+	
+	std::cout << "Directory apres:" << _header.directory << std::endl;
+	
 	for (++it; it != header.end() && *it->data() != '\r' && *it->data() != 0; it++)
 	{
 		std::cout << *it << std::endl;
