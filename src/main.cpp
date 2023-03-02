@@ -6,12 +6,13 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 14:07:35 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/02 15:11:59 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //#include "../include/common.h"
 #include "../include/Webserv.hpp"
+#define __DEBUG
 
 bool Webserv::created = false;
 fd_set		Webserv::readfd;

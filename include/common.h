@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 14:05:31 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/02 14:57:14 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ typedef struct s_header
 	std::string							connection;
 	std::string							cache_control;
 	std::string							user_agent;
+	std::string							listen;
+	
 	std::vector<std::string>			accept;
 	std::vector<std::string>			language;
 	std::vector<std::string>			encoding;
