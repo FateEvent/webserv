@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 12:01:40 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/02 12:05:36 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ void	Client::_make_struct()
 		std::cout << "recup variables OK" << std::endl;
 	}
 	
-	//recuperer le file dans une paire
+	//recuperer le file et l'extension du directory dans une paire
 	if(this->_header.directory.find(".") != std::string::npos)
 	{
 		std::string				key;
