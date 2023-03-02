@@ -6,12 +6,13 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 13:56:31 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/02 15:10:50 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //#include "../include/common.h"
 #include "../include/Webserv.hpp"
+#define __DEBUG
 
 bool Webserv::created = false;
 fd_set		Webserv::readfd;

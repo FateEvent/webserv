@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 14:05:29 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/02 15:10:45 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,8 +114,10 @@ void	Client::_make_struct()
 		key = _header.directory.substr(pos +1);
 		_header.directory.erase(pos + 1);	
 		_header.file = std::make_pair(key, val);
-		std::cout << "file key: " << key << std::endl;
-		std::cout << "file value: " << val << std::endl;
+		#ifdef __DEBUG
+			std::cout << "file key: " << key << std::endl;
+			std::cout << "file value: " << val << std::endl;
+		#endif
 	}
 	
 	std::cout << "Directory apres:" << _header.directory << std::endl;
@@ -169,7 +171,18 @@ void	Client::_make_struct()
 			s_str = it->find_first_of(' ') + 1;
 			this->_header.host = it->erase(0, s_str);
 			std::cout << "Host: " << this->_header.host << std::endl;
-			std::cout << "Host OK" << std::endl;
+
+			std::size_t pos = _header.host.find(':');
+			if(pos != std::string::npos)
+			{
+				pos += 1;
+				_header.listen = _header.host.substr(pos);
+				_header.host.erase(pos - 1);
+				_header.listen.erase(_header.listen.end() - 1);
+			}
+			std::cout << "Host apres split:-" << _header.host << '$' << std::endl;
+			std::cout << "listen:-" << _header.listen << '$' << std::endl;
+			std::cout << "Host & listen OK" << std::endl;
 		}
 		else if (!it->find("Cookie:"))
 		{
