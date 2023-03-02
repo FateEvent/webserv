@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/01 15:18:30 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/02 13:56:31 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	main(int ac, char **av)
 	std::multimap<std::string, std::string> server2;
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server2.insert(std::pair<std::string, std::string>("host", "10.12.3.14"));
+	server2.insert(std::pair<std::string, std::string>("host", "10.12.2.11"));
 	server2.insert(std::pair<std::string, std::string>("listen", "1025"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));

@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 12:05:36 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/02 14:05:29 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,6 @@ void	Client::_make_struct()
 	//isoler les variables qui sont dans le directory
 	if (!this->_header.method.compare("GET"))
 	{
-		std::cout << "GET" << std::endl;
 		std::size_t pos = _header.directory.find('?');
 		if(pos != std::string::npos)
 		{
@@ -98,6 +97,7 @@ void	Client::_make_struct()
 			for (; first != this->_header.data.end(); ++first)
 				std::cout << "data key: " << first->first << ", data value: " << first->second << std::endl;
 		}
+		std::cout << "Directory apres split variables:" << _header.directory << std::endl;
 		std::cout << "recup variables OK" << std::endl;
 	}
 	
@@ -112,7 +112,7 @@ void	Client::_make_struct()
 		while (_header.directory[pos] != '/')
 			pos--;
 		key = _header.directory.substr(pos +1);
-		_header.directory.erase(pos);	
+		_header.directory.erase(pos + 1);	
 		_header.file = std::make_pair(key, val);
 		std::cout << "file key: " << key << std::endl;
 		std::cout << "file value: " << val << std::endl;
