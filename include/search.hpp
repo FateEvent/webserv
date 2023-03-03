@@ -41,7 +41,7 @@ namespace ft {
 	string_vector			str_to_vect(std::string str, std::string sep);
 	string_pair				string_parser(std::string str, std::string sep);
 	void					space_eraser(std::string &str, std::string::size_type i = 0);
-	void					cutter(std::string &str);
+	std::string				string_cutter(std::string str);
 }
 
 #endif
