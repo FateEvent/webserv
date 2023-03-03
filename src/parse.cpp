@@ -6,11 +6,19 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 14:26:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/03 14:31:00 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/03 14:52:11 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/search.hpp"
+
+void	ft::cutter(std::string &str)
+{
+	std::string::size_type	s_str;
+
+	s_str = str.find_first_of(' ') + 1;
+	str.erase(0, s_str);
+}
 
 void	ft::space_eraser(std::string &str, std::string::size_type i)
 {
