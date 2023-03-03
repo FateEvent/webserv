@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 15:18:12 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/03 09:53:51 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "../include/Webserv.hpp"
 #define __DEBUG
 
-bool Webserv::created = false;
+bool		Webserv::created = false;
 fd_set		Webserv::readfd;
 fd_set		Webserv::writefd;
 fd_set		Webserv::errfd;
@@ -42,7 +42,7 @@ int	main(int ac, char **av)
 	std::multimap<std::string, std::string> server2;
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server2.insert(std::pair<std::string, std::string>("host", "10.12.2.11"));
+	server2.insert(std::pair<std::string, std::string>("host", "10.12.3.14"));
 	server2.insert(std::pair<std::string, std::string>("listen", "1025"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
@@ -128,13 +128,13 @@ int	main(int ac, char **av)
 	while (1)
 	{	
 		test.fd_rst();
-		std::cout << "\rwaitting..." << std::flush;
+		std::cout << "\rwaiting..." << std::flush;
 		int recept = select(test.get_greaterfd(), &test.get_readfd(), &test.get_writefd(), NULL, &test.timeout());
 		if (recept)
 			client = test.make_client();
 	}
 	test.stop_all();
-	
+
 	(void) ac;
 	(void) av;
 	return (0);

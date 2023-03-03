@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   common.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/02 14:57:14 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/03 11:05:08 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ typedef struct s_header
 	std::vector<std::string>			encoding;
 	std::map<std::string, std::string>	cookie; // change to a ref of cookie in instance
 	unsigned long						length;
-	std::vector<std::string>			content_type;
+	std::string							content_type;
+	std::vector<std::string>			content;
 	std::map<std::string, std::string>	data; // Need change to a map<string, string> => OK
 }	header;
 
