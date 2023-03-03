@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/03 11:08:30 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/03 14:20:28 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void	Client::_make_struct()
 			throw ("unavailable header!"); // give maybe a error to the client!
 		this->_header.directory.append(*it, s_str, e_str - s_str);
 		#ifdef __DEBUG
-			std::cout << "Directory avant:" << _header.directory << std::endl;
+			std::cout << "Directory before:" << _header.directory << std::endl;
 		#endif
 	}
 	else
@@ -102,7 +102,7 @@ void	Client::_make_struct()
 			#endif
 		}
 		#ifdef __DEBUG
-			std::cout << "Directory apres split variables:" << _header.directory << std::endl;
+			std::cout << "Directory after split variables:" << _header.directory << std::endl;
 			std::cout << "recup variables OK" << std::endl;
 		#endif
 	}
@@ -126,14 +126,11 @@ void	Client::_make_struct()
 		#endif
 	}
 	#ifdef __DEBUG
-		std::cout << "Directory apres:" << _header.directory << std::endl;
+		std::cout << "Directory after:" << _header.directory << std::endl;
 	#endif
 	
 	for (++it; it != header.end() && *it->data() != '\r' && *it->data() != 0; it++)
 	{
-//		#ifdef __DEBUG
-			std::cout << "line: " << *it << std::endl;
-//		#endif
 // NO NEED BECAUSE ALREADY IN RIGHT SOCKET
 /*
 		if (!it->find("Host:"))
@@ -154,7 +151,8 @@ void	Client::_make_struct()
 			#ifdef __DEBUG
 				std::cout << "Accept" << std::endl;
 				std::vector<std::string>::iterator	first = this->_header.accept.begin();
-				for (; first != this->_header.accept.end(); ++first)
+				std::vector<std::string>::iterator	last = this->_header.accept.end();
+				for (; first != last; ++first)
 					std::cout << "it: " << *first << std::endl;
 			#endif
 			// USE TO FABIO'S SPLIT (<MIME_type>/<MIME_subtype>, ....)
@@ -192,7 +190,7 @@ void	Client::_make_struct()
 				ft::space_eraser(_header.listen);
 			}
 			#ifdef __DEBUG
-				std::cout << "Host apres split: " << _header.host << '$' << std::endl;
+				std::cout << "Host after split: " << _header.host << '$' << std::endl;
 				std::cout << "listen: " << _header.listen << '$' << std::endl;
 				std::cout << "Host & listen OK" << std::endl;
 			#endif
@@ -202,18 +200,24 @@ void	Client::_make_struct()
 			s_str = it->find_first_of(' ') + 1;
 			it->erase(0, s_str);
 			this->_header.language = ft::str_to_vect(*it, ", ");
-//			std::vector<std::string>::iterator	first = this->_header.language.begin();
-//			for (; first != this->_header.language.end(); ++first)
-//				std::cout << "it: " << *first << std::endl;
+			#ifdef __DEBUG
+				std::vector<std::string>::iterator	first = this->_header.language.begin();
+				std::vector<std::string>::iterator	last = this->_header.language.end();
+				for (; first != last; ++first)
+					std::cout << "it: " << *first << std::endl;
+			#endif
 		}
 		else if (it->find("Accept-Encoding:") == 0)
 		{
 			s_str = it->find_first_of(' ') + 1;
 			it->erase(0, s_str);
 			this->_header.encoding = ft::str_to_vect(*it, ", ");
-//			std::vector<std::string>::iterator	first = this->_header.encoding.begin();
-//			for (; first != this->_header.encoding.end(); ++first)
-//				std::cout << "it: " << *first << std::endl;
+			#ifdef __DEBUG
+				std::vector<std::string>::iterator	first = this->_header.encoding.begin();
+				std::vector<std::string>::iterator	last = this->_header.encoding.end();
+				for (; first != last; ++first)
+					std::cout << "it: " << *first << std::endl;
+			#endif
 		}
 		else if (!it->find("Cookie:"))
 		{
@@ -255,7 +259,9 @@ void	Client::_make_struct()
 		int i = 0;
 		// NEED PARSE ELEMENT IN CONTENT AND PUT IN data, NEED TO CHANGE TYPE OF data TOO!
 		this->_header.content.push_back((++it)->data());
-		for (ft::string_vector::iterator it = _header.content.begin(); it < _header.content_type.end(); ++it, ++i)
+		ft::string_vector::iterator	first = _header.content.begin();
+		ft::string_vector::iterator	last = _header.content.end();
+		for (; first != last; ++first, ++i)
 			std::cout << i << ": " << *it << std::endl;
 	}
 }

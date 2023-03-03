@@ -8,6 +8,7 @@ INCLUDES	=	./include/common.h \
 FILES		=	Webserv.cpp \
 				Client.cpp \
 				search.cpp \
+				parse.cpp \
 				main.cpp
 RM			=	rm -rf
 SRCS		=	$(addprefix ./src/, $(FILES))

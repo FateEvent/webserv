@@ -21,6 +21,7 @@ namespace ft {
 	typedef std::map<std::string, std::string>		string_map;
 	typedef std::pair<std::string, std::string>		string_pair;
 
+	// config file parsing
 	int						bracket_parser(char opening, char closure);
 	int						cut_multiple_blocks(char opening, char closure, std::multimap<std::string, std::string> &map);
 	int						config_file_reader(std::vector<t_search> &arr, char opening, char closure);
@@ -29,15 +30,17 @@ namespace ft {
 	string_multimap			split_block(std::multimap<std::string, std::string>::iterator it, char opening, char closure);
 	std::string::size_type	find_char(std::string str, char c, std::string::size_type i);
 	string_pair				string_parser(std::string str, char closure, std::string::size_type i);
-	string_pair				string_parser(std::string str, std::string sep);
 	int						string_looper(char c, std::string str);
 	string_pair				block_parser(std::string str, char closure, std::string::size_type &i);
 	void					comments_cleaner(std::multimap<std::string, std::string> &map);
 	void					kärcherizer(std::multimap<std::string, std::string> &map);
 	void					space_eraser(std::multimap<std::string, std::string> &map);
-	void					space_eraser(std::string &str, std::string::size_type i = 0);
-	string_vector			str_to_vect(std::string str, std::string sep);
+
+	// server-client communication parsing
 	string_map				str_to_map(std::string str, std::string sep);
+	string_vector			str_to_vect(std::string str, std::string sep);
+	string_pair				string_parser(std::string str, std::string sep);
+	void					space_eraser(std::string &str, std::string::size_type i = 0);
 }
 
 #endif
