@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/03 14:26:08 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/06 17:04:58 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ void	ft::kärcherizer(std::multimap<std::string, std::string> &map)
 			else
 				map.insert(std::make_pair(first->first, str));
 			first->second.erase(pos);
+			str.clear();
 		}
 	}
 	ft::space_eraser(map);
