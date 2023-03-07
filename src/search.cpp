@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/06 17:04:58 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/07 12:53:30 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,24 +101,28 @@ void	ft::kärcherizer(std::multimap<std::string, std::string> &map)
 		std::string::size_type	pos = first->second.find_last_of(':');
 		if (pos != std::string::npos)
 		{
-			i = pos + 1;
-			while (first->second[i])
+			if (first->second[pos + 1] != '\0' && first->second[pos + 1] != '\n'
+				 && first->second[pos + 1] != '\r')
 			{
-				if (!::isspace(first->second[i]))
-					str += first->second[i];
-				else if (::isspace(first->second[i]))
+				i = pos + 1;
+				while (first->second[i])
 				{
-					map.insert(std::make_pair("listen", str));
-					str.clear();
+					if (!::isspace(first->second[i]))
+						str += first->second[i];
+					else if (::isspace(first->second[i]))
+					{
+						map.insert(std::make_pair("listen", str));
+						str.clear();
+					}
+					++i;
 				}
-				++i;
+				if (str == "tcp" || str == "udp")
+					map.insert(std::make_pair("type", str));
+				else
+					map.insert(std::make_pair(first->first, str));
+				first->second.erase(pos);
+				str.clear();
 			}
-			if (str == "tcp" || str == "udp")
-				map.insert(std::make_pair("type", str));
-			else
-				map.insert(std::make_pair(first->first, str));
-			first->second.erase(pos);
-			str.clear();
 		}
 	}
 	ft::space_eraser(map);
@@ -386,7 +390,7 @@ int	ft::config_file_reader(std::vector<t_search> &arr, char opening, char closur
 	if (!inFlux)
 	{
 		std::cerr << "Error: impossible to open the config file." << std::endl;
-		return (1);
+		return (-1);
 	}
 	while (getline(inFlux, buffer))
 	{
@@ -426,7 +430,7 @@ int	ft::cut_multiple_blocks(char opening, char closure, std::multimap<std::strin
 		}
 		return (0);
 	}
-	return (1);
+	return (-1);
 }
 
 int	ft::bracket_parser(char opening, char closure)
@@ -439,7 +443,7 @@ int	ft::bracket_parser(char opening, char closure)
 	if (!inFlux)
 	{
 		std::cerr << "Error: impossible to open the config file." << std::endl;
-		return (1);
+		return (-1);
 	}
 	while (getline(inFlux, buffer))
 	{
@@ -452,7 +456,7 @@ int	ft::bracket_parser(char opening, char closure)
 	}
 	if (op >= 1 && op == cl)
 		return (0);
-	return (1);
+	return (-1);
 }
 
 // example of use
