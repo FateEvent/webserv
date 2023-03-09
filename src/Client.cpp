@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/03 17:37:24 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/09 15:50:19 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,3 +243,10 @@ void	Client::_make_struct()
 			std::cout << i << ": " << *it << std::endl;
 	}
 }
+/*
+std::string	Client::find_path(std::string path)
+{
+	
+	this->_ref_conf.root;
+}
+*/
