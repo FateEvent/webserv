@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 21:39:20 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/07 17:26:54 by averon           ###   ########.fr       */
+/*   Updated: 2023/03/09 11:29:38 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,32 +21,43 @@ fd_set		Webserv::errfd;
 
 int	main(int ac, char **av)
 {
+	std::multimap<std::string, std::string>	block_map;
+	std::pair<std::multimap<std::string, std::string>::iterator, std::multimap<std::string, std::string>::iterator>	ret;
+
+	ft::cut_multiple_blocks('{', '}', block_map);
+	ret = block_map.equal_range("server");
+
 	std::multimap<std::string, std::multimap<std::string, std::string> > config;
 	// Config webserb test - Not server instance!!
-	std::multimap<std::string, std::string> conf;
+	std::multimap<std::string, std::string> conf(ft::split_block(block_map.find("http"), '{', '}'));
+/*
 	conf.insert(std::pair<std::string, std::string>("max_client", "100"));
 	conf.insert(std::pair<std::string, std::string>("max_buff", "1000000"));
 	conf.insert(std::pair<std::string, std::string>("time_out", "120"));
 	conf.insert(std::pair<std::string, std::string>("listen", "80")); // LISTEN ON ALL IP.
 	conf.insert(std::pair<std::string, std::string>("root", "/www/"));
 	conf.insert(std::pair<std::string, std::string>("index_page", "index.html"));
-
-	std::multimap<std::string, std::string> server1;
+*/
+	std::multimap<std::string, std::string> server1(ft::split_block(ret.first, '{', '}'));
+/*
 	server1.insert(std::pair<std::string, std::string>("name", "test server"));
 	server1.insert(std::pair<std::string, std::string>("host", "127.0.0.1"));
 	server1.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
 	server1.insert(std::pair<std::string, std::string>("listen", "8080"));
 	server1.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server1.insert(std::pair<std::string, std::string>("root", "/web1/"));
-
-	std::multimap<std::string, std::string> server2;
+*/
+	std::multimap<std::string, std::string> server2(ft::split_block(++ret.first, '{', '}'));
+/*
 	server2.insert(std::pair<std::string, std::string>("name", "test server2"));
 	server2.insert(std::pair<std::string, std::string>("protocol", "AF_INET"));
-	server2.insert(std::pair<std::string, std::string>("host", "10.12.3.13"));
+	server2.insert(std::pair<std::string, std::string>("host", "10.12.2.14"));
 	server2.insert(std::pair<std::string, std::string>("listen", "1025"));
 	server2.insert(std::pair<std::string, std::string>("type", "tcp"));
 	server2.insert(std::pair<std::string, std::string>("root", "/web2/"));
-
+*/
+	for (std::multimap<std::string, std::string>::iterator it = server2.begin(); it != server2.end(); ++it)
+		std::cout << "key: " << it->first << ", val: " << it->second << std::endl;
 	config.insert(std::make_pair("http", conf));
 	config.insert(std::make_pair("server", server1));
 	config.insert(std::make_pair("server", server2));

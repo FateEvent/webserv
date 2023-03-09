@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/03 14:20:28 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/03 17:37:24 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,10 +94,11 @@ void	Client::_make_struct()
 			pos += 1;
 			std::string temp = _header.directory.substr(pos);
 			this->_header.data = ft::str_to_map(temp, "&");
-			_header.directory.erase(pos -1);
+			_header.directory.erase(pos - 1);
 			#ifdef __DEBUG
 				std::map<std::string, std::string>::iterator	first = this->_header.data.begin();
-				for (; first != this->_header.data.end(); ++first)
+				std::map<std::string, std::string>::iterator	last = this->_header.data.end();
+				for (; first != last; ++first)
 					std::cout << "data key: " << first->first << ", data value: " << first->second << std::endl;
 			#endif
 		}
@@ -113,11 +114,11 @@ void	Client::_make_struct()
 		std::string				key;
 		std::string				val;
 		std::string::size_type pos = _header.directory.find(".");
-		val = _header.directory.substr(pos +1);
+		val = _header.directory.substr(pos + 1);
 		_header.directory.erase(pos);	
 		while (_header.directory[pos] != '/')
 			pos--;
-		key = _header.directory.substr(pos +1);
+		key = _header.directory.substr(pos + 1);
 		_header.directory.erase(pos + 1);	
 		_header.file = std::make_pair(key, val);
 		#ifdef __DEBUG
@@ -131,23 +132,9 @@ void	Client::_make_struct()
 	
 	for (++it; it != header.end() && *it->data() != '\r' && *it->data() != 0; it++)
 	{
-// NO NEED BECAUSE ALREADY IN RIGHT SOCKET
-/*
-		if (!it->find("Host:"))
-		{
-			s_str = it->find_first_of(' ') + 1;
-			if (!it->find(":"))
-			{
-				e_str = it->find_first_of(':');
-				
-			}
-		}
-*/
 		if (!it->find("Accept:"))
 		{
-			s_str = it->find_first_of(' ') + 1;
-			it->erase(0, s_str);
-			this->_header.accept = ft::str_to_vect(*it, ", ");
+			this->_header.accept = ft::str_to_vect(ft::string_cutter(*it), ", ");
 			#ifdef __DEBUG
 				std::cout << "Accept" << std::endl;
 				std::vector<std::string>::iterator	first = this->_header.accept.begin();
@@ -159,24 +146,21 @@ void	Client::_make_struct()
 		}
 		else if (!it->find("User-Agent:"))
 		{
-			s_str = it->find_first_of(' ') + 1;
-			this->_header.user_agent = it->erase(0, s_str);
+			this->_header.user_agent = ft::string_cutter(*it);
 			#ifdef __DEBUG
 				std::cout << "User-Agent: " << this->_header.user_agent << std::endl;
 			#endif
 		}
 		else if (!it->find("Connection:"))
 		{
-			s_str = it->find_first_of(' ') + 1;
-			this->_header.connection = it->erase(0, s_str);
+			this->_header.connection = ft::string_cutter(*it);
 			#ifdef __DEBUG
 				std::cout << "Connection: " << this->_header.connection << std::endl;
 			#endif
 		}
 		else if (!it->find("Host:"))
 		{
-			s_str = it->find_first_of(' ') + 1;
-			this->_header.host = it->erase(0, s_str);
+			this->_header.host = ft::string_cutter(*it);
 			#ifdef __DEBUG
 				std::cout << "Host: " << this->_header.host << std::endl;
 			#endif
@@ -197,9 +181,7 @@ void	Client::_make_struct()
 		}
 		else if (it->find("Accept-Language:") == 0)
 		{
-			s_str = it->find_first_of(' ') + 1;
-			it->erase(0, s_str);
-			this->_header.language = ft::str_to_vect(*it, ", ");
+			this->_header.language = ft::str_to_vect(ft::string_cutter(*it), ", ");
 			#ifdef __DEBUG
 				std::vector<std::string>::iterator	first = this->_header.language.begin();
 				std::vector<std::string>::iterator	last = this->_header.language.end();
@@ -209,9 +191,7 @@ void	Client::_make_struct()
 		}
 		else if (it->find("Accept-Encoding:") == 0)
 		{
-			s_str = it->find_first_of(' ') + 1;
-			it->erase(0, s_str);
-			this->_header.encoding = ft::str_to_vect(*it, ", ");
+			this->_header.encoding = ft::str_to_vect(ft::string_cutter(*it), ", ");
 			#ifdef __DEBUG
 				std::vector<std::string>::iterator	first = this->_header.encoding.begin();
 				std::vector<std::string>::iterator	last = this->_header.encoding.end();
@@ -221,8 +201,7 @@ void	Client::_make_struct()
 		}
 		else if (!it->find("Cookie:"))
 		{
-			s_str = it->find_first_of(' ') + 1;
-			this->_header.cookie = ft::str_to_map(it->erase(0, s_str), "; ");
+			this->_header.cookie = ft::str_to_map(ft::string_cutter(*it), "; ");
 			#ifdef __DEBUG
 				std::cout << "Cookies" << std::endl;
 				std::map<std::string, std::string>::iterator	first = this->_header.cookie.begin();
@@ -232,11 +211,10 @@ void	Client::_make_struct()
 			// USE TO FABIO'S SPLIT (name=value; ....)
 		}
 		else if (it->find("Content-Length:") == 0)
-			this->_header.length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
+			this->_header.length = std::strtol(ft::string_cutter(*it).c_str(), NULL, 10);
 		else if (!it->find("Content-Type:"))
 		{
-			s_str = it->find_first_of(' ') + 1;
-			this->_header.user_agent = it->erase(0, s_str);
+			this->_header.user_agent = ft::string_cutter(*it);
 			#ifdef __DEBUG
 				std::cout << "Content-Type: " << this->_header.user_agent << std::endl;
 			#endif
@@ -259,8 +237,8 @@ void	Client::_make_struct()
 		int i = 0;
 		// NEED PARSE ELEMENT IN CONTENT AND PUT IN data, NEED TO CHANGE TYPE OF data TOO!
 		this->_header.content.push_back((++it)->data());
-		ft::string_vector::iterator	first = _header.content.begin();
-		ft::string_vector::iterator	last = _header.content.end();
+		std::vector<std::string>::iterator	first = _header.content.begin();
+		std::vector<std::string>::iterator	last = _header.content.end();
 		for (; first != last; ++first, ++i)
 			std::cout << i << ": " << *it << std::endl;
 	}
