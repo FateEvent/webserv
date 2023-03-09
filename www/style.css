@@ -117,7 +117,7 @@ input[type=submit] {
 	border-radius: 4px;
 }
 
- .services {
+.services {
 	grid-area: services;
 	display: grid;
 	grid-template-columns: 50px 50px 1fr;
@@ -191,7 +191,7 @@ img {
 	text-align: center;
 	flex: 50px;
 	flex-wrap: wrap;
-	margin: 10px;
+	margin: 5px;
 }
 
 .offer-title {
@@ -208,6 +208,7 @@ img {
 	justify-content: justify;
 	margin-left: 5px;
 	margin-right: 5px;
+	height: fit-content;
 }
 
 .info {
