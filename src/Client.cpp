@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/10 14:21:24 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/10 16:17:31 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,6 +244,7 @@ void	Client::_make_struct()
 	}
 }
 
+// need the location struct to compare with each location directory to find the right location root! 
 std::string	Client::find_path(std::string path)
 {
 	if (access(path.data(), F_OK) == 0)

@@ -4,12 +4,12 @@ html{
 
 body {
 	font-family: papyrus, 'Courier New', Courier, monospace;
-	background-image: repeating-linear-gradient(196deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 13px,rgba(0,0,0,0.03) 13px, rgba(0,0,0,0.03) 18px,transparent 18px, transparent 26px),repeating-linear-gradient(131deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 6px,transparent 6px, transparent 14px,rgba(0,0,0,0.03) 14px, rgba(0,0,0,0.03) 26px,transparent 26px, transparent 38px),repeating-linear-gradient(373deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 15px,rgba(0,0,0,0.03) 15px, rgba(0,0,0,0.03) 20px,transparent 20px, transparent 30px),repeating-linear-gradient(196deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 5px,transparent 5px, transparent 7px,rgba(0,0,0,0.03) 7px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 23px),repeating-linear-gradient(378deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 6px,transparent 6px, transparent 17px,rgba(0,0,0,0.03) 17px, rgba(0,0,0,0.03) 28px,transparent 28px, transparent 29px),repeating-linear-gradient(190deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 6px,transparent 6px, transparent 7px,rgba(0,0,0,0.03) 7px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 21px),linear-gradient(138deg, hsl(124,0%,91%),hsl(124,0%,91%));
 }
 
 .container {
 	position: absolute;
 	justify-items: center;
+	background-image: repeating-linear-gradient(196deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 13px,rgba(0,0,0,0.03) 13px, rgba(0,0,0,0.03) 18px,transparent 18px, transparent 26px),repeating-linear-gradient(131deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 6px,transparent 6px, transparent 14px,rgba(0,0,0,0.03) 14px, rgba(0,0,0,0.03) 26px,transparent 26px, transparent 38px),repeating-linear-gradient(373deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 15px,rgba(0,0,0,0.03) 15px, rgba(0,0,0,0.03) 20px,transparent 20px, transparent 30px),repeating-linear-gradient(196deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 5px,transparent 5px, transparent 7px,rgba(0,0,0,0.03) 7px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 23px),repeating-linear-gradient(378deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 6px,transparent 6px, transparent 17px,rgba(0,0,0,0.03) 17px, rgba(0,0,0,0.03) 28px,transparent 28px, transparent 29px),repeating-linear-gradient(190deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 6px,transparent 6px, transparent 7px,rgba(0,0,0,0.03) 7px, rgba(0,0,0,0.03) 12px,transparent 12px, transparent 21px),linear-gradient(138deg, hsl(124,0%,91%),hsl(124,0%,91%));
 }
 
 .title {
@@ -34,14 +34,6 @@ body {
 	font-size: 2.8rem;
 	justify-items: right;
 	float: right;
-}
-
-@media (max-width: 460px) {
-	.title {
-	  font-family: Harrington, 'Permanent Marker', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-	  font-size: 3.5rem;
-	  text-align: center;
-	}
 }
 
 p {
