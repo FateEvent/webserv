@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/13 14:19:33 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/13 14:23:31 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -246,15 +246,18 @@ void	Client::_make_struct()
 
 static std::string	test_dir(std::string root, std::string index)
 {
-	std::string	tok, rest;
-	std::make_pair(tok, rest) = ft::string_parser(index, " ");
-
-	while (tok != "")
+	if (index != "")	// how is a string initialised?
 	{
-		std::string	tmp = root + tok;
-		if (access(tmp.data(), F_OK) == 0)
-			return (root + tok);
-		std::make_pair(tok, rest) = ft::string_parser(rest, " ");
+		std::string	tok, rest;
+		std::make_pair(tok, rest) = ft::string_parser(index, " ");
+
+		while (tok != "")
+		{
+			std::string	tmp = root + tok;
+			if (access(tmp.data(), F_OK) == 0)
+				return (root + tok);
+			std::make_pair(tok, rest) = ft::string_parser(rest, " ");
+		}
 	}
 	return ("www/404.html");
 }
@@ -309,6 +312,5 @@ std::string	Client::find_path(void)
 			}
 		}
 	}
-//	if (this->_ref_conf.index != "")	// how is a string initialised?
 	return (test_dir(res, _ref_conf.index));	// if I don't find anything I return "www/404.html"
 }
