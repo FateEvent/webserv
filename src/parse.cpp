@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 14:26:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/03 17:34:40 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/13 13:55:32 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,48 @@ void	ft::space_eraser(std::string &str, std::string::size_type i)
 		else
 			++i;
 	}
+}
+
+int	ft::string_looper(char c, std::string str)
+{
+	std::string::size_type	i(0);
+
+	while (str[i])
+	{
+		if (str[i] == c)
+			return (1);
+		++i;
+	}
+	return (0);
+}
+
+std::pair<std::string, std::string>	ft::string_parser(std::string str, std::string sep)
+{
+	std::string				key;
+	std::string				val;
+	std::string::size_type	i(0);
+	std::string::size_type	pos(0);
+
+	while (str[i] && ::isspace(str[i]))
+		++i;
+	while (str[i] && (!::isspace(str[i]) && !ft::string_looper(str[i], sep)))
+	{
+		key += str[i];
+		++i;
+	}
+	while (str[i])
+	{
+		if (!::isspace(str[i]) && !ft::string_looper(str[i], sep))
+			val += str[i];
+		if (::isspace(str[i]) && ft::string_looper(str[i], sep)
+			&& !::isspace(str[i + 1]) && !ft::string_looper(str[i + 1], sep))
+			val += ' ';
+		++i;
+	}
+	pos = val.find(';');
+	if (pos != std::string::npos)
+		val.erase(pos);
+	return (std::make_pair(key, val));
 }
 
 std::vector<std::string>	ft::str_to_vect(std::string str, std::string sep)

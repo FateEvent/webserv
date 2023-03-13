@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/10 16:17:31 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/13 14:19:33 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,16 +244,71 @@ void	Client::_make_struct()
 	}
 }
 
-// need the location struct to compare with each location directory to find the right location root! 
-std::string	Client::find_path(std::string path)
+static std::string	test_dir(std::string root, std::string index)
 {
-	if (access(path.data(), F_OK) == 0)
-		return (path);
-	else
+	std::string	tok, rest;
+	std::make_pair(tok, rest) = ft::string_parser(index, " ");
+
+	while (tok != "")
 	{
-		std::string	newPath = this->_ref_conf.root + '/' + path;
-		if ((access(newPath.data(), F_OK) == 0))
-			return (path);	
+		std::string	tmp = root + tok;
+		if (access(tmp.data(), F_OK) == 0)
+			return (root + tok);
+		std::make_pair(tok, rest) = ft::string_parser(rest, " ");
 	}
 	return ("www/404.html");
+}
+
+// need the location struct to compare with each location directory to find the right location root! 
+std::string	Client::find_path(void)
+{
+	std::string	path = this->_header.host;
+	std::string	res;
+	std::map<std::string, std::map<std::string, std::string> >::const_iterator first = this->_ref_conf.location.begin();
+	std::map<std::string, std::map<std::string, std::string> >::const_iterator last = this->_ref_conf.location.end();
+	
+	if (path == this->_ref_conf.root)
+		res = this->_ref_conf.root;
+	else
+	{
+		for (; first != last; ++first)
+		{
+			if (first->first == path)
+			{
+				std::map<std::string, std::string>::const_iterator root = first->second.find("root");
+
+				if (root != first->second.end())
+				{
+					res = root->second;
+					break ;
+				}
+			}
+		}
+		if (res == "")
+		{
+			std::vector<std::string> directory = ft::str_to_vect(path, "/");
+			std::vector<std::string>::const_iterator rfirst = directory.begin();
+			std::vector<std::string>::const_iterator rlast = directory.end() - 1;
+
+			for (; rfirst != rlast; --rfirst)
+			{
+				for (; first != last; ++first)
+				{
+					if (first->first.find(*rfirst))
+					{
+						res = first->first;
+						
+						while (rfirst != rlast)
+						{
+							res += "/" + *rfirst;
+							++rfirst;
+						}
+						break ;
+					}
+				}
+			}
+		}
+	}
+//	if (this->_ref_conf.index != "")	// how is a string initialised?
+	return (test_dir(res, _ref_conf.index));	// if I don't find anything I return "www/404.html"
 }

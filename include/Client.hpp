@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/10 11:40:40 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/13 13:44:36 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ class Client
 		~Client();
 		int				get_sockfd() const;
 		void			test_client();
-		std::string		find_path(std::string path);
+		std::string		find_path();
 
 	protected:
 };

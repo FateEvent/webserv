@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/03 11:05:08 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/13 12:29:58 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,20 @@
 
 typedef struct	s_config
 {
-	std::string						name;
-	std::string						root;
-	std::string						index;
-	std::string						ip;
-	sockaddr_in						addr;
-	int								sock_fd;	// retour of socket()
-	int								domain;		//Type AF_INET, AF_LOCAL, AF_LINUX....
-	int								type;		// type TCP,UDP... SOCK_STREAM, SOCK_DGRAM
-	int								max_client;
-	uint16_t						port;
-	bool							active;
-	bool							prepare;
-	std::map<int, std::string>		error_page;
+	std::string													name;
+	std::string													root;
+	std::string													index;
+	std::string													ip;
+	sockaddr_in													addr;
+	int															sock_fd;	// retour of socket()
+	int															domain;		//Type AF_INET, AF_LOCAL, AF_LINUX....
+	int															type;		// type TCP,UDP... SOCK_STREAM, SOCK_DGRAM
+	int															max_client;
+	uint16_t													port;
+	bool														active;
+	bool														prepare;
+	std::map<int, std::string>									error_page;
+	std::map<std::string, std::map<std::string, std::string> >	location;
 }	config;
 
 typedef struct s_header

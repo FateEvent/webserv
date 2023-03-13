@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/07 12:53:30 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/13 13:49:57 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,45 +164,6 @@ std::pair<std::string, std::string>	ft::block_parser(std::string str, char closu
 			val += ' ';
 		++i;
 	}
-	return (std::make_pair(key, val));
-}
-
-int	ft::string_looper(char c, std::string str)
-{
-	std::string::size_type	i(0);
-
-	while (str[i])
-	{
-		if (str[i] == c)
-			return (1);
-		++i;
-	}
-	return (0);
-}
-
-std::pair<std::string, std::string>	ft::string_parser(std::string str, std::string sep)
-{
-	std::string				key;
-	std::string				val;
-	std::string::size_type	i(0);
-	std::string::size_type	pos(0);
-
-	while (str[i] && ::isspace(str[i]))
-		++i;
-	while (str[i] && (!::isspace(str[i]) && !ft::string_looper(str[i], sep)))
-	{
-		key += str[i];
-		++i;
-	}
-	while (str[i])
-	{
-		if (!::isspace(str[i]) && !ft::string_looper(str[i], sep))
-			val += str[i];
-		++i;
-	}
-	pos = val.find(';');
-	if (pos != std::string::npos)
-		val.erase(pos);
 	return (std::make_pair(key, val));
 }
 
