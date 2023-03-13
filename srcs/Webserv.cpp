@@ -6,24 +6,23 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/02/26 18:41:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/13 23:34:05 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/Webserv.hpp"
+#include "../includes/Webserv.hpp"
 
 Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::string> >& config) : _nbr_server(0)
 {
 	if (this->created)
 		throw err_init(); // Classe webserv already exist
 	if (config.find("http") == config.end())
-		throw err_init(); //("No default configuration set in config file.");
+		throw std::invalid_argument("No http in config file!"); //("No default configuration set in config file.");
 	std::multimap<std::string, std::multimap<std::string, std::string> >::iterator itconfig = config.find("http");
 	std::multimap<std::string, std::string> it = itconfig->second;
-
 	this->_base.name.assign("Default");
 	this->_base.root.assign(it.find("root")->second);
-	this->_base.index.assign(it.find("index_page")->second);
+	this->_base.index.assign(it.find("index_page")->second);;
 	this->_base.port = std::stoul(it.find("listen")->second.data(), NULL, 10);
 	this->_base.addr.sin_addr.s_addr = INADDR_ANY;
 	this->_base.addr.sin_family = AF_INET;
@@ -32,9 +31,10 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	this->_base.type = SOCK_STREAM;
 	this->_base.max_client = std::strtoul(it.find("max_client")->second.data(), NULL, 10);
 	if (it.find("error_page") != it.end())
-		this->_base.error_page = {}; // parsse_error(config.find("error_page")); // Give iterator of error_page to parse end return a map<int, string>
+		ft::parse_err_page(this->_base.error_page, itconfig->second);
 	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
+	fcntl(this->_base.sock_fd, F_SETFL, O_NONBLOCK);
 	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
 		throw err_init(); // ("Server bind error.");
 	if (::listen(this->_base.sock_fd, this->_base.max_client) != 0)
@@ -44,6 +44,15 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	this->_base.active = false;
 	this->created = true;
 }
+
+Webserv::~Webserv()
+{
+	//this->stop_all(this->servers.begin());
+	this->created = false;
+}
+
+std::map<std::string, config>::iterator	Webserv::begin()	{ return (this->_servers.begin());}
+std::map<std::string, config>::iterator	Webserv::end()		{ return (this->_servers.end());}
 
 void	Webserv::close(std::map<std::string, config>::iterator &instance)
 {
@@ -58,7 +67,6 @@ void	Webserv::close(std::map<std::string, config>::iterator &instance)
 	}
 }
 
-
 void	Webserv::prepare_all()
 {
 	for (std::map<std::string, config>::iterator instance = this->_servers.begin(); instance != this->_servers.end(); instance++)
@@ -72,11 +80,14 @@ void	Webserv::prepare_all()
  */
 void	Webserv::prepare(config &instance)
 {
-	if (instance.prepare == false && instance.port != 80)
+	if (instance.prepare == false && instance.port != this->_base.port)
 	{
 		if ((instance.sock_fd = socket(instance.addr.sin_family, instance.type, 0)) != -1)
+		{
 			//socket(instance.addr.sin_family, instance.type, instance.addr.sin_addr.s_addr)))
 			instance.prepare = true;
+			fcntl(instance.sock_fd, F_SETFL, O_NONBLOCK);
+		}
 	}
 		else
 		std::cout << "Info: " + instance.name + " have already a socket!" << std::endl;
@@ -174,8 +185,21 @@ void	Webserv::bind(config &bind)
 		//htonl(INADDR_LOOPBACK);
 		//inet_addr("127.0.0.1");
 		//bind.addr.sin_addr.s_addr = htonl(INADDR_ANY);
-		if (bind.port != 80)
-			res = ::bind(bind.sock_fd, reinterpret_cast<sockaddr *>(&bind.addr), sizeof(bind.addr));
+		if (bind.port != this->_base.port)
+		{
+			if (bind.port == 0)
+			{
+				bind.active = true;
+				bind.port = this->_base.port;
+				std::cout << "Instance \033[0;33m" + bind.name + "\033[0m is vhost of main port \033[0;33m" + std::to_string(bind.port)  + "\033[0m."<< std::endl;
+				return ;
+			}
+			else
+			{
+				res = ::bind(bind.sock_fd, reinterpret_cast<sockaddr *>(&bind.addr), sizeof(bind.addr));
+				fcntl(bind.sock_fd, F_SETFL, O_NONBLOCK);
+			}
+		}
 		if (res)
 		{
 			bind.active = false;
@@ -220,20 +244,99 @@ void	Webserv::bind_all()
 	}
 }
 
-/**
- * @brief Return number of instance
- * 
- * @return unsigned 
- */
-unsigned	Webserv::get_nbr_server() const
+const char	*Webserv::err_init::what() const throw()	{ return ("\033[0;31mInstance webserv already init!\033[0m");}
+
+void	Webserv::add(std::multimap<std::string, std::string> &server)
 {
-	return (this->_nbr_server);
+	config	ret(server);
+	_check_instance(ret);
+	this->_servers.insert(std::make_pair(ret.name, ret));
+	this->_nbr_server++;
 }
 
-const char	*Webserv::err_init::what() const throw()
+/**
+ * @brief Check if the instance have the right parameter
+ * if some non importante param is not present, then set
+ * as delfault value in mainconfig
+ * 
+ * @param conf Struct config to check
+ */
+void	Webserv::_check_instance(config &conf)
 {
-	return ("\033[0;31mInstance webserv already init!\033[0m");
+	std::multimap<std::string, std::string>::iterator main;
+	if (conf.name.empty())
+		throw std::invalid_argument("Error in config file, miss server name.");
+	if (conf.root.empty())
+		throw std::invalid_argument("Error in config file, miss root directory.");
+	if (conf.index.empty())
+		conf.index = this->_base.index;
+	if (conf.ip.empty())
+		conf.ip = this->_base.ip;
+	if (!conf.domain)
+	{
+		conf.domain = AF_INET;
+		conf.addr.sin_family = conf.domain;
+	}
+	if (!conf.type)
+		conf.type = SOCK_STREAM;
+	if (conf.max_client)
+		conf.max_client = this->_base.max_client;
+	if (!conf.port)
+		std::cout << conf.name << " is a virtual host (no listen in config file)" << std::endl;
+		//throw std::invalid_argument("Error in config file, miss miss port on instance.");
 }
+
+void	Webserv::listen_all()
+{
+	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+	{
+		if (it->second.active && it->second.prepare)
+		{
+			try
+			{
+				listen(it->second);
+			}
+			catch (std::exception &e)
+			{
+				std::cerr << e.what() << std::endl;
+			}
+		}
+		else
+			std::cout << "Instance " + it->second.name + " ignored. Not active or prepared." << std::endl;
+	}
+}
+
+void	Webserv::listen(config &instance)
+{
+	if (::listen(instance.sock_fd, instance.max_client) != 0)
+		throw ("Error on listen for " + instance.name + " with error " + std::to_string(errno));
+}
+
+void	Webserv::fd_rst()
+{
+	FD_ZERO(&this->writefd);
+	FD_ZERO(&this->readfd);
+	FD_ZERO(&this->errfd);
+	
+	// Set FD on all instances
+	// test if cgi true and if true add fd of cgi.
+	for (std::map<std::string, config>::const_iterator it = this->_servers.begin(); 
+			it != this->_servers.end(); it++)
+		if (it->second.active && it->second.sock_fd > 0)
+			FD_SET(it->second.sock_fd, &this->readfd);
+	// Set FD on client if exist
+	for (std::map<int, Client>::iterator it = this->_client.begin();
+		it != this->_client.end(); it++)
+	{
+		FD_SET(it->first, &this->readfd);
+		if (it->second.is_cgi())
+			FD_SET(it->second.get_fd_cgi(), &this->readfd);
+	}
+	// Set FD on Server default port
+	FD_SET(this->_base.sock_fd, &this->readfd);
+}
+
+unsigned	Webserv::get_nbr_server() const		{ return (this->_nbr_server);}
 
 /**
  * @brief Return the info about server
@@ -280,245 +383,104 @@ std::string	Webserv::get_info_instance() const
 	return (info);
 }
 
-Webserv::~Webserv()
-{
-	//this->stop_all(this->servers.begin());
-	this->created = false;
-}
-
-std::map<std::string, config>::iterator	Webserv::begin()
-{
-	return (this->_servers.begin());
-}
-
-std::map<std::string, config>::iterator	Webserv::end()
-{
-	return (this->_servers.end());
-}
-
-void	Webserv::add(std::multimap<std::string, std::string> &server)
-{
-	config	ret = {"","","","",{},-1,0,0,0,0,0,0,{}}; // Last bracket for map<> work on c++11. Need to fix this for c++98
-	for (std::multimap<std::string, std::string>::iterator it = server.begin(); it != server.end(); it++)
-	{
-		if (!it->first.compare("name"))
-		{
-			if (it->second.empty())
-				throw ("No instance name!");
-			ret.name = it->second;
-		}
-		else if (!it->first.compare("protocol"))
-		{
-			if (it->second.empty())
-				ret.domain = AF_INET;
-			else if (it->second.compare("IPV4") || it->second.compare("INET") || it->second.compare("AF_INET"))
-				ret.domain = AF_INET;
-			else if (it->second.compare("IPV6") || it->second.compare("INET6") || it->second.compare("AF_INET6"))
-				ret.domain = AF_INET6;
-			else if (it->second.compare("local") || it->second.compare("LOCAL"))
-				ret.domain = AF_LOCAL;
-			else
-				throw ("Socket protocol invalid!");
-			ret.addr.sin_family = ret.domain;
-		}
-		else if (!it->first.compare("host"))
-		{
-			unsigned int ip[4];
-			if (!sscanf(it->second.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
-				throw ("IP bad host in config file");
-			ret.ip = it->second;
-			ret.addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
-										(ip[1] % 256 << 8 | 0) |\
-										(ip[2] % 256 << 16 | 0) |\
-										(ip[3] % 256 << 24 | 0);
-		}
-		else if (!it->first.compare("listen"))
-		{
-			if ((std::stoul(it->second) < 1) && (std::stoul(it->second) >= 0xFFFFFF))
-				throw ("Invalid port");
-			ret.port = std::stoul(it->second);
-			ret.addr.sin_port = htons(ret.port);
-		}
-		else if (!it->first.compare("type"))
-		{
-			if (!it->second.compare("tcp"))
-				ret.type = SOCK_STREAM;
-			else if (!it->second.compare("udp"))
-				ret.type = SOCK_DGRAM;
-			else
-				ret.type = SOCK_STREAM;;
-		}
-		else if (!it->first.compare("max_client"))
-		{
-			int max = std::stol(it->second);
-			if (!(max > 0 && max < static_cast<int>(0x7FFFFFFF)))
-				throw ("Max client incorrect in instance!");
-			ret.max_client = max;
-		}
-		else if (!it->first.compare("root"))
-		{
-			if (it->second.empty())
-				throw ("root destination empty!");
-			ret.root = it->second;
-		}
-		else if (!it->first.compare("index_page"))
-		{
-			if (it->second.empty())
-				throw ("no index referenced!");
-			ret.index = it->second;
-		}
-		else if (!it->first.compare("error_page"))
-		{
-			// PAS BESOIN D ITERER ET ATTENTION A BIEN AJOUTER DIRECTEMENT DANS LA MAP
-			// L ITERATEUR DU MULTMAP PEUX CONTENIR PLUSIEURS FOIS LE "error_page"...
-			std::map<int, std::string> errnbr; // = ft::parse_err(it->second);s
-			std::map<int, std::string>::iterator iterr = errnbr.begin();
-			for (; iterr != errnbr.end(); iterr++)
-			{
-				try
-				{
-					ret.error_page.insert(std::make_pair(iterr->first, iterr->second));
-				}
-				catch (std::exception &e)
-				{
-					throw ("Invalid error page in config file!");
-				}
-			}
-		}
-		else
-		{
-			std::cout << "Unknown key " << it->first << " in config file" << std::endl;
-			//throw ("Unknow parameter in config file!");
-		}
-		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
-	}
-	_check_instance(ret);
-	this->_servers.insert(std::make_pair(ret.name, ret));
-	this->_nbr_server++;
-}
-
-/**
- * @brief Check if the instance have the right parameter
- * if some non importante param is not present, then set
- * as delfault value in mainconfig
- * 
- * @param conf Struct config to check
- */
-void	Webserv::_check_instance(config &conf)
-{
-	std::multimap<std::string, std::string>::iterator main;
-	if (conf.name.empty())
-		throw ("Error in config file, miss server name.");
-	if (conf.root.empty())
-		throw ("Error in config file, miss root directory.");
-	if (conf.index.empty())
-		conf.index = this->_base.index;
-	if (conf.ip.empty())
-		conf.ip = this->_base.ip;
-	if (!conf.domain)
-	{
-		conf.domain = AF_INET;
-		conf.addr.sin_family = conf.domain;
-	}
-	if (!conf.type)
-		conf.type = SOCK_STREAM;
-	if (conf.max_client)
-		conf.max_client = this->_base.max_client;
-	if (!conf.port)
-		throw ("Error in config file, miss miss port on instance.");
-}
-
-
-void	Webserv::listen_all()
-{
-	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-	{
-		if (it->second.active && it->second.prepare)
-		{
-			try
-			{
-				listen(it->second);
-			}
-			catch (std::exception &e)
-			{
-				std::cerr << e.what() << std::endl;
-			}
-		}
-		else
-			std::cout << "Instance " + it->second.name + " ignored. Not active or prepared." << std::endl;
-	}
-}
-
-void	Webserv::listen(config &instance)
-{
-	if (::listen(instance.sock_fd, instance.max_client) != 0)
-		throw ("Error on listen for " + instance.name + " with error " + std::to_string(errno));
-}
-
 int	Webserv::get_greaterfd() const
 {
 	int	nbr = this->_base.sock_fd + 1;
-	std::map<std::string, config>::const_iterator it = this->_servers.begin();
-	for (; it != this->_servers.end(); it++)
+	
+	for (std::map<std::string, config>::const_iterator it = this->_servers.begin();
+			it != this->_servers.end(); it++)
 		if (it->second.active && it->second.sock_fd > 0 && it->second.sock_fd >= nbr)
 			nbr = it->second.sock_fd + 1;
+ 	for (std::map<int, Client>::const_iterator it = this->_client.begin();
+			it != this->_client.end(); it++)
+	{
+		if (it->first >= nbr)
+			nbr = it->first + 1;
+		if (it->second.get_fd_cgi() >= nbr)
+			nbr = it->second.get_fd_cgi() + 1;
+	}
 	return (nbr);
 }
 
-void	Webserv::fd_rst()
-{
-	FD_ZERO(&this->writefd);
-	FD_ZERO(&this->readfd);
-	FD_ZERO(&this->errfd);
-	
-	std::map<std::string, config>::const_iterator it = this->_servers.begin();
-	for (; it != this->_servers.end(); it++)
-		if (it->second.active && it->second.sock_fd > 0)
-			FD_SET(it->second.sock_fd, &this->readfd);
-	FD_SET(this->_base.sock_fd, &this->readfd);
-}
-
-fd_set&	Webserv::get_writefd()
-{
-	return (this->writefd);
-}
-
-fd_set&	Webserv::get_readfd()
-{
-	return (this->readfd);
-}
+fd_set&	Webserv::get_writefd()	{ return (this->writefd);}
+fd_set&	Webserv::get_readfd()	{ return (this->readfd);}
 
 timeval&	Webserv::timeout()
 {
-	this->_timeout.tv_sec = 1;
-	this->_timeout.tv_usec = 0;
+	this->_timeout = {1,0};
 	return (this->_timeout);
 }
 
-std::map<int, Client>::iterator	Webserv::make_client()
+// Check if is a new connexion on main config or on vhost
+// If it's a new client create the client and set right variables.
+void	Webserv::check_server()
 {
 	if (FD_ISSET(this->_base.sock_fd, &this->readfd))
 	{
+			// create a new constructor in client special for request come from server.
+			// WARNING: _ref_conf is a const reference!!!
+			// need todo header first to know the instance and after create client
+			// client constructor need to set _ref_conf in direct implementation it's const...
+			// ex: new Client(_base, 1)
+			// this->client.insert(std::make_pair(new Client->get_sockfd(), *new Client))
 			std::cout << "SUR SERVEUR PRINCIPAL" << std::endl;
 	}
-	else
-	{
-		for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd))
 		{
-			if (it->second.active)
-				if (FD_ISSET(it->second.sock_fd, &this->readfd))
-				{
-					Client *ret = new Client(it->second);
-					this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
-					FD_CLR(it->second.sock_fd, &this->readfd);
-				}
+			Client *ret = new Client(it->second);
+			this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
+			FD_CLR(it->second.sock_fd, &this->readfd);
+		}
+}
+
+// Check client if exist and if working to call the right function
+void	Webserv::check_client()
+{
+	std::vector<int>	to_close;
+	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
+	{
+		if ((FD_ISSET(it->second.get_sockfd(), &this->readfd) && it->second.is_working()) ||
+			(it->second.get_fd_cgi() > 0 && FD_ISSET(it->second.get_fd_cgi(), &this->readfd)))
+		{
+			it->second.continue_client(&this->readfd);
+			continue;
+		}
+		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd) && !it->second.new_request())
+		{
+			to_close.push_back(it->second.get_sockfd());
+			std::cout << "Connexion closed." << std::endl;
+		}
+		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd))// ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
+			std::cout << "NEW REQUEST OK" << std::endl;
+	}
+	if (!to_close.empty())
+	{
+		for (std::vector<int>::iterator it = to_close.begin(); it != to_close.end(); it++)
+		{
+			std::cout << "Connexion number: " << *it << std::endl;
+			::close(*it);
+			this->_client.erase(*it);
 		}
 	}
-	for (std::map<int,Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
+}
+
+void	Webserv::exec_client()
+{
+	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
-		std::cout << "Client with socket " + std::to_string(it->first) + " Connected" << std::endl;
-		it->second.test_client();
-		::close(it->second.get_sockfd());
+		if (it->second.get_methode().compare("BAD") == 0 || it->second.get_methode().compare("CLOSE") == 0)
+		{
+			std::cout << "BAD HEADER! Only POST, GET and DELETE are available!" << std::endl;
+			send(it->second.get_sockfd(), "HTTP/1.1 400 Bad Request\r\nContent-Length: 60\r\n\r\n<html><head></head><body>BAD REQUEST ERROR 400</body></html>\0", 109, MSG_OOB); // , NULL, 0);
+			it->second.clear_header();
+			//::close(it->second.get_sockfd());
+			// maybe segfault... clien not removed!
+		}
+		if (!it->second.get_methode().empty() && !it->second.is_working())
+		{
+			// VERIF AND SET LOCATION
+			it->second.execute_client();
+		}
 	}
-	return (this->_client.begin());
 }
