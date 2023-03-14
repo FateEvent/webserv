@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/13 23:36:52 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 16:52:12 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,11 @@ bool	Client::new_request()
 	#ifdef DEBUG
 		if (recept == 0) // empty fd
 		{
-			std::cout << "---FULL HEADER RECEPT RAW: \n\e[100m" + tmp + "\e[0m" << std::endl;
+			std::cout << "---	RECV return 0 -\n\e[10	0m" + tmp + "\e[0m" << std::endl;
 			return (false);
 		}
 		else if (recept == -1)
-			std::cout << "HEADER RECEPT RAW: \n\e[100m" + tmp + "\e[0m" << std::endl;
+			std::cout << "HEADER RECEPT RAW -1: \n\e[100m" + tmp + "\e[0m" << std::endl;
 	#endif
 
 	if (recept == -1) // end of fd
@@ -121,14 +121,16 @@ bool	Client::new_request()
 			this->_header.Methode = "BAD";
 			return (true);
 		}
-		s_str = it->find_first_of('/');
-		e_str = it->find_last_of(' ');
-		if (s_str == e_str)
+		s_str = it->find_first_of("/");
+		e_str = it->find_first_of(" \v\t\f\n", s_str);
+		if (s_str == e_str || e_str == it->npos)
 		{
 			std::cout << "unvailable header!" << std::endl;
 			return (false);
 		}
-		this->_header.Dir.append(*it, s_str, e_str - s_str);
+		this->_header.Dir = it->substr(s_str, it->find_first_of(" \v\t\f\n", s_str) - s_str);
+//		this->_header.Dir = this->_header.Dir.substr(0, this->_header.Dir.find_first_of(' '));
+		//this->_header.Dir.append(*it, s_str, e_str - s_str);
 	}
 	else
 	{
@@ -139,35 +141,34 @@ bool	Client::new_request()
 	for (++it; it != header.end() && *it->data() != '\r' && *it->data() != 0; it++)
 	{
 		if (!it->find("Host:"))
-			s_str = it->find_first_of(' ') + 1;
-		else if (!it->find("Accept:"))
-			s_str = it->find_first_of(' ') + 1;
+			this->_header.Host = it->substr(it->find_last_of(' ') + 1);
+		else if (!it->find("Accept:")) 
+			ft::split_to_vectors(this->_header.Accept, it->data());
 		else if (!it->find("User-Agent:"))
-			s_str = it->find_first_of(' ') + 1;
-		else if (!it->find("Host:"))
-			s_str = it->find_first_of(' ') + 1;
+			this->_header.User_Agent = it->substr(it->find_last_of(' ') + 1);
 		else if (!it->find("Cookie:"))
-			s_str = it->find_first_of(' ') + 1;
+		{
+			if (!ft::split_to_mapss(this->_header.Cookie, it->data()))
+				return (false);
+		}
+		else if (!it->find("Keep-Alive:"))
+			this->_header.Connexion = std::stoul(it->substr(it->find_last_of(' ') + 1));
+		else if (!it->find("Connection:"))
+			this->_header.Connexion = it->substr(it->find_last_of(' ') + 1);
 		else if (it->find("Content-Length:") == 0)
 			this->_header.Content_Length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
+		else if (!it->find("Content_Type:")) 
+			ft::split_to_vectors(this->_header.Content_Type, it->data());
+		else if (!it->find("Content_Encoding:")) 
+			ft::split_to_vectors(this->_header.Content_Encoding, it->data());
+		else if (!it->find("Transfer_Encoding:")) 
+			ft::split_to_vectors(this->_header.Transfer_Encoding, it->data());
+		else
+			ft::split_to_maposs(this->_header.other, it->data());
 	}	
-/*
-	else if (!this->_header.methode.compare("POST"))
-		{
-			std::cout << "TYPE POST" << std::endl;
-
-			else
-				this->_header.lenght = 0;
-			std::cout << "POST OK" << std::endl;
-		}
-*/
-	std::cout << "Length of content: " << this->_header.Content_Length << std::endl;
-/* 	if (!this->_header.methode.compare("POST") && this->_header.lenght > 0)
-	{
-		// NEED PARSE ELEMENT IN CONTENT AND PUT IN data, NEED TO CHANGE TYPE OF data TOO!
-		this->_header.content_type.push_back((++it)->data());
-		std::cout << "Data: " << this->_header.content_type.back() << std::endl;
-	} */
+	#ifdef DEBUG
+		this->_header.print_all();
+	#endif
 	this->_timeout = ::time(NULL);
 	return (true);
 }

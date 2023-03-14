@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/13 23:34:05 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 14:50:06 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -407,7 +407,7 @@ fd_set&	Webserv::get_readfd()	{ return (this->readfd);}
 
 timeval&	Webserv::timeout()
 {
-	this->_timeout = {1,0};
+	this->_timeout = (timeval){1,0};
 	return (this->_timeout);
 }
 
