@@ -1,18 +1,30 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
+#    Updated: 2023/03/14 12:02:02 by averon           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME		=	webserv
 CC			=	c++
-FLAGS		=	-Wall -Werror -Wextra -std=c++11
-INCLUDES	=	./include/common.h \
-				./include/Webserv.hpp \
-				./include/Client.hpp \
-				./include/search.hpp
-FILES		=	Webserv.cpp \
+FLAGS		=	-Wall -Werror -Wextra -std=c++11 -g
+INCLUDES	=	./includes/utils.h
+FILES		=	utils/s_config.cpp \
+				utils/file_to_map.cpp \
+				utils/multi_to_config.cpp \
+				utils/parse_err_page.cpp \
+				utils/s_header.cpp \
 				Client.cpp \
-				search.cpp \
-				parse.cpp \
+				Webserv.cpp \
 				main.cpp
 RM			=	rm -rf
-SRCS		=	$(addprefix ./src/, $(FILES))
-OBJS		=	$(SRCS:%.cpp=%.o)
+SRCS		=	$(addprefix ./srcs/, $(FILES))
+OBJS		=	$(SRCS:%.c=%.o)
 
 $(NAME)		:	$(OBJS)
 				$(CC) $(OBJS) -o $(NAME)
