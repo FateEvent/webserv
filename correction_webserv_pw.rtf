@@ -1,0 +1,66 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red251\green2\blue7;\red100\green190\blue237;
+\red230\green230\blue230;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c100000\c14913\c0;\cssrgb\c45490\c79216\c94510;
+\csgray\c92143;}
+\margl1440\margr1440\vieww20400\viewh21340\viewkind0
+\deftab720
+\pard\pardeftab720\sa0\partightenfactor0
+
+\f0\b\fs28 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 ***************************** CORRECTION WEBSERV PW ******************************** \uc0\u8232 
+\f1\b0 \
+- launch the installation of siege with homebrew : to see further : siege -b http://localhost:8020/ \cf3 \strokec4 \
+siege -b http://localhost:8020/\
+\cf4 \
+\cf2 \strokec2 - Explain the basics of an HTTP server. : \
+\cf3 \strokec4 The client (Firefox) makes a request to the server with the HTTP protocol, the server checks that it can execute it and sends the client the response respecting the HTTP protocol\cf4 \
+\cf2 \strokec2 \
+- Ask which function they used for I/O Multiplexing.\
+\cf3 \strokec4 We used the select function\cf4 \
+\cf2 \strokec2 \
+- Ask to get an explanation of how select (or equivalent) is working.\
+\cf3 \strokec4 The "select" function listens to the read and write from the different sockets which are stored in "read" and "write" for a determined time so as not to overload the CPU, as soon as it receives a response the program continues and tests with " FD_ISSED" which socket answered and the "accept". We use the "recv" function to retrieve the request from the client, process it and send the response back to the client with "send"\cf5 \
+\cf2 \strokec2 \
+- Ask if they use only one select (or equivalent) and how they've managed the server accept and the clientread/write.\
+\cf3 \strokec4 We use a single "select" which manages the acceptance of reads/writes from the client thanks to the FD_SET, FD_CLR, FD_ISSET and FD_ZERO.\cf4 \
+\cf2 \strokec2 \
+- There should be only one read or one write per client per select (or equivalent). Ask to show you the code that goesfrom the select (or equivalent) to the read and write of a client.\
+\cf3 \strokec4 "select" is at line 466 of main.cpp, reading "recv" is at line 482, and writing "send" at line 492.\cf4 \
+\cf2 \strokec2 \
+- Search for all read/recv/write/send on a socket and check that if an error returned the client is removed \
+- Search for all read/recv/write/send and check if the returned value is well checked. (checking only -1 or 0 is notgood you should check both)\
+\cf3 \strokec4 In case of error the client is deleted on line 485 or 494 from main.cpp and -1 and 0 is checked.\cf4 \
+\cf2 \strokec2 \
+- If a check of errno is done after read/recv/write/send. Please stop the evaluation and put a mark to 0\
+- Writing or reading ANY file descriptor without going through the select (or equivalent) is strictly FORBIDDEN\
+\cf3 \strokec4 "errno" is not used in the project. "select" is the mandatory waypoint to read from and write to the client.\cf4 \
+\cf2 \strokec2 \
+In the configuration file check if you can do the following and test the result:\
+\cf3 \strokec4 tests on .conf and test : curl http://localhost:8020 --resolve http://localhost:8022\cf4 \
+\cf2 \strokec2 \
+- setup default error page (try to change the error 404)\
+\cf3 \strokec4 Changing the default 404 page at the root of the HTML folder\cf4 \
+\cf2 \strokec2 \
+- limit the client body (use curl -X POST -H "Content-Type: plain/text" --data "BODY IS HERE write something shorteror longer than body limit")\
+\cf3 \strokec4 curl http://localhost:8022 -X POST -H "Content-Type: plain/text" --data "BODY IS HERE wri" \cf4 \
+\cf2 \strokec2 \
+- setup a list of method accepted for a certain route (ex: try to delete something with and without permission)\
+\cf3 \strokec4 Do the tests with Postman, for DELETE you are allowed to delete the test_delete.html file if you have the rights in .conf for security reasons.\cf4 \
+\cf2 \strokec2 \
+Using telnet, curl, prepared files demonstrates that the following features work properly: \uc0\u8232 - GET requests -> should work \u8232 - POST requests -> should work \u8232 - DELETE requests -> should work \u8232 - UNKNOWN requests -> should not produce any crash \u8232 - For every test the status code must be good \u8232 - upload some file to the server and get it back\
+\cf3 \strokec4 To do all these tests you can use the site "site_3_form" which will allow you to test the GET, POST, DELETE and site_1 for Upload and Download files of your choice (port 8042).\
+You can upload the files of your choice to the server and retrieve them, they will be stored on the server in the server's storage/ folder, for security reasons only the files in this location can be retrieved by the client. (example: port 8020)\
+\cf2 \strokec2 \
+- Use the reference browser of the team, open the network part of it and try to connect to the server with it \uc0\u8232 - Look at the request header and response header \u8232 - It should be compatible to serve a fully static website \u8232 - Try a wrong URL on the server \u8232 - Try to list a directory \u8232 - Try a redirected URL \u8232 - Try things\
+\cf3 \strokec4 To do all these tests you can use: \uc0\u8232 Port 8020 for a fully static site. \u8232 Port 8022 to list directories. \u8232 Port 8013 for a redirect to ww.google. \cf4 \uc0\u8232 ...\
+\cf2 \strokec2 - Use Siege to run some stress tests. \uc0\u8232 - Availability should be above 99.5% for a simple get on an empty page with a siege -b on that page \u8232 - Check if there is no memory leak (monitor the process memory usage it should not go up indefinitely) \u8232 - Check if there is no hanging connection \u8232 - You should be able to use siege indefinitely without restarting the server (look at siege -b)\
+\cf3 \strokec4 ex : siege -b http://localhost:8020/\cf4 \
+\cf2 \strokec2 \
+Cookies and session \uc0\u8232 There's a working session and cookies system on the webserver\
+\cf3 \strokec4 There is a management of cookies by counting the number of visits by customers and web pages visited.\cf4 \
+\cf2 \strokec2 \
+CGI \uc0\u8232 There's more than one CGI system\
+\cf3 \strokec4 There are several CGIs supported for .py and .c files tests with Postman by calling the .py and .c files they are interpreted by the CGI and then transformed into an HTML page.\cf4 \
+}
