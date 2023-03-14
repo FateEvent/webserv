@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 14:50:06 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 22:26:54 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -480,7 +480,7 @@ void	Webserv::exec_client()
 		if (!it->second.get_methode().empty() && !it->second.is_working())
 		{
 			// VERIF AND SET LOCATION
-			it->second.execute_client();
+			it->second.execute_client(it->second.check_location());
 		}
 	}
 }

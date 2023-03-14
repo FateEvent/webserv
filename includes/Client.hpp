@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/13 23:18:17 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 22:26:49 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,12 +61,13 @@ class Client
 		const config*	get_config() const;
 		int				get_fd_cgi() const;
 		void			continue_client(fd_set*);
-		void			execute_client();
+		void			execute_client(bool);
 		bool			is_working() const;
 		bool			is_cgi() const;
 		bool			is_chunk() const;
 		bool			new_request();
 		void			clear_header();
+		bool			check_location();
 
 		void			chunk(); // get chunked data
 		void			take_data(); // Get or search body data. count and put total in length variable

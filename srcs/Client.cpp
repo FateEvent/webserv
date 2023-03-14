@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 22:15:16 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 22:26:58 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,8 +202,9 @@ void	Client::continue_client(fd_set *fdset)
 	}
 }
 
-void	Client::execute_client()
+void	Client::execute_client(bool path)
 {
+	(void)path;
 	// THERE SEND ARE ONLY FOR PRE-TEST...
 	#ifdef DEBUG
 		std::cout << "\e[100m---------- HEADER CLIENT NUMBER " << this->_sock_fd << " ---------------" << std::endl;
@@ -228,6 +229,14 @@ void	Client::execute_client()
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl;
 	
+}
+
+bool	Client::check_location()
+{
+	// Test location to Dir and file-first file->second
+	// Test directory if exist, test file if exist
+	// return true root ok or false	bad root (404)
+	return (true);
 }
 
 void	Client::chunk()
