@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   s_header.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/13 20:58:28 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 10:36:54 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	s_header::clear()
 	Content_Length = 0;
 	Content_Type.clear();
 	Content_Encoding.clear();
+	Transfer_Encoding.clear();
 	Accept.clear();
 	Cookie.clear(); // change to a ref of cookie in instance
 	time_out = 0;
