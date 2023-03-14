@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 16:52:12 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 16:57:47 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,9 @@ bool	Client::new_request()
 			ft::split_to_vectors(this->_header.Transfer_Encoding, it->data());
 		else
 			ft::split_to_maposs(this->_header.other, it->data());
-	}	
+	}
+	// LEAVE IN DIR ONLY THE DIRECTORY PUT FILE IN FILE::PAIR<STRING, STRING> KEY= FILE NAME, VALUE= EXTENSION OF FILE.
+	// NEED SEARCH ABOUT FILE WITHOUT EXTENSION
 	#ifdef DEBUG
 		this->_header.print_all();
 	#endif
