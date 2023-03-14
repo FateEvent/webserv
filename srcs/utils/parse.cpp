@@ -6,11 +6,11 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/03 14:26:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/13 13:55:32 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/14 13:34:54 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/search.hpp"
+#include "../../includes/search.hpp"
 
 std::string	ft::string_cutter(std::string str)
 {

@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/13 17:04:39 by faventur          #+#    #+#             */
-/*   Updated: 2023/03/13 13:49:57 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/14 13:34:45 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@
 ** operates necessary key replacements.
 */
 
-#include "../include/search.hpp"
+#include "../../includes/search.hpp"
 
 void	ft::space_eraser(std::multimap<std::string, std::string> &map)
 {
