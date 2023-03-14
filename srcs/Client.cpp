@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 16:57:47 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 22:15:16 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,13 +122,13 @@ bool	Client::new_request()
 			return (true);
 		}
 		s_str = it->find_first_of("/");
-		e_str = it->find_first_of(" \v\t\f\n", s_str);
+		e_str = it->find_first_of(" \r\v\t\f\n", s_str);
 		if (s_str == e_str || e_str == it->npos)
 		{
 			std::cout << "unvailable header!" << std::endl;
 			return (false);
 		}
-		this->_header.Dir = it->substr(s_str, it->find_first_of(" \v\t\f\n", s_str) - s_str);
+		this->_header.Dir = it->substr(s_str, it->find_first_of(" \v\t\f\n\r", s_str) - s_str);
 //		this->_header.Dir = this->_header.Dir.substr(0, this->_header.Dir.find_first_of(' '));
 		//this->_header.Dir.append(*it, s_str, e_str - s_str);
 	}
@@ -141,11 +141,11 @@ bool	Client::new_request()
 	for (++it; it != header.end() && *it->data() != '\r' && *it->data() != 0; it++)
 	{
 		if (!it->find("Host:"))
-			this->_header.Host = it->substr(it->find_last_of(' ') + 1);
+			this->_header.Host = it->substr(it->find_last_of(' ') + 1, it->find_last_of(':') - it->find_last_of(' ') - 1);
 		else if (!it->find("Accept:")) 
 			ft::split_to_vectors(this->_header.Accept, it->data());
 		else if (!it->find("User-Agent:"))
-			this->_header.User_Agent = it->substr(it->find_last_of(' ') + 1);
+			this->_header.User_Agent = it->substr(it->find_last_of(' ') + 1, it->find_last_of('\r') - it->find_last_of(" ") - 1);
 		else if (!it->find("Cookie:"))
 		{
 			if (!ft::split_to_mapss(this->_header.Cookie, it->data()))
@@ -154,7 +154,7 @@ bool	Client::new_request()
 		else if (!it->find("Keep-Alive:"))
 			this->_header.Connexion = std::stoul(it->substr(it->find_last_of(' ') + 1));
 		else if (!it->find("Connection:"))
-			this->_header.Connexion = it->substr(it->find_last_of(' ') + 1);
+			this->_header.Connexion = it->substr(it->find_last_of(' ') + 1, it->find_last_of('\r') - it->find_last_of(" ") - 1);
 		else if (it->find("Content-Length:") == 0)
 			this->_header.Content_Length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
 		else if (!it->find("Content_Type:")) 
@@ -166,12 +166,12 @@ bool	Client::new_request()
 		else
 			ft::split_to_maposs(this->_header.other, it->data());
 	}
-	// LEAVE IN DIR ONLY THE DIRECTORY PUT FILE IN FILE::PAIR<STRING, STRING> KEY= FILE NAME, VALUE= EXTENSION OF FILE.
-	// NEED SEARCH ABOUT FILE WITHOUT EXTENSION
+	this->_header.split_dir();
+	this->_timeout = ::time(NULL);
+	this->_header.time_out = this->_timeout;
 	#ifdef DEBUG
 		this->_header.print_all();
 	#endif
-	this->_timeout = ::time(NULL);
 	return (true);
 }
 

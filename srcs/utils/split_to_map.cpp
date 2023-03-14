@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 16:47:57 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 22:10:35 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line)
 	for (; i != line.npos; i = line.find_first_of(","))
 	{
 		//std::cout << line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i ) << std::endl;
-		svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i ));
+		svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i )); // Possible problem when false
 		line = line.substr(i + 1);
 	}
 	//std::cout << line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i ) << std::endl;
@@ -57,6 +57,6 @@ bool	ft::split_to_maposs(std::map<std::string, std::string> &mapss, std::string 
 {
 	mapss.insert(std::make_pair<std::string, std::string>(
 						line.substr(0, line.find_first_of(":")),
-						line.substr(line.find_first_of(" ") + 1, line.length())));
+						line.substr(line.find_first_of(" ") + 1, line.find_last_not_of(" \r\n") - line.find_first_of(" "))));
 	return (true);
 }
