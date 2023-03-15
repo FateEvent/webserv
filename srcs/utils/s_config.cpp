@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/13 11:31:43 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/15 18:45:31 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 			if (!ft::put_err_page(it->second, this->error_page))
 				throw std::invalid_argument("error page in config file not set properly!");
 		}
-		else if (!it->first.compare("location"))
+		else if (!it->first.find("location"))
 			do_location(it->second);
 		#ifdef DEBUG
 		else
@@ -162,16 +162,17 @@ void s_config::do_location(std::string loc)
 
 void	s_config::get_all_loc(std::string loc, struct s_location *st)
 {
-	std::string line;
+	std::string	line;
+	std::string	key;
 	size_t		pos;
+
 	while ((pos = loc.find(";")) != loc.npos)
 	{
 		line = loc.substr(0, pos);
+		key = line.substr(0, line.find_first_of(" \v\f\r\n\t"));
+		line = line.substr(line.find_first_of(" \v\t\r\n\t"));
+		line = line.substr(line.find_first_not_of(" \v\t\r\n\t"));
 		loc.erase(0, pos + 1);
-		st->to.insert(std::make_pair(line.substr(0, line.find_first_of(" \v\f\r\n\t")),
-									line.substr(line.find_last_of(" \v\f\r\n\t"))));
-		#ifdef DEBUG
-			std::cout << "Location line: " + line << std::endl;
-		#endif
+		st->to.insert(std::make_pair(key, line.substr(line.find_first_not_of(" \v\f\r\n\t"))));
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 13:30:38 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/11 15:17:19 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/15 19:02:52 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	ft::parse_err_page(std::map<int, std::string>& err, std::multimap<std::stri
 {
 	for (std::map<std::string, std::string>::iterator it = page.begin(); it != page.end(); it++)
 	{
-		if (it->first.compare("error_page") == 0 && !ft::put_err_page(it->second, err))
+		if (it->first.find("error_page") == 0 && !ft::put_err_page(it->second, err))
 			throw std::invalid_argument("error page in config file not set properly!");
 	}
 }

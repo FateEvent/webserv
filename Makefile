@@ -6,7 +6,7 @@
 #    By: stissera <stissera@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/03/14 14:31:55 by stissera         ###   ########.fr        #
+#    Updated: 2023/03/15 11:56:08 by stissera         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,7 @@ FILES		=	utils/s_config.cpp \
 				utils/parse_err_page.cpp \
 				utils/split_to_map.cpp \
 				utils/s_header.cpp \
+				utils/test_path.cpp \
 				Client.cpp \
 				Webserv.cpp \
 				main.cpp
