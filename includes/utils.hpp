@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:26:03 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 16:46:15 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/14 23:59:18 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,6 @@ namespace ft {
 	bool	split_to_vectors(std::vector<std::string> &, std::string);
 	bool	split_to_mapss(std::map<std::string, std::string> &, std::string);
 	bool	split_to_maposs(std::map<std::string, std::string> &, std::string);
+	bool	test_path(std::string &);
 };
 #endif

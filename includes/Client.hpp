@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 22:26:49 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/15 00:37:22 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ class Client
 		socklen_t			_socklen;
 //		sockaddr_un			_addr_local;	// sockaddr_un is a local socket
 		const config&		_ref_conf;
+		std::string			_root;
+		std::string			_index;
 		time_t				_timeout;
 		header				_header;
 		size_t				_max_body;
@@ -67,8 +69,10 @@ class Client
 		bool			is_chunk() const;
 		bool			new_request();
 		void			clear_header();
+	
 		bool			check_location();
-
+		void			simple_location(std::vector<struct s_location>::const_iterator &);
+		void			condition_location(std::vector<struct s_location>::const_iterator &);
 		void			chunk(); // get chunked data
 		void			take_data(); // Get or search body data. count and put total in length variable
 		
