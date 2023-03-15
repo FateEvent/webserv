@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+         #
+#    By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/03/14 13:34:05 by faventur         ###   ########.fr        #
+#    Updated: 2023/03/15 11:59:29 by averon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,6 +18,7 @@ FILES		=	utils/s_config.cpp \
 				utils/file_to_map.cpp \
 				utils/multi_to_config.cpp \
 				utils/parse_err_page.cpp \
+				utils/split_to_map.cpp \
 				utils/s_header.cpp \
 				utils/search.cpp \
 				utils/parse.cpp \
