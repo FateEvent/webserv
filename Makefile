@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: stissera <stissera@student.42.fr>          +#+  +:+       +#+         #
+#    By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/03/15 11:56:08 by stissera         ###   ########.fr        #
+#    Updated: 2023/03/16 10:29:37 by faventur         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,18 +26,22 @@ FILES		=	utils/s_config.cpp \
 				main.cpp
 RM			=	rm -rf
 SRCS		=	$(addprefix ./srcs/, $(FILES))
-OBJS		=	$(SRCS:%.c=%.o)
+OBJS		=	$(SRCS:%.cpp=%.o)
 
-$(NAME)		:	$(OBJS)
-				$(CC) $(FLAGS) $(OBJS) -o $(NAME)
+$(NAME)	:	$(OBJS)
+			$(CC) $(OBJS) -o $(NAME)
 
-all			:	$(NAME)
+.cpp.o	:
+	$(CC) $(FLAGS) -c $< -o ${<:.cpp=.o}
 
-clean		:	$(RM) $(OBJS)
+all		:	$(NAME)
 
-flcean		:	clean
-				$(RM) $(NAME)
+clean:
+	$(RM) $(OBJS)
 
-re			:	fclean all
+fclean	:	clean
+			$(RM) $(NAME)
 
-.PHONY		:	all clean fclean re
+re		:	fclean all
+
+.PHONY	:	all clean fclean re

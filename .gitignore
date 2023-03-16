@@ -1,8 +1,13 @@
+#Param
+.vscode
+*.json
+
+#Debug
+*.dSYM
+*.plist
+
 #Exec
 *.o
 *.out
 webserv
 test
-
-.vscode
-*.json
