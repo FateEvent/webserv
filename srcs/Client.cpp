@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/15 19:04:23 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/16 12:12:35 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ Client::Client(const config &config) : _ref_conf(config)
 }
 
 Client::~Client() {}
-int	Client::get_sockfd() const 				{ return (this->_sock_fd);}
+int	Client::get_sockfd() const				{ return (this->_sock_fd);}
 time_t	Client::get_time_alive() const		{ return (this->_timeout);}
 std::string Client::get_methode() const		{ return (this->_header.Methode);}
 std::string	Client::get_directory() const	{ return (this->_header.Dir);}
@@ -59,12 +59,12 @@ void	Client::clear_header()
 
 bool	Client::new_request()
 {
-	char 						buffer[2];
+	char						buffer[2];
 	std::string					tmp;
 	std::string					line;
 	std::vector<std::string>	header;
-	size_t 						s_str;
-	size_t 						e_str;
+	size_t						s_str;
+	size_t						e_str;
 	ssize_t						recept = 1;
 
 	while (tmp.find("\r\n\r\n") == tmp.npos)
@@ -307,7 +307,7 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 				std::string err = it->second;
 				ft::put_err_page(err, this->_error_page);
 			}
- 			/* else if (!it->first.find("proxy_pass"))
+			/* else if (!it->first.find("proxy_pass"))
 			{
 
 			}
