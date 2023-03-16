@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 22:10:35 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/15 12:45:07 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line)
 {
 	line = line.substr(line.find_first_of(" ") + 1);
-	size_t i = line.find_first_of(",");
+	size_t i = line.find_first_of(",\r");
 
-	for (; i != line.npos; i = line.find_first_of(","))
+	for (; i != line.npos; i = line.find_first_of(",\r"))
 	{
 		//std::cout << line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i ) << std::endl;
 		svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i )); // Possible problem when false

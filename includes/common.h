@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 22:13:36 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/15 17:35:11 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,9 +77,9 @@ typedef struct s_header
 
 typedef struct s_location
 {
-	std::string							base; 	// first argument after location
-	std::string							search;	// second before open bracket if exist"
-	std::map<std::string, std::string>	to; 	// what we do (name, directive).
+	std::string								base; 	// first argument after location
+	std::string								search;	// second before open bracket if exist"
+	std::multimap<std::string, std::string>	to; 	// what we do (name, directive).
 }	t_location;
 
 #endif

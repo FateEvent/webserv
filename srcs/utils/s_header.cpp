@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 22:11:56 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/15 13:51:39 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,8 @@ bool	s_header::split_dir()
 		{
 			return (false);
 		}
-		return (true);
 	}
+	if (this->Dir.find_last_of("/") != this->Dir.npos && this->Dir.find_last_of("/") == this->Dir.length() - 1)
+		this->Dir.pop_back();
 	return (true);
 }

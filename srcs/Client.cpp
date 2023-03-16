@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/15 11:29:03 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/15 19:04:23 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ bool	Client::new_request()
 		}
 		s_str = it->find_first_of("/");
 		e_str = it->find_first_of(" \r\v\t\f\n", s_str);
-		if (s_str == e_str || e_str == it->npos)
+		if (s_str == e_str || s_str == it->npos || e_str == it->npos)
 		{
 			std::cout << "unvailable header!" << std::endl;
 			return (false);
@@ -204,17 +204,39 @@ void	Client::continue_client(fd_set *fdset)
 
 void	Client::execute_client(bool path)
 {
-	(void)path;
-	// THERE SEND ARE ONLY FOR PRE-TEST...
+	if (!path)
+		std::cout << "Can't open file!!!!" << std::endl; // if error 404.
+
 	#ifdef DEBUG
 		std::cout << "\e[100m---------- HEADER CLIENT NUMBER " << this->_sock_fd << " ---------------" << std::endl;
 		std::cout << _header.Methode + " " + _header.Dir << std::endl;
 		std::cout << "Host: " + _header.Host + "\e[0m" << std::endl;
 	#endif
+
 	if (_header.Methode.compare("GET") == 0)
 	{
 		std::cout << "GET METHODE" << std::endl;
-		send(this->_sock_fd, "HTTP/1.1 404 Not Found\r\nContent-Length: 52\r\n\r\n<html><head></head><body>GET ERROR 404</body></html>\0", 99, MSG_OOB); // , NULL, 0);
+
+////////// TESST MODE
+		std::fstream file;
+		file.open(this->_root + "/" + this->_index);
+		this->_root.clear();
+		this->_index.clear();
+		file.seekg(0, file.end);
+		int	nbr = file.tellg();
+		file.seekg(0, file.beg);
+		char tmp[nbr + 1];
+		std::string data;
+		data = std::to_string(nbr);
+		data = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + data;
+		data.append("\r\n\r\n");
+		file.getline(tmp, nbr);
+		data.append(tmp);
+		data.append("\r\n\r\n");
+		send(this->_sock_fd, data.c_str(), data.length() + 1, 0);
+//////////// END TEST MODE
+
+		//send(this->_sock_fd, "HTTP/1.1 404 Not Found\r\nContent-Length: 52\r\n\r\n<html><head></head><body>GET ERROR 404</body></html>\0", 99, MSG_OOB); // , NULL, 0);
 		this->_working = false;
 		this->_header.clear();
 	}
@@ -246,15 +268,13 @@ bool	Client::check_location()
 			this->condition_location(it);
 	}
 	if (this->_root.empty())
-	{
 		this->_root = this->_ref_conf.root + this->_header.Dir;
-	}
 	if (this->_index.empty())
 	{
 		if (this->_header.file.second.empty())
 			this->_index = this->_ref_conf.index;
 		else
-			this->_index = this->_header.file.first + "." + this->_header.file.second;
+			this->_index = this->_header.file.first + "." + this->_header.file.second; // ????
 	}
 	path = this->_root + "/" + this->_index;
 	#ifdef DEBUG
@@ -268,32 +288,44 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 	if (location->base.length() > this->_header.Dir.length())
 		return ;
 	if (std::strncmp((location->base + "/").c_str(), this->_header.Dir.c_str(), location->base.length()) == 0)
-		for (std::map<std::string, std::string>::const_iterator it = location->to.begin(); it != location->to.end(); it++)
+		for (std::multimap<std::string, std::string>::const_iterator it = location->to.begin(); it != location->to.end(); it++)
 		{
-			if (it->first.find("root"))
+			if (!it->first.find("root"))
 			{
 				this->_root = it->second;
 				this->_root.append(this->_header.Dir, location->base.length());
 			}
-			else if (it->first.find("index_page"))
+			else if (!it->first.find("index_page"))
 			{
 				if (this->_header.file.first.empty())
-					this->_index = this->_ref_conf.index;
+					this->_index = it->second;
 				else
-					this->_index = it->first + "." + it->second;
+					this->_index = this->_header.file.first + "." + this->_header.file.second;
 			}
+			else if (!it->first.find("error_page"))
+			{
+				std::string err = it->second;
+				ft::put_err_page(err, this->_error_page);
+			}
+ 			/* else if (!it->first.find("proxy_pass"))
+			{
+
+			}
+			else if (!it->first.find("cgi"))
+			{
+
+			} */
 			// do reste of location
 		}
-
-
 }
 
 void	Client::condition_location(std::vector<struct s_location>::const_iterator &location)
 {
-	for (std::map<std::string, std::string>::const_iterator it = location->to.begin(); it != location->to.end(); it++)
-	{
-		
-	}	
+	if (std::strncmp((location->base + "/").c_str(), this->_header.Dir.c_str(), location->base.length()) == 0)
+		std::cout << "Location double condition can't work! Please fix this in your config file" << std::endl;
+//	for (std::map<std::string, std::string>::const_iterator it = location->to.begin(); it != location->to.end(); it++)
+//	{
+//	}	
 }
 
 void	Client::chunk()

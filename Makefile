@@ -6,7 +6,7 @@
 #    By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/03/15 13:44:43 by averon           ###   ########.fr        #
+#    Updated: 2023/03/16 10:16:29 by averon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,8 +20,6 @@ FILES		=	utils/s_config.cpp \
 				utils/parse_err_page.cpp \
 				utils/split_to_map.cpp \
 				utils/s_header.cpp \
-				utils/search.cpp \
-				utils/parse.cpp \
 				utils/test_path.cpp \
 				Client.cpp \
 				Webserv.cpp \
