@@ -35,6 +35,7 @@ namespace ft {
 	void					comments_cleaner(std::multimap<std::string, std::string> &map);
 	void					kärcherizer(std::multimap<std::string, std::string> &map);
 	void					space_eraser(std::multimap<std::string, std::string> &map);
+	
 
 	// server-client communication parsing
 	string_map				str_to_map(std::string str, std::string sep);
