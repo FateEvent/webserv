@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 13:28:14 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/20 13:34:16 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,13 @@ bool	Client::new_request()
 		if (recept < 1 || buffer[0] == 0)
 			break;
 		tmp.append(buffer);
-		if (tmp.find("Content-Length") != tmp.npos)
+		size_t	length = tmp.find("Content-Length");
+
+		if (length != tmp.npos)
 		{
 			std::string	str = tmp.substr(tmp.find("Content-Length"));
-			int	length = std::strtol(tmp.substr(tmp.find(' ') + 1).c_str(), NULL, 10);
+
+			length = std::strtol(tmp.substr(tmp.find(' ') + 1).c_str(), NULL, 10);
 			if (length > this->_max_body)
 			{
 				throw ("The content is too long");
