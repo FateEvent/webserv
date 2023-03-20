@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 22:26:54 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/20 13:30:26 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,11 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	std::multimap<std::string, std::string> it = itconfig->second;
 	this->_base.name.assign("Default");
 	this->_base.root.assign(it.find("root")->second);
-	this->_base.index.assign(it.find("index_page")->second);;
+	this->_base.index.assign(it.find("index_page")->second);
+	if (it.find("index_page") != it.end())	
+		this->_base.autoindex.assign(it.find("autoindex")->second);
+	else
+		this->_base.autoindex.assign("off");
 	this->_base.port = std::stoul(it.find("listen")->second.data(), NULL, 10);
 	this->_base.addr.sin_addr.s_addr = INADDR_ANY;
 	this->_base.addr.sin_family = AF_INET;
@@ -131,7 +135,7 @@ void	Webserv::stop(config &server)
 		std::cout << "Closed..." << std::endl;
 	}
 	else
-		std::cout << "Not active, not need to close..." << std::endl;
+		std::cout << "Not active, no need to close..." << std::endl;
 //		throw ("Server was already shutdown.");
 }
 
@@ -256,8 +260,8 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 
 /**
  * @brief Check if the instance have the right parameter
- * if some non importante param is not present, then set
- * as delfault value in mainconfig
+ * if some non important param is not present, then set
+ * as default value in mainconfig
  * 
  * @param conf Struct config to check
  */
@@ -475,7 +479,7 @@ void	Webserv::exec_client()
 			send(it->second.get_sockfd(), "HTTP/1.1 400 Bad Request\r\nContent-Length: 60\r\n\r\n<html><head></head><body>BAD REQUEST ERROR 400</body></html>\0", 109, MSG_OOB); // , NULL, 0);
 			it->second.clear_header();
 			//::close(it->second.get_sockfd());
-			// maybe segfault... clien not removed!
+			// maybe segfault... client not removed!
 		}
 		if (!it->second.get_methode().empty() && !it->second.is_working())
 		{

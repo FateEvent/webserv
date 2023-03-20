@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/16 12:12:35 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/20 13:28:14 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,17 @@ bool	Client::new_request()
 		if (recept < 1 || buffer[0] == 0)
 			break;
 		tmp.append(buffer);
+		if (tmp.find("Content-Length") != tmp.npos)
+		{
+			std::string	str = tmp.substr(tmp.find("Content-Length"));
+			int	length = std::strtol(tmp.substr(tmp.find(' ') + 1).c_str(), NULL, 10);
+			if (length > this->_max_body)
+			{
+				throw ("The content is too long");
+				// faudrait bloquer la requete et fermer la connexion avec le client
+			}
+		}
+			
 	}
 
 	#ifdef DEBUG
@@ -125,7 +136,7 @@ bool	Client::new_request()
 		e_str = it->find_first_of(" \r\v\t\f\n", s_str);
 		if (s_str == e_str || s_str == it->npos || e_str == it->npos)
 		{
-			std::cout << "unvailable header!" << std::endl;
+			std::cout << "unavailable header!" << std::endl;
 			return (false);
 		}
 		this->_header.Dir = it->substr(s_str, it->find_first_of(" \v\t\f\n\r", s_str) - s_str);
@@ -259,6 +270,9 @@ bool	Client::check_location()
 	// Test location to Dir and file-first file->second
 	// Test directory if exist, test file if exist
 	// return true root ok or false	bad root (404)
+	// or return index or,
+	// if autoindex is off (by default it is off),
+	// return permission denied (403)
 	for (std::vector<struct s_location>::const_iterator it = this->_ref_conf.location.begin();
 				it != this->_ref_conf.location.end(); it++)
 	{
@@ -276,7 +290,10 @@ bool	Client::check_location()
 		else
 			this->_index = this->_header.file.first + "." + this->_header.file.second; // ????
 	}
-	path = this->_root + "/" + this->_index;
+	if (this->_autoindex == "off")
+		path = this->_root + "/" + this->_error_page[403];
+	else
+		path = this->_root + "/" + this->_index;
 	#ifdef DEBUG
 		std::cout << "Path of file is: " + path << std::endl;
 	#endif

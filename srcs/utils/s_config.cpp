@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   s_config.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/15 18:45:31 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/20 11:40:24 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,12 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 				throw ("no index referenced!");
 			this->index = it->second;
 		}
+		else if (!it->first.compare("autoindex"))
+		{
+			if (it->second.empty())
+				this->autoindex.assign("off");
+			this->autoindex = it->second;
+		}
 		else if (!it->first.compare("error_page"))
 		{
 			if (!ft::put_err_page(it->second, this->error_page))
@@ -129,7 +135,7 @@ void s_config::set_zero()
 	this->type = 0;	
 }
 
-void s_config::do_location(std::string loc)
+void	s_config::do_location(std::string loc)
 {
 	t_location st;
 	size_t start , end;
