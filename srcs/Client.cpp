@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 13:34:16 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/20 14:44:25 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,9 +273,6 @@ bool	Client::check_location()
 	// Test location to Dir and file-first file->second
 	// Test directory if exist, test file if exist
 	// return true root ok or false	bad root (404)
-	// or return index or,
-	// if autoindex is off (by default it is off),
-	// return permission denied (403)
 	for (std::vector<struct s_location>::const_iterator it = this->_ref_conf.location.begin();
 				it != this->_ref_conf.location.end(); it++)
 	{
@@ -293,10 +290,7 @@ bool	Client::check_location()
 		else
 			this->_index = this->_header.file.first + "." + this->_header.file.second; // ????
 	}
-	if (this->_autoindex == "off")
-		path = this->_root + "/" + this->_error_page[403];
-	else
-		path = this->_root + "/" + this->_index;
+	path = this->_root + "/" + this->_index;
 	#ifdef DEBUG
 		std::cout << "Path of file is: " + path << std::endl;
 	#endif

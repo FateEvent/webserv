@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 13:30:26 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/20 14:44:41 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,6 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	this->_base.name.assign("Default");
 	this->_base.root.assign(it.find("root")->second);
 	this->_base.index.assign(it.find("index_page")->second);
-	if (it.find("index_page") != it.end())	
-		this->_base.autoindex.assign(it.find("autoindex")->second);
-	else
-		this->_base.autoindex.assign("off");
 	this->_base.port = std::stoul(it.find("listen")->second.data(), NULL, 10);
 	this->_base.addr.sin_addr.s_addr = INADDR_ANY;
 	this->_base.addr.sin_family = AF_INET;

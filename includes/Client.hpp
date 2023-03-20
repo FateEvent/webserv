@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 13:07:11 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/20 14:44:55 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ class Client
 		const config&				_ref_conf;
 		std::string					_root;
 		std::string					_index;
-		std::string					_autoindex;
 		time_t						_timeout;
 		header						_header;
 		size_t						_max_body;

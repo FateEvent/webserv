@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 11:40:24 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/20 14:44:47 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,12 +87,6 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 			if (it->second.empty())
 				throw ("no index referenced!");
 			this->index = it->second;
-		}
-		else if (!it->first.compare("autoindex"))
-		{
-			if (it->second.empty())
-				this->autoindex.assign("off");
-			this->autoindex = it->second;
 		}
 		else if (!it->first.compare("error_page"))
 		{
