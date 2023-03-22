@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/15 19:04:23 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/22 11:07:52 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 Client::Client(const config &config) : _ref_conf(config)
 {
+	this->clear_header();
 	_socklen = sizeof(this->_addr);
 	this->_working = false;
 	FD_ZERO(&this->_readfd); // maybe don't need
@@ -72,26 +73,21 @@ bool	Client::new_request()
 		recept = recv(this->_sock_fd, &buffer, 1, 0);
 		if (recept < 1 || buffer[0] == 0)
 			break;
-		tmp.append(buffer);
+		tmp.push_back(buffer[0]);
 	}
 
-	#ifdef DEBUG
+	//#ifdef DEBUG
 		if (recept == 0) // empty fd
 		{
 			std::cout << "---	RECV return 0 -\n\e[10	0m" + tmp + "\e[0m" << std::endl;
 			return (false);
 		}
 		else if (recept == -1)
-			std::cout << "HEADER RECEPT RAW -1: \n\e[100m" + tmp + "\e[0m" << std::endl;
-	#endif
-
-	if (recept == -1) // end of fd
-	{
-		#ifdef DEBUG
-			std::cout << "\n\e[94m" + tmp + "\e[0m" << std::endl;
-		#endif
-		return (false);
-	}
+		{
+			std::cout << "HEADER RECEPT RAW -1: \n\e[100m + tmp + \e[0m" << std::endl;
+			return (true);
+		}
+	//#endif
 
 	// SET HEADER IN VECTOR BY LINE
 	for (std::string::iterator it = tmp.begin(); it != tmp.end() && *it != 0; it++)
@@ -128,9 +124,9 @@ bool	Client::new_request()
 			std::cout << "unvailable header!" << std::endl;
 			return (false);
 		}
-		this->_header.Dir = it->substr(s_str, it->find_first_of(" \v\t\f\n\r", s_str) - s_str);
-//		this->_header.Dir = this->_header.Dir.substr(0, this->_header.Dir.find_first_of(' '));
-		//this->_header.Dir.append(*it, s_str, e_str - s_str);
+		this->_header.Dir = it->substr(s_str, it->find_first_of(" \v\t\f\n\r\?", s_str) - s_str);
+		if (it->find_first_of("?") != it->npos && !this->_header.Methode.compare("GET"))
+			ft::split_to_mapss(this->_header.other, it->substr(it->find_first_of("?") + 1, it->find_last_of(" ") - it->find_last_of("?") - 1), '&');
 	}
 	else
 	{
@@ -204,8 +200,20 @@ void	Client::continue_client(fd_set *fdset)
 
 void	Client::execute_client(bool path)
 {
-	if (!path)
-		std::cout << "Can't open file!!!!" << std::endl; // if error 404.
+	if (!path && !this->is_working())
+	{
+		std::cout << "Can't open file!!!!" << std::endl;
+		std::string body, header;
+		header = ft::make_header(404);
+				body = ft::get_page_error(404, this->_error_page[404].empty() ?
+								(this->_ref_conf.error_page.find(404)->second.empty() ?
+								this->_ref_conf._base->error_page.find(404)->second : this->_ref_conf.error_page.find(404)->second) :
+								this->_error_page[404]);
+				header.append(body);
+				header.append("\r\n\r\n");
+				send(this->_sock_fd, header.c_str(), header.length() + 1, 0);
+	}
+
 
 	#ifdef DEBUG
 		std::cout << "\e[100m---------- HEADER CLIENT NUMBER " << this->_sock_fd << " ---------------" << std::endl;
@@ -216,27 +224,49 @@ void	Client::execute_client(bool path)
 	if (_header.Methode.compare("GET") == 0)
 	{
 		std::cout << "GET METHODE" << std::endl;
-
-////////// TESST MODE
-		std::fstream file;
-		file.open(this->_root + "/" + this->_index);
-		this->_root.clear();
-		this->_index.clear();
-		file.seekg(0, file.end);
-		int	nbr = file.tellg();
-		file.seekg(0, file.beg);
-		char tmp[nbr + 1];
-		std::string data;
-		data = std::to_string(nbr);
-		data = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: " + data;
-		data.append("\r\n\r\n");
-		file.getline(tmp, nbr);
-		data.append(tmp);
-		data.append("\r\n\r\n");
-		send(this->_sock_fd, data.c_str(), data.length() + 1, 0);
-//////////// END TEST MODE
-
-		//send(this->_sock_fd, "HTTP/1.1 404 Not Found\r\nContent-Length: 52\r\n\r\n<html><head></head><body>GET ERROR 404</body></html>\0", 99, MSG_OOB); // , NULL, 0);
+		if (!this->_ref_conf.cgi.empty()) // && cgi->first == _header->file.second
+		{
+			for(std::map<std::string, std::string>::const_iterator it = this->_ref_conf.cgi.begin(); it != this->_ref_conf.cgi.end(); it++)
+			{
+				if (!this->_header.file.second.compare(it->first))
+				{
+					std::cout << "CGI......." << std::endl; //ft::do_cgi(); // Call cgi function
+					break;
+				}
+			}
+		}
+		else
+		{
+			std::fstream file(this->_root + "/" + this->_index, std::ios::in | std::ios::binary);
+			std::string	header;
+			if (file.is_open())
+			{
+				std::string body((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+				header = ft::make_header(200);
+				header.append("Content-Length: " + std::to_string(body.size()) + "\r\n");
+				header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+				header.append(body.c_str());
+		std::cout << "REQUEST SENDING: ->" << header << "<-->" << header.length() << std::endl;
+				file.close();
+				send(this->_sock_fd, header.c_str(), header.length(), 0);
+				body.clear();
+				header.clear();
+				this->_index.clear();
+				this->_root.clear();
+			}
+			else
+			{
+				std::string	body;
+				header = ft::make_header(500);
+				body = ft::get_page_error(500, this->_error_page[500].empty() ?
+								(this->_ref_conf.error_page.find(500)->second.empty() ?
+								this->_ref_conf._base->error_page.find(500)->second : this->_ref_conf.error_page.find(500)->second) :
+								this->_error_page[500]);
+				header.append(body);
+				send(this->_sock_fd, header.c_str(), header.length(), 0);
+			}
+		}
+		// check keep-alive abd timeout
 		this->_working = false;
 		this->_header.clear();
 	}
@@ -256,9 +286,6 @@ void	Client::execute_client(bool path)
 bool	Client::check_location()
 {
 	std::string	path;
-	// Test location to Dir and file-first file->second
-	// Test directory if exist, test file if exist
-	// return true root ok or false	bad root (404)
 	for (std::vector<struct s_location>::const_iterator it = this->_ref_conf.location.begin();
 				it != this->_ref_conf.location.end(); it++)
 	{
@@ -307,15 +334,15 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 				std::string err = it->second;
 				ft::put_err_page(err, this->_error_page);
 			}
- 			/* else if (!it->first.find("proxy_pass"))
+ 			else if (!it->first.find("proxy_pass"))
 			{
-
+				this->_proxy = it->second;
 			}
 			else if (!it->first.find("cgi"))
 			{
-
-			} */
-			// do reste of location
+				this->_cgi_call.insert(std::make_pair(it->second.substr(0, it->second.find_first_of(" \t\v\f")),
+													it->second.substr(it->second.find_last_of(" \t\v\f") + 1)));
+			}
 		}
 }
 

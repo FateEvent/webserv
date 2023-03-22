@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/13 23:31:30 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/21 17:28:54 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,9 @@ int main(int ac, char **av) //, char** ev)
 		std::cout << "Argument error.\nNeed " << av[0] << " [CONFIG FILE]" << std::endl;
 		return (1);
 	}
+
+	ft::make_header(0);
+	ft::make_content_type("");
 
 	// FIRST PARSE IN MAP STRING STRING
 	std::ifstream file;

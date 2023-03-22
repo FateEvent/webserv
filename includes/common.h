@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/15 17:35:11 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/21 17:28:56 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,13 @@ typedef struct	s_config
 	uint16_t							port;
 	std::string							error_log;
 	std::map<std::string, std::string>	cgi;
+	std::string							proxy;
 	std::vector<std::string>			allow;
 	unsigned int						max_client;
 	size_t								max_body;
 	bool								active;
 	bool								prepare;
-	std::vector<struct s_location>		location; // can have multiple location
+	std::vector<struct s_location>		location;
 	std::map<int, std::string>			error_page;
 	unsigned int						time_out;
 	std::map<std::string, std::string>	other;
@@ -49,6 +50,7 @@ typedef struct	s_config
 	int									sock_fd;	// socket() return
 	int									domain;		// Type AF_INET, AF_LOCAL, AF_LINUX.... # We use only AF_INET
 	int									type;		// type TCP,UDP... SOCK_STREAM, SOCK_DGRAM
+	struct s_config						*_base;
 }	config;
 
 typedef struct s_header

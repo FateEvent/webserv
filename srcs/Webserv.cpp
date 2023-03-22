@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/14 22:26:54 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/21 23:37:31 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,6 +250,7 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 {
 	config	ret(server);
 	_check_instance(ret);
+	ret._base = &this->_base;
 	this->_servers.insert(std::make_pair(ret.name, ret));
 	this->_nbr_server++;
 }
@@ -482,5 +483,6 @@ void	Webserv::exec_client()
 			// VERIF AND SET LOCATION
 			it->second.execute_client(it->second.check_location());
 		}
+		FD_CLR(it->second.get_sockfd(), &this->readfd);
 	}
 }

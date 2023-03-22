@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/15 18:45:31 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/21 15:08:10 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,9 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		}
 		else if (!it->first.find("location"))
 			do_location(it->second);
+		else if (!it->first.find("cgi"))
+			this->cgi.insert(std::make_pair(it->second.substr(0, it->second.find_first_of(" \t\v\f")),
+											it->second.substr(it->second.find_last_of(" \t\v\f") + 1)));
 		#ifdef DEBUG
 		else
 		{
@@ -127,6 +130,8 @@ void s_config::set_zero()
 	this->sock_fd = 0;
 	this->domain = 2;
 	this->type = 0;	
+	this->root.clear();
+	this->index.clear();
 }
 
 void s_config::do_location(std::string loc)

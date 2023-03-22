@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/15 18:01:25 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/21 17:28:56 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 #include <sys/un.h> // FOR LOCAL SOCKET
 // #include "../includes/Reponse.hpp"
 #include <fstream>
+#include <sstream>
 #include <fcntl.h>
 
 class Client
@@ -37,12 +38,15 @@ class Client
 		socklen_t					_socklen;
 //		sockaddr_un					_addr_local;	// sockaddr_un is a local socket
 		const config&				_ref_conf;
+		std::string					_reponse;
 		std::string					_root;
 		std::string					_index;
 		time_t						_timeout;
 		header						_header;
 		size_t						_max_body;
 		std::map<int, std::string>	_error_page;
+		std::string					_proxy;
+		std::map<std::string, std::string>	_cgi_call;
 		int							_fd_cgi;
 		bool						_working;
 		bool						_chunked;
