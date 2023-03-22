@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/22 11:07:52 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/22 13:27:58 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,16 @@ void	Client::clear_header()
 	this->_chunked = false;
 	this->_fd_cgi = 0;
 	this->_cgi = false;
+	this->_sedding = false;
+	this->_pseed = 0;
+	this->_reponse.clear();
+	this->_root.clear();
+	this->_index.clear();
+	this->_error_page.clear();
+	this->_proxy.clear();
+	this->_cgi_call.clear();
+	this->_max_body = 0;
+	this->other.clear();
 }
 
 bool	Client::new_request()

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/21 17:28:56 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/22 13:24:18 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,8 @@ class Client
 		bool						_chunked;
 		bool						_cgi;
 		fd_set						_readfd;
+		bool						_sedding;
+		size_t						_pseed;
 		std::map<std::string, std::string>	other;
 //		fd_set			_writefd;		
 		void			_make_struct();
