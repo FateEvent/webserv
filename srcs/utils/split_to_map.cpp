@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 15:19:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/24 00:56:56 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line)
 
 bool	ft::split_to_mapss(std::map<std::string, std::string> &mapss, std::string line, char sep)
 {
-	line = line.substr(line.find_first_of(" ") + 1);
+	line = line.substr(line.find_first_of(" "));
+	line = line.substr(line.find_first_not_of(" \t\v\n")); // + 1 change of to not off
 	size_t i = line.find_first_of(sep);
 
 	for (; i != line.npos; i = line.find_first_of(sep))
@@ -41,15 +42,15 @@ bool	ft::split_to_mapss(std::map<std::string, std::string> &mapss, std::string l
 	//	std::cout << "Value: " << line.substr(line.find_first_of("=") + 1,
 	//											line.find_first_of(";") - line.find_first_of("=") - 1) << std::endl;
 		mapss.insert(std::make_pair<std::string, std::string>(
-						line.substr(0, line.find_first_of("=")),
+						line.substr(line.find_first_not_of(" \t\v\n"), line.find_first_of("=") - line.find_first_not_of(" \t\v\n")),
 						line.substr(line.find_first_of("=") + 1, line.find_first_of(sep) - line.find_first_of("=") - 1)));
 		line = line.substr(i + 1);
 	}
 	//std::cout <<  "Key:   " << line.substr(0, line.find_first_of("=")) << std::endl;
 	//std::cout <<  "Value: " << line.substr(line.find_first_of("=") + 1, line.length()) << std::endl;
 	mapss.insert(std::make_pair<std::string, std::string>(
-						line.substr(0, line.find_first_of("=")),
-						line.substr(line.find_first_of("=") + 1, line.length())));
+						line.substr(line.find_first_not_of(" \t\v\n"), line.find_first_of("=")),
+						line.substr(line.find_first_of("=") + 1, line.find_last_not_of(" \r\n") - line.find_first_of("="))));
 	return (true);
 }
 

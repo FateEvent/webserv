@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:26:03 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/21 15:23:44 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/24 15:20:57 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,24 +20,25 @@
 #include <algorithm>
 #include <map>
 #include <vector>
+#include "../includes/common.h"
 //#include "../includes/Client.hpp"
 
 namespace ft {
-	void		file_to_map(std::ifstream &, std::multimap<std::string, std::string> &);
-	void		parse_map(std::multimap<std::string, std::string>::iterator,
-					std::multimap<std::string, std::string>::iterator,
-					std::multimap<std::string, std::multimap<std::string, std::string> > &);
-	void		check_host(std::multimap<std::string, std::string> &);
-	void		parse_err_page(std::map<int, std::string>&, std::multimap<std::string, std::string>&);
-	bool		put_err_page(std::string&, std::map<int, std::string>&);
-	bool		split_to_vectors(std::vector<std::string> &, std::string);
-	bool		split_to_mapss(std::map<std::string, std::string> &, std::string, char sep = ';');
-	bool		split_to_maposs(std::map<std::string, std::string> &, std::string);
-	bool		test_path(std::string &);
-	std::string	make_header(int = 0);
-	std::string make_content_type(std::string);
-	std::string	get_page_error(int nbr_error, std::string dir);
-	void		do_cgi();
-	std::string	return_content_type(char *);
+	void			file_to_map(std::ifstream &, std::multimap<std::string, std::string> &);
+	void			parse_map(std::multimap<std::string, std::string>::iterator,
+						std::multimap<std::string, std::string>::iterator,
+						std::multimap<std::string, std::multimap<std::string, std::string> > &);
+	void			check_host(std::multimap<std::string, std::string> &);
+	void			parse_err_page(std::map<int, std::string>&, std::multimap<std::string, std::string>&);
+	bool			put_err_page(std::string&, std::map<int, std::string>&);
+	bool			split_to_vectors(std::vector<std::string> &, std::string);
+	bool			split_to_mapss(std::map<std::string, std::string> &, std::string, char sep = ';');
+	bool			split_to_maposs(std::map<std::string, std::string> &, std::string);
+	std::ifstream	*test_path(std::string &);
+	std::string		make_header(int = 0);
+	std::string 	make_content_type(std::string);
+	std::string		get_page_error(int nbr_error, std::string dir);
+	void			do_cgi();
+	std::string		return_content_type(char *);
 };
 #endif

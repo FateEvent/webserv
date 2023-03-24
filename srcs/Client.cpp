@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/22 13:27:58 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/24 18:31:09 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,13 @@ Client::Client(const config &config) : _ref_conf(config)
 {
 	this->clear_header();
 	_socklen = sizeof(this->_addr);
-	this->_working = false;
 	FD_ZERO(&this->_readfd); // maybe don't need
 	this->_sock_fd = accept(_ref_conf.sock_fd, reinterpret_cast<sockaddr *>(&this->_addr), reinterpret_cast<socklen_t *>(&this->_socklen));
 	if (this->_sock_fd == -1)
+	{
+		std::cout << strerror(errno) << std::endl;
 		throw std::invalid_argument("Socket error in constructor Client!");
+	}
 	fcntl(this->_sock_fd, F_SETFL, O_NONBLOCK);
 }
 
@@ -57,7 +59,6 @@ void	Client::clear_header()
 	this->_fd_cgi = 0;
 	this->_cgi = false;
 	this->_sedding = false;
-	this->_pseed = 0;
 	this->_reponse.clear();
 	this->_root.clear();
 	this->_index.clear();
@@ -66,6 +67,11 @@ void	Client::clear_header()
 	this->_cgi_call.clear();
 	this->_max_body = 0;
 	this->other.clear();
+	this->_data.data_sended = 0;
+	this->_data.data_size = 0;
+	this->_data.fd = 0;
+	this->_data.header.clear();
+	this->_ready = false;
 }
 
 bool	Client::new_request()
@@ -87,15 +93,16 @@ bool	Client::new_request()
 	}
 
 	//#ifdef DEBUG
-		if (recept == 0) // empty fd
+		if (recept == 0 || (tmp.find("\r\n\r\n") == tmp.npos)) // close client
 		{
 			std::cout << "---	RECV return 0 -\n\e[10	0m" + tmp + "\e[0m" << std::endl;
 			return (false);
 		}
-		else if (recept == -1)
+		else if (recept == -1)	// empty
 		{
+			std::cout << strerror(errno) << std::endl;
 			std::cout << "HEADER RECEPT RAW -1: \n\e[100m + tmp + \e[0m" << std::endl;
-			return (true);
+			return (false);
 		}
 	//#endif
 
@@ -178,12 +185,63 @@ bool	Client::new_request()
 	#ifdef DEBUG
 		this->_header.print_all();
 	#endif
+	this->_ready = true;
 	return (true);
 }
 
-void	Client::continue_client(fd_set *fdset)
+bool	Client::is_seeding() const	{ return (this->_sedding?true:false); }
+bool	Client::is_ready() const	{ return (this->_ready?true:false); }
+
+bool	Client::send_data(int fd)
+{
+	int size;
+	socklen_t len = sizeof(int);
+	if (getsockopt(fd, SOL_SOCKET, SO_SNDBUF, &size, &len) == -1)
+	{
+		std::cout << RED << "SOCKET PROLEM!" << RST << std::endl;
+		return (false);
+	}
+
+	this->_data.file->seekg(0, this->_data.file->beg);
+	this->_data.file->seekg(this->_data.data_sended, this->_data.file->cur);
+	char buff[size];
+	memset(buff, 0, size);
+	ssize_t r = this->_data.file->readsome(buff, size);
+	if (r == 0)
+		return (true);
+	else if (r == -1)
+		throw std::invalid_argument("Problem on readsome file to send!");
+	ssize_t s = send(fd, buff, r, 0);
+	if (s == -1)
+	{
+		std::cout << RED << "send_data send return -1" << RST << std::endl;
+		std::cout << RED << "STOP SEEDING!" << RST << std::endl;
+		return (true);
+	}
+	this->_data.data_sended += s;
+	if (this->_data.data_sended == this->_data.data_size)
+		return (true);
+	return (false);
+}
+
+bool	Client::continue_client(fd_set *fdset)
 {
 	// SHOULD POST METHOD OR MAYBE DELETE ONLY
+	if (this->_sedding)
+	{
+		if (this->send_data(this->_sock_fd))
+		{
+			this->clear_header();
+			this->_index.clear();
+			this->_root.clear();
+			//close(this->_sock_fd);
+			this->_data.file->close();
+			this->_ready = true;
+			this->_header.Methode = "CLOSE";
+			return (true);
+		}
+		return (false);
+	}
 	if (this->_chunked)
 		this->chunk();
 	else if (FD_ISSET(this->_cgi, fdset))
@@ -206,30 +264,30 @@ void	Client::continue_client(fd_set *fdset)
 		else
 			std::cout << "PROBLEME EXIST IF ON SCREEN!!!!!continue_client" << std::endl;
 	}
+	return (false);
 }
 
 void	Client::execute_client(bool path)
 {
 	if (!path && !this->is_working())
 	{
-		std::cout << "Can't open file!!!!" << std::endl;
+		std::cout << RED << "Can't open file!!!!" << RST << std::endl;
 		std::string body, header;
 		header = ft::make_header(404);
-				body = ft::get_page_error(404, this->_error_page[404].empty() ?
-								(this->_ref_conf.error_page.find(404)->second.empty() ?
-								this->_ref_conf._base->error_page.find(404)->second : this->_ref_conf.error_page.find(404)->second) :
-								this->_error_page[404]);
-				header.append(body);
-				header.append("\r\n\r\n");
-				send(this->_sock_fd, header.c_str(), header.length() + 1, 0);
+		body = ft::get_page_error(404, this->_error_page[404].empty() ?
+					(this->_ref_conf.error_page.find(404)->second.empty() ?
+					this->_ref_conf._base->error_page.find(404)->second : this->_ref_conf.error_page.find(404)->second) :
+					this->_error_page[404]);
+		header.append(body);
+		header.append("\r\n\r\n");
+		send(this->_sock_fd, header.c_str(), header.length(), 0);
 	}
 
-
-	#ifdef DEBUG
+/* 	#ifdef DEBUG
 		std::cout << "\e[100m---------- HEADER CLIENT NUMBER " << this->_sock_fd << " ---------------" << std::endl;
 		std::cout << _header.Methode + " " + _header.Dir << std::endl;
 		std::cout << "Host: " + _header.Host + "\e[0m" << std::endl;
-	#endif
+	#endif */
 
 	if (_header.Methode.compare("GET") == 0)
 	{
@@ -247,38 +305,24 @@ void	Client::execute_client(bool path)
 		}
 		else
 		{
-			std::fstream file(this->_root + "/" + this->_index, std::ios::in | std::ios::binary);
 			std::string	header;
-			if (file.is_open())
+			this->_data.header = ft::make_header(200);
+			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
+			this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+			int check;
+			check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
+			if (check == -1)
 			{
-				std::string body((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-				header = ft::make_header(200);
-				header.append("Content-Length: " + std::to_string(body.size()) + "\r\n");
-				header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
-				header.append(body.c_str());
-		std::cout << "REQUEST SENDING: ->" << header << "<-->" << header.length() << std::endl;
-				file.close();
-				send(this->_sock_fd, header.c_str(), header.length(), 0);
-				body.clear();
-				header.clear();
-				this->_index.clear();
-				this->_root.clear();
+				// ERROR 500
 			}
-			else
+			if (check == 0)
 			{
-				std::string	body;
-				header = ft::make_header(500);
-				body = ft::get_page_error(500, this->_error_page[500].empty() ?
-								(this->_ref_conf.error_page.find(500)->second.empty() ?
-								this->_ref_conf._base->error_page.find(500)->second : this->_ref_conf.error_page.find(500)->second) :
-								this->_error_page[500]);
-				header.append(body);
-				send(this->_sock_fd, header.c_str(), header.length(), 0);
+				// ERROR 501
 			}
+			std::cout << BLUE << this->_data.header << RST << std::endl;
+			this->_sedding = true;
+			//this->_working = true;
 		}
-		// check keep-alive abd timeout
-		this->_working = false;
-		this->_header.clear();
 	}
 	else if (_header.Methode.compare("POST") == 0)
 	{
@@ -290,7 +334,6 @@ void	Client::execute_client(bool path)
 		std::cout << "DELETE METHODE" << std::endl;
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl;
-	
 }
 
 bool	Client::check_location()
@@ -317,7 +360,11 @@ bool	Client::check_location()
 	#ifdef DEBUG
 		std::cout << "Path of file is: " + path << std::endl;
 	#endif
-	return (ft::test_path(path));
+	this->_data.file = ft::test_path(path);
+	this->_data.file->seekg(0, this->_data.file->end);
+	this->_data.data_size = this->_data.file->tellg();
+	this->_data.file->seekg(0, this->_data.file->beg);
+	return (this->_data.file->is_open() ? true : false);
 }
 
 void	Client::simple_location(std::vector<struct s_location>::const_iterator &location)

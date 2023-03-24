@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/22 13:24:18 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/24 15:22:31 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@ class Client
 		bool						_cgi;
 		fd_set						_readfd;
 		bool						_sedding;
-		size_t						_pseed;
+		struct s_clt_data			_data;
+		bool						_ready;
 		std::map<std::string, std::string>	other;
 //		fd_set			_writefd;		
 		void			_make_struct();
@@ -69,19 +70,22 @@ class Client
 		header*			get_header();
 		const config*	get_config() const;
 		int				get_fd_cgi() const;
-		void			continue_client(fd_set*);
+		bool			continue_client(fd_set*);
 		void			execute_client(bool);
 		bool			is_working() const;
 		bool			is_cgi() const;
 		bool			is_chunk() const;
+		bool			is_seeding() const;
+		bool			is_ready() const;
 		bool			new_request();
 		void			clear_header();
-	
+		void			clear();
 		bool			check_location();
 		void			simple_location(std::vector<struct s_location>::const_iterator &);
 		void			condition_location(std::vector<struct s_location>::const_iterator &);
 		void			chunk(); // get chunked data
 		void			take_data(); // Get or search body data. count and put total in length variable
+		bool			send_data(int);
 		
 	protected:
 };

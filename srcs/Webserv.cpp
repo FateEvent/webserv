@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/21 23:37:31 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/24 15:15:48 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,29 +313,7 @@ void	Webserv::listen(config &instance)
 		throw ("Error on listen for " + instance.name + " with error " + std::to_string(errno));
 }
 
-void	Webserv::fd_rst()
-{
-	FD_ZERO(&this->writefd);
-	FD_ZERO(&this->readfd);
-	FD_ZERO(&this->errfd);
-	
-	// Set FD on all instances
-	// test if cgi true and if true add fd of cgi.
-	for (std::map<std::string, config>::const_iterator it = this->_servers.begin(); 
-			it != this->_servers.end(); it++)
-		if (it->second.active && it->second.sock_fd > 0)
-			FD_SET(it->second.sock_fd, &this->readfd);
-	// Set FD on client if exist
-	for (std::map<int, Client>::iterator it = this->_client.begin();
-		it != this->_client.end(); it++)
-	{
-		FD_SET(it->first, &this->readfd);
-		if (it->second.is_cgi())
-			FD_SET(it->second.get_fd_cgi(), &this->readfd);
-	}
-	// Set FD on Server default port
-	FD_SET(this->_base.sock_fd, &this->readfd);
-}
+
 
 unsigned	Webserv::get_nbr_server() const		{ return (this->_nbr_server);}
 
@@ -384,6 +362,28 @@ std::string	Webserv::get_info_instance() const
 	return (info);
 }
 
+void	Webserv::fd_rst()
+{
+	FD_ZERO(&this->writefd);
+	FD_ZERO(&this->readfd);
+	FD_ZERO(&this->errfd);
+
+	for (std::map<std::string, config>::const_iterator it = this->_servers.begin(); 
+			it != this->_servers.end(); it++)
+		if (it->second.active && it->second.sock_fd > 0)
+			FD_SET(it->second.sock_fd, &this->readfd);
+	// Set FD on client if exist
+	for (std::map<int, Client>::iterator it = this->_client.begin();
+			it != this->_client.end(); it++)
+	{
+		FD_SET(it->first, &this->readfd);
+		if (it->second.is_cgi())
+			FD_SET(it->second.get_fd_cgi(), &this->readfd);
+	}
+	// Set FD on Server default port
+	FD_SET(this->_base.sock_fd, &this->readfd);
+}
+
 int	Webserv::get_greaterfd() const
 {
 	int	nbr = this->_base.sock_fd + 1;
@@ -416,7 +416,7 @@ timeval&	Webserv::timeout()
 // If it's a new client create the client and set right variables.
 void	Webserv::check_server()
 {
-	if (FD_ISSET(this->_base.sock_fd, &this->readfd))
+/*  	if (FD_ISSET(this->_base.sock_fd, &this->readfd))
 	{
 			// create a new constructor in client special for request come from server.
 			// WARNING: _ref_conf is a const reference!!!
@@ -425,12 +425,22 @@ void	Webserv::check_server()
 			// ex: new Client(_base, 1)
 			// this->client.insert(std::make_pair(new Client->get_sockfd(), *new Client))
 			std::cout << "SUR SERVEUR PRINCIPAL" << std::endl;
-	}
+			FD_CLR(this->_base.sock_fd, &this->readfd);
+	} */
 	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd))
 		{
-			Client *ret = new Client(it->second);
-			this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
+			std::cout << "Ask of new client." << std::endl;
+			try
+			{
+				Client *ret = new Client(it->second);
+				this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
+				std::cout << GREEN << "New client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+			}
+			catch (std::exception &e)
+			{
+				std::cout << e.what() << std::endl;
+			}
 			FD_CLR(it->second.sock_fd, &this->readfd);
 		}
 }
@@ -441,25 +451,41 @@ void	Webserv::check_client()
 	std::vector<int>	to_close;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
-		if ((FD_ISSET(it->second.get_sockfd(), &this->readfd) && it->second.is_working()) ||
+/* 		if ((FD_ISSET(it->second.get_sockfd(), &this->readfd) && it->second.is_working()) ||
 			(it->second.get_fd_cgi() > 0 && FD_ISSET(it->second.get_fd_cgi(), &this->readfd)))
 		{
 			it->second.continue_client(&this->readfd);
 			continue;
+		} */
+		if (FD_ISSET(it->second.get_sockfd(), &this->readfd) &&
+				!it->second.is_ready())
+		{
+			if (it->second.new_request())
+			{
+				std::cout << GREEN << "Valid Header." << RST << std::endl;
+				FD_CLR(it->second.get_sockfd(), &this->readfd);
+			}
+			else
+			{
+				// send error 400 to client.
+				to_close.push_back(it->second.get_sockfd());
+				std::cout << RED << "NOT HTTP! Closed." << RST << std::endl;
+			}
+			continue;
 		}
-		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd) && !it->second.new_request())
+		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd) &&
+					it->second.is_ready())// && it->second.is_ready())// ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
 		{
 			to_close.push_back(it->second.get_sockfd());
-			std::cout << "Connexion closed." << std::endl;
+			std::cout << YELLOW << "CLOSE CONNEXION" << RST << std::endl;
+			FD_CLR(it->second.get_sockfd(), &this->readfd);
 		}
-		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd))// ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
-			std::cout << "NEW REQUEST OK" << std::endl;
 	}
 	if (!to_close.empty())
 	{
-		for (std::vector<int>::iterator it = to_close.begin(); it != to_close.end(); it++)
+		for (std::vector<int>::iterator it = to_close.begin(); it != to_close.end(); ++it)
 		{
-			std::cout << "Connexion number: " << *it << std::endl;
+			std::cout << GREEN << "Connexion number: " << *it << " close" << RST << std::endl;
 			::close(*it);
 			this->_client.erase(*it);
 		}
@@ -468,21 +494,28 @@ void	Webserv::check_client()
 
 void	Webserv::exec_client()
 {
+	std::list<int> toclose;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
-		if (it->second.get_methode().compare("BAD") == 0 || it->second.get_methode().compare("CLOSE") == 0)
+		if ((it->second.get_methode().compare("BAD") == 0 || it->second.get_methode().compare("CLOSE") == 0) && it->second.is_ready())
 		{
-			std::cout << "BAD HEADER! Only POST, GET and DELETE are available!" << std::endl;
+			std::cout << RED << "BAD HEADER! Only POST, GET and DELETE are available!" << RST << std::endl;
 			send(it->second.get_sockfd(), "HTTP/1.1 400 Bad Request\r\nContent-Length: 60\r\n\r\n<html><head></head><body>BAD REQUEST ERROR 400</body></html>\0", 109, MSG_OOB); // , NULL, 0);
 			it->second.clear_header();
-			//::close(it->second.get_sockfd());
-			// maybe segfault... clien not removed!
+			toclose.push_back(it->second.get_sockfd());
+			::close(it->second.get_sockfd());
 		}
-		if (!it->second.get_methode().empty() && !it->second.is_working())
-		{
-			// VERIF AND SET LOCATION
+		else if (!it->second.is_seeding() && it->second.is_ready()) // else if (!it->second.get_methode().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
 			it->second.execute_client(it->second.check_location());
+		else if (it->second.is_seeding() && it->second.is_ready())
+		{
+			if (it->second.continue_client(&this->readfd))
+				toclose.push_back(it->first);	//check keep alive...
 		}
 		FD_CLR(it->second.get_sockfd(), &this->readfd);
+	}
+	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
+	{
+		this->_client.erase(*it);
 	}
 }

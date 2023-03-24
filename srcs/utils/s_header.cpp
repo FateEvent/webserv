@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/21 17:28:56 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/24 00:51:34 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	s_header::print_all()
 	for (std::vector<std::string>::iterator it = Accept.begin(); it != Accept.end(); it++) //ok
 		std::cout << "Accept         : \"" << it->data() << "\"" << std::endl;	
 	for (std::map<std::string, std::string>::iterator it = Cookie.begin(); it != Cookie.end(); it++) // ok
-		std::cout << "Cookie         : " << it->first << "\" = \"" << it->second << "\"" << std::endl;
+		std::cout << "Cookie         : \"" << it->first << "\" = \"" << it->second << "\"" << std::endl;
 	std::cout << "Keep_Alive     : \"" << Keep_Alive << "\"" << std::endl; // ok
 	std::cout << "Connection     : \"" << Connexion << "\"" << std::endl; // ok
 	std::cout << "Time Out       : \"" << time_out << "\"" << std::endl;
