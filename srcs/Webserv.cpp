@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 11:12:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 15:27:56 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -517,7 +517,6 @@ void	Webserv::exec_client()
 			else
 				this->timeout(0);
 		}
-		//FD_CLR(it->second.get_sockfd(), &this->readfd);
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{

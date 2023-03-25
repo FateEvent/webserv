@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 15:14:46 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 15:27:34 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,18 +205,11 @@ bool	Client::send_data(int fd)
 	}
 	this->_data.file->seekg(this->_data.data_sended - 1, this->_data.file->beg);
 	char buff[size + 1] = {0};
-	//memset(buff, 0, size + 1);
 	this->_data.file->read(buff, size);
-	//ssize_t r = std::strlen(buff);
 	//std::cout << YELLOW << "\nreturn size: " << size << RST << std::endl;
 	//std::cout << YELLOW << "return read: " << this->_data.file->gcount() << RST << std::endl;
-	//std::cout << YELLOW << "return read: " << r << RST << std::endl;
 	//std::cout << RED << buff << RST << std::endl;
 
-/* 	if (r == 0)
-		return (true);
-	else if (r == -1)
-		throw std::invalid_argument("Problem on readsome file to send!"); */
 	ssize_t s = send(fd, buff,  this->_data.file->gcount(), 0);
 	//std::cout << YELLOW << "return send: " << s << RST << std::endl;
 	if (s == -1 || s == 0)
@@ -285,12 +278,6 @@ void	Client::execute_client(bool path)
 		header.append("\r\n\r\n");
 		send(this->_sock_fd, header.c_str(), header.length(), 0);
 	}
-
-/* 	#ifdef DEBUG
-		std::cout << "\e[100m---------- HEADER CLIENT NUMBER " << this->_sock_fd << " ---------------" << std::endl;
-		std::cout << _header.Methode + " " + _header.Dir << std::endl;
-		std::cout << "Host: " + _header.Host + "\e[0m" << std::endl;
-	#endif */
 
 	if (_header.Methode.compare("GET") == 0)
 	{
