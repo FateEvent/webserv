@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 00:23:49 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 02:17:56 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 #define	BLUE "\033[0;34m"
 #define GREEN "\033[0;32m"
 #define	YELLOW "\033[0;33m"
+#define	PURPLE "\033[0;35m"
 #define	BLACK "\033[0;30m"
 #define WHITE "\033[0;37m"
 #define RST "\033[0m"

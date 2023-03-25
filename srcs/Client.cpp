@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 01:36:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 02:21:27 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,13 +96,13 @@ bool	Client::new_request()
 	//#ifdef DEBUG
 		if (recept == 0 || (tmp.find("\r\n\r\n") == tmp.npos)) // close client
 		{
-			std::cout << "---	RECV return 0 -\n\e[10	0m" + tmp + "\e[0m" << std::endl;
+			std::cout << YELLOW << "Connexion closed by client" << RST << std::endl;
 			return (false);
 		}
 		else if (recept == -1)	// empty
 		{
 			std::cout << strerror(errno) << std::endl;
-			std::cout << "HEADER RECEPT RAW -1: \n\e[100m + tmp + \e[0m" << std::endl;
+			std::cout << RED << "Not HTTP/1.1 request, connexion closed!" << RST << std::endl;
 			return (false);
 		}
 	//#endif
@@ -199,7 +199,7 @@ bool	Client::send_data(int fd)
 	socklen_t len = sizeof(size);
 	if (getsockopt(this->_sock_fd, SOL_SOCKET, SO_SNDBUF, &size, &len) == -1)
 	{
-		std::cout << RED << "SOCKET PROLEM!" << RST << std::endl;
+		std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		return (false);
 	}
 	this->_data.file->seekg(this->_data.data_sended, this->_data.file->beg);
@@ -208,7 +208,7 @@ bool	Client::send_data(int fd)
 	this->_data.file->readsome(buff, size);
 	//ssize_t r = std::strlen(buff);
 	//std::cout << YELLOW << "return size: " << size << RST << std::endl;
-	std::cout << YELLOW << "return read: " << this->_data.file->gcount() << RST << std::endl;
+	//std::cout << YELLOW << "return read: " << this->_data.file->gcount() << RST << std::endl;
 	//std::cout << RED << buff << RST << std::endl;
 
 /* 	if (r == 0)
@@ -216,10 +216,10 @@ bool	Client::send_data(int fd)
 	else if (r == -1)
 		throw std::invalid_argument("Problem on readsome file to send!"); */
 	ssize_t s = send(fd, buff,  this->_data.file->gcount(), 0);
-	std::cout << YELLOW << "return send: " << s << RST << std::endl;
+	//std::cout << YELLOW << "return send: " << s << RST << std::endl;
 	if (s == -1)
 	{
-		std::cout << RED << "Socket not ready, try next time." << RST << std::endl;
+		std::cout << std::endl << PURPLE << "Socket full, try next time." << RST << std::endl;
 		return (false);
 	}
 	this->_data.data_sended += s;

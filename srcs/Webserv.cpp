@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 01:59:25 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 02:15:03 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -466,14 +466,13 @@ void	Webserv::check_client()
 		{
 			if (it->second.new_request())
 			{
-				std::cout << GREEN << "Valid Header." << RST << std::endl;
+				//std::cout << GREEN << "Valid Header." << RST << std::endl;
 				FD_CLR(it->second.get_sockfd(), &this->readfd);
 			}
 			else
 			{
 				// send error 400 to client.
 				to_close.push_back(it->second.get_sockfd());
-				std::cout << RED << "NOT HTTP! Closed." << RST << std::endl;
 			}
 			continue;
 		}
