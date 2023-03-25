@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/24 15:36:29 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 00:39:43 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,8 @@ int main(int ac, char **av) //, char** ev)
 		if (recept)
 		{
 			std::cout << std::endl;
-			server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
 			server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
+			server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
 		}	
 		server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALY GOES ONE TIME/REQUEST
 		recept = 0;

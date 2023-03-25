@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/24 15:15:48 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 01:40:47 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -441,7 +441,7 @@ void	Webserv::check_server()
 			{
 				std::cout << e.what() << std::endl;
 			}
-			FD_CLR(it->second.sock_fd, &this->readfd);
+			//FD_CLR(it->second.sock_fd, &this->readfd);
 		}
 }
 
@@ -512,10 +512,12 @@ void	Webserv::exec_client()
 			if (it->second.continue_client(&this->readfd))
 				toclose.push_back(it->first);	//check keep alive...
 		}
-		FD_CLR(it->second.get_sockfd(), &this->readfd);
+		//FD_CLR(it->second.get_sockfd(), &this->readfd);
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
+		::close(*it);
 		this->_client.erase(*it);
+		std::cout << BLUE << "Socket " << *it << " closed." << RST << std::endl;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/24 00:56:56 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 01:17:07 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line)
 
 bool	ft::split_to_mapss(std::map<std::string, std::string> &mapss, std::string line, char sep)
 {
-	line = line.substr(line.find_first_of(" "));
+	if (line.find_first_of(" ") != line.npos)
+		line = line.substr(line.find_first_of(" "));
 	line = line.substr(line.find_first_not_of(" \t\v\n")); // + 1 change of to not off
 	size_t i = line.find_first_of(sep);
 

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/24 18:31:09 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 01:36:27 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ void	Client::clear_header()
 	this->_data.data_size = 0;
 	this->_data.fd = 0;
 	this->_data.header.clear();
+	this->_data.file = NULL;
 	this->_ready = false;
 }
 
@@ -195,28 +196,31 @@ bool	Client::is_ready() const	{ return (this->_ready?true:false); }
 bool	Client::send_data(int fd)
 {
 	int size;
-	socklen_t len = sizeof(int);
-	if (getsockopt(fd, SOL_SOCKET, SO_SNDBUF, &size, &len) == -1)
+	socklen_t len = sizeof(size);
+	if (getsockopt(this->_sock_fd, SOL_SOCKET, SO_SNDBUF, &size, &len) == -1)
 	{
 		std::cout << RED << "SOCKET PROLEM!" << RST << std::endl;
 		return (false);
 	}
+	this->_data.file->seekg(this->_data.data_sended, this->_data.file->beg);
+	char buff[size + 1];
+	memset(buff, 0, size + 1);
+	this->_data.file->readsome(buff, size);
+	//ssize_t r = std::strlen(buff);
+	//std::cout << YELLOW << "return size: " << size << RST << std::endl;
+	std::cout << YELLOW << "return read: " << this->_data.file->gcount() << RST << std::endl;
+	//std::cout << RED << buff << RST << std::endl;
 
-	this->_data.file->seekg(0, this->_data.file->beg);
-	this->_data.file->seekg(this->_data.data_sended, this->_data.file->cur);
-	char buff[size];
-	memset(buff, 0, size);
-	ssize_t r = this->_data.file->readsome(buff, size);
-	if (r == 0)
+/* 	if (r == 0)
 		return (true);
 	else if (r == -1)
-		throw std::invalid_argument("Problem on readsome file to send!");
-	ssize_t s = send(fd, buff, r, 0);
+		throw std::invalid_argument("Problem on readsome file to send!"); */
+	ssize_t s = send(fd, buff,  this->_data.file->gcount(), 0);
+	std::cout << YELLOW << "return send: " << s << RST << std::endl;
 	if (s == -1)
 	{
-		std::cout << RED << "send_data send return -1" << RST << std::endl;
-		std::cout << RED << "STOP SEEDING!" << RST << std::endl;
-		return (true);
+		std::cout << RED << "Socket not ready, try next time." << RST << std::endl;
+		return (false);
 	}
 	this->_data.data_sended += s;
 	if (this->_data.data_sended == this->_data.data_size)
@@ -231,13 +235,14 @@ bool	Client::continue_client(fd_set *fdset)
 	{
 		if (this->send_data(this->_sock_fd))
 		{
+			this->_data.file->close();
 			this->clear_header();
 			this->_index.clear();
 			this->_root.clear();
 			//close(this->_sock_fd);
-			this->_data.file->close();
-			this->_ready = true;
 			this->_header.Methode = "CLOSE";
+			this->_ready = true;
+			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
 		return (false);
@@ -360,7 +365,9 @@ bool	Client::check_location()
 	#ifdef DEBUG
 		std::cout << "Path of file is: " + path << std::endl;
 	#endif
-	this->_data.file = ft::test_path(path);
+	this->_data.file = new std::ifstream(path, std::ios::binary);
+	if (!this->_data.file->is_open())
+		return (false);
 	this->_data.file->seekg(0, this->_data.file->end);
 	this->_data.data_size = this->_data.file->tellg();
 	this->_data.file->seekg(0, this->_data.file->beg);
