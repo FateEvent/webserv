@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 01:40:47 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 01:59:25 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -406,9 +406,13 @@ int	Webserv::get_greaterfd() const
 fd_set&	Webserv::get_writefd()	{ return (this->writefd);}
 fd_set&	Webserv::get_readfd()	{ return (this->readfd);}
 
+void	Webserv::timeout(int sec)
+{
+	this->_timeout = (timeval){sec,0};
+}
+
 timeval&	Webserv::timeout()
 {
-	this->_timeout = (timeval){1,0};
 	return (this->_timeout);
 }
 
@@ -511,6 +515,8 @@ void	Webserv::exec_client()
 		{
 			if (it->second.continue_client(&this->readfd))
 				toclose.push_back(it->first);	//check keep alive...
+			else
+				this->timeout(0);
 		}
 		//FD_CLR(it->second.get_sockfd(), &this->readfd);
 	}

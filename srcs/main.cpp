@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 00:39:43 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 02:00:33 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ int main(int ac, char **av) //, char** ev)
 	server.prepare_all();
 	server.bind_all();
 	server.listen_all();
+	server.timeout(1);
 	std::cout << server.get_info_server() << std::endl;
 	std::cout << server.get_info_instance() << std::endl;
 
@@ -98,7 +99,8 @@ int main(int ac, char **av) //, char** ev)
 			std::cout << std::endl;
 			server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
 			server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
-		}	
+		}
+		server.timeout(1);	
 		server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALY GOES ONE TIME/REQUEST
 		recept = 0;
 	}
