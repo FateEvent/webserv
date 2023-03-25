@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 02:21:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 15:14:46 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void	Client::clear_header()
 	this->_cgi_call.clear();
 	this->_max_body = 0;
 	this->other.clear();
-	this->_data.data_sended = 0;
+	this->_data.data_sended = 1;
 	this->_data.data_size = 0;
 	this->_data.fd = 0;
 	this->_data.header.clear();
@@ -106,7 +106,7 @@ bool	Client::new_request()
 			return (false);
 		}
 	//#endif
-
+std::cout << PURPLE << tmp << RST << std::endl;
 	// SET HEADER IN VECTOR BY LINE
 	for (std::string::iterator it = tmp.begin(); it != tmp.end() && *it != 0; it++)
 	{
@@ -139,7 +139,7 @@ bool	Client::new_request()
 		e_str = it->find_first_of(" \r\v\t\f\n", s_str);
 		if (s_str == e_str || s_str == it->npos || e_str == it->npos)
 		{
-			std::cout << "unvailable header!" << std::endl;
+			std::cout << RED << "unvailable header!" << RST << std::endl;
 			return (false);
 		}
 		this->_header.Dir = it->substr(s_str, it->find_first_of(" \v\t\f\n\r\?", s_str) - s_str);
@@ -148,6 +148,7 @@ bool	Client::new_request()
 	}
 	else
 	{
+		std::cout << RED << "Header not supported!" << RST << std::endl;
 		this->_header.Methode = "NOT_SUPPORTED";
 		return (false);
 	}
@@ -202,13 +203,14 @@ bool	Client::send_data(int fd)
 		std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		return (false);
 	}
-	this->_data.file->seekg(this->_data.data_sended, this->_data.file->beg);
-	char buff[size + 1];
-	memset(buff, 0, size + 1);
-	this->_data.file->readsome(buff, size);
+	this->_data.file->seekg(this->_data.data_sended - 1, this->_data.file->beg);
+	char buff[size + 1] = {0};
+	//memset(buff, 0, size + 1);
+	this->_data.file->read(buff, size);
 	//ssize_t r = std::strlen(buff);
-	//std::cout << YELLOW << "return size: " << size << RST << std::endl;
+	//std::cout << YELLOW << "\nreturn size: " << size << RST << std::endl;
 	//std::cout << YELLOW << "return read: " << this->_data.file->gcount() << RST << std::endl;
+	//std::cout << YELLOW << "return read: " << r << RST << std::endl;
 	//std::cout << RED << buff << RST << std::endl;
 
 /* 	if (r == 0)
@@ -217,20 +219,19 @@ bool	Client::send_data(int fd)
 		throw std::invalid_argument("Problem on readsome file to send!"); */
 	ssize_t s = send(fd, buff,  this->_data.file->gcount(), 0);
 	//std::cout << YELLOW << "return send: " << s << RST << std::endl;
-	if (s == -1)
+	if (s == -1 || s == 0)
 	{
-		std::cout << std::endl << PURPLE << "Socket full, try next time." << RST << std::endl;
+		//std::cout << std::endl << PURPLE << "Socket full, try next time." << RST << std::endl;
 		return (false);
 	}
 	this->_data.data_sended += s;
-	if (this->_data.data_sended == this->_data.data_size)
+	if (this->_data.data_sended >= this->_data.data_size)
 		return (true);
 	return (false);
 }
 
 bool	Client::continue_client(fd_set *fdset)
 {
-	// SHOULD POST METHOD OR MAYBE DELETE ONLY
 	if (this->_sedding)
 	{
 		if (this->send_data(this->_sock_fd))
@@ -239,10 +240,7 @@ bool	Client::continue_client(fd_set *fdset)
 			this->clear_header();
 			this->_index.clear();
 			this->_root.clear();
-			//close(this->_sock_fd);
-			this->_header.Methode = "CLOSE";
-			this->_ready = true;
-			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
+			std::cout << std::endl << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
 		return (false);
@@ -276,7 +274,7 @@ void	Client::execute_client(bool path)
 {
 	if (!path && !this->is_working())
 	{
-		std::cout << RED << "Can't open file!!!!" << RST << std::endl;
+		std::cout << PURPLE << "File not found or can't open!" << RST << std::endl;
 		std::string body, header;
 		header = ft::make_header(404);
 		body = ft::get_page_error(404, this->_error_page[404].empty() ?
