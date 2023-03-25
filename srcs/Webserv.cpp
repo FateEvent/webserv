@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 15:27:56 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 20:09:47 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
 	fcntl(this->_base.sock_fd, F_SETFL, O_NONBLOCK);
 	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
-		throw err_init(); // ("Server bind error.");
+		throw std::invalid_argument("Cannot bind port! Usualy already used."); // ("Server bind error.");
 	if (::listen(this->_base.sock_fd, this->_base.max_client) != 0)
-		throw err_init(); // ("Server listen error.");
+		throw std::invalid_argument("Cannot listen port! Usualy already used."); // ("Server listen error.");
 	// Set prepare and active on true
 	this->_base.prepare = true;
 	this->_base.active = false;
@@ -403,34 +403,56 @@ int	Webserv::get_greaterfd() const
 	return (nbr);
 }
 
-fd_set&	Webserv::get_writefd()	{ return (this->writefd);}
-fd_set&	Webserv::get_readfd()	{ return (this->readfd);}
-
-void	Webserv::timeout(int sec)
-{
-	this->_timeout = (timeval){sec,0};
-}
-
-timeval&	Webserv::timeout()
-{
-	return (this->_timeout);
-}
+fd_set&	Webserv::get_writefd()		{ return (this->writefd);}
+fd_set&	Webserv::get_readfd()		{ return (this->readfd);}
+void	Webserv::timeout(int sec)	{ this->_timeout = (timeval){sec,0};}
+timeval&	Webserv::timeout()		{ return (this->_timeout); }
 
 // Check if is a new connexion on main config or on vhost
 // If it's a new client create the client and set right variables.
 void	Webserv::check_server()
 {
-/*  	if (FD_ISSET(this->_base.sock_fd, &this->readfd))
+	if (FD_ISSET(this->_base.sock_fd, &this->readfd))
 	{
-			// create a new constructor in client special for request come from server.
-			// WARNING: _ref_conf is a const reference!!!
-			// need todo header first to know the instance and after create client
-			// client constructor need to set _ref_conf in direct implementation it's const...
-			// ex: new Client(_base, 1)
-			// this->client.insert(std::make_pair(new Client->get_sockfd(), *new Client))
-			std::cout << "SUR SERVEUR PRINCIPAL" << std::endl;
-			FD_CLR(this->_base.sock_fd, &this->readfd);
-	} */
+		int				sock_fd;
+		sockaddr_in		addr;
+		socklen_t		socklen;
+		header			head;
+
+		std::cout << "Ask of new client on vhost." << std::endl;
+		socklen = sizeof(addr);
+		sock_fd = accept(_base.sock_fd, reinterpret_cast<sockaddr *>(&addr), reinterpret_cast<socklen_t *>(&socklen));
+		if (sock_fd == -1)
+		{
+			std::cout << strerror(errno) << std::endl;
+			throw std::invalid_argument("Socket error in vhost!");
+		}
+		fcntl(sock_fd, F_SETFL, O_NONBLOCK);
+		if (!ft::parse_header(sock_fd, head))
+			::close(sock_fd);
+		std::map<std::string, config>::iterator serv = this->_servers.begin();
+		for (; serv != this->_servers.end(); serv++)
+			if (serv->first.compare(head.Host) == 0)
+				break;
+		if (serv == this->_servers.end())
+		{
+			std::cout << PURPLE << "Vhost don't exist, connexion close." << RST << std::endl;
+			::close(sock_fd);
+		}
+		else
+		{
+			try
+			{
+				Client *ret = new Client(serv->second, addr, socklen, sock_fd, head);
+				this->_client.insert(std::make_pair(sock_fd, *ret));
+				std::cout << GREEN << "New vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+			}
+			catch (std::exception &e)
+			{
+				std::cout << e.what() << std::endl;
+			}
+		}
+	}
 	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd))
 		{

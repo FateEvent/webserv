@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/24 15:22:31 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 20:04:36 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ class Client
 
 	public:
 		Client(const config&);
+		Client(const config&, sockaddr_in, socklen_t, int, header&);
 		~Client();
 		int				get_sockfd() const;
 		std::string		get_methode() const;

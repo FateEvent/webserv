@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 15:27:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 20:05:34 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ Client::Client(const config &config) : _ref_conf(config)
 {
 	this->clear_header();
 	_socklen = sizeof(this->_addr);
-	FD_ZERO(&this->_readfd); // maybe don't need
+	//FD_ZERO(&this->_readfd); // maybe don't need
 	this->_sock_fd = accept(_ref_conf.sock_fd, reinterpret_cast<sockaddr *>(&this->_addr), reinterpret_cast<socklen_t *>(&this->_socklen));
 	if (this->_sock_fd == -1)
 	{
@@ -24,6 +24,35 @@ Client::Client(const config &config) : _ref_conf(config)
 		throw std::invalid_argument("Socket error in constructor Client!");
 	}
 	fcntl(this->_sock_fd, F_SETFL, O_NONBLOCK);
+}
+
+Client::Client(const config &config, sockaddr_in sock, socklen_t len, int fd, header& head) : _ref_conf(config), _header(head)
+{
+	this->_working = false;
+	this->_chunked = false;
+	this->_fd_cgi = 0;
+	this->_cgi = false;
+	this->_sedding = false;
+	this->_reponse.clear();
+	this->_root.clear();
+	this->_index.clear();
+	this->_error_page.clear();
+	this->_proxy.clear();
+	this->_cgi_call.clear();
+	this->_max_body = 0;
+	this->other.clear();
+	this->_data.data_sended = 1;
+	this->_data.data_size = 0;
+	this->_data.fd = 0;
+	this->_data.header.clear();
+	this->_data.file = NULL;
+	
+	this->_sock_fd = fd;
+	this->_addr = sock;
+	this->_socklen = len;
+	this->_timeout = ::time(NULL);
+	this->_header.time_out = this->_timeout;
+	this->_ready = true;
 }
 
 Client::~Client() {}
@@ -182,11 +211,11 @@ std::cout << PURPLE << tmp << RST << std::endl;
 			ft::split_to_maposs(this->_header.other, it->data());
 	}
 	this->_header.split_dir();
-	this->_timeout = ::time(NULL);
-	this->_header.time_out = this->_timeout;
 	#ifdef DEBUG
 		this->_header.print_all();
 	#endif
+	this->_timeout = ::time(NULL);
+	this->_header.time_out = this->_timeout;
 	this->_ready = true;
 	return (true);
 }

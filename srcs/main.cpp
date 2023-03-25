@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 14:32:09 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 19:47:40 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,12 +87,12 @@ int main(int ac, char **av) //, char** ev)
 	std::cout << server.get_info_server() << std::endl;
 	std::cout << server.get_info_instance() << std::endl;
 
-	//char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
-	//unsigned int	nbr = 0;
+	char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
+	unsigned int	nbr = 0;
 	while (1)
 	{	
 		server.fd_rst();
-		//std::cout << "\b\rwait... " << wait[nbr++ % 8]  << std::flush;
+		std::cout << "\b\rwait... " << wait[nbr++ % 8]  << std::flush;
 		int recept = select(server.get_greaterfd(), &server.get_readfd(), &server.get_writefd(), NULL, &server.timeout());
 		if (recept)
 		{

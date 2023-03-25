@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 15:10:57 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 19:23:53 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,5 +103,8 @@ typedef struct s_clt_data
 	ssize_t			data_sended;
 }	clt_data;
 
+namespace ft {
+	bool			parse_header(int, s_header&);
+};
 
 #endif
