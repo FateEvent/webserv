@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/26 01:31:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/26 12:49:11 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ bool	ft::parse_header(int fd, s_header &head)
 			break;
 		tmp.push_back(buffer[0]);
 	}
-
+std::cout << PURPLE << tmp << RST << std::endl;
 	if (recept == 0 || (tmp.find("\r\n\r\n") == tmp.npos)) // close client
 	{
 		std::cout << YELLOW << "Connexion closed by client" << RST << std::endl;
@@ -41,7 +41,7 @@ bool	ft::parse_header(int fd, s_header &head)
 		std::cout << RED << "Not HTTP/1.1 request, connexion closed!" << RST << std::endl;
 		return (false);
 	}
-std::cout << PURPLE << tmp << RST << std::endl;
+
 	// SET HEADER IN VECTOR BY LINE
 	for (std::string::iterator it = tmp.begin(); it != tmp.end() && *it != 0; it++)
 	{

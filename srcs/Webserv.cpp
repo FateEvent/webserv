@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/26 03:03:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/26 13:00:18 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -425,30 +425,34 @@ void	Webserv::check_server()
 		if (sock_fd == -1)
 		{
 			std::cout << strerror(errno) << std::endl;
+			goto spring_block;
 			throw std::invalid_argument("Socket error in vhost!");
 		}
 		fcntl(sock_fd, F_SETFL, O_NONBLOCK);
 		if (!ft::parse_header(sock_fd, head))
+		{
 			::close(sock_fd);
-		std::map<std::string, config>::iterator serv = this->_servers.begin();
+			goto spring_block;
+		}
+		std::map<std::string, config>::iterator serv = this->_servers.find(head.Host);
 		for (; serv != this->_servers.end(); serv++)
 			if (serv->first.compare(head.Host) == 0)
 				break;
-		if (serv == this->_servers.end()) // If instance not found give a webserv page... // Header with postman don't work!
+		if (serv == this->_servers.end()) // If instance not found give a webserv page... // Header with postman don't work??!!!
 		{
-/* 			try
+			try
 			{
 				Client *ret = new Client(this->_base, addr, socklen, sock_fd, head);
 				this->_client.insert(std::make_pair(sock_fd, *ret));
 				std::cout << GREEN << "New bad adress vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
-				FD_CLR(this->_base.sock_fd, &this->readfd);
 			}
 			catch (std::exception &e)
 			{
 				std::cout << e.what() << std::endl;
-			} */
-			std::cout << PURPLE << "Vhost don't exist, connexion close." << RST << std::endl;
-			::close(sock_fd);
+			}
+			//FD_CLR(this->_base.sock_fd, &this->readfd);
+			/* std::cout << PURPLE << "Vhost don't exist, connexion close." << RST << std::endl;
+			::close(sock_fd); */
 		}
 		else
 		{
@@ -464,6 +468,7 @@ void	Webserv::check_server()
 			}
 		}
 	}
+	spring_block:
 	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd))
 		{
@@ -482,7 +487,6 @@ void	Webserv::check_server()
 		}
 }
 
-// Check client if exist and if working to call the right function
 void	Webserv::check_client()
 {
 	std::vector<int>	to_close;

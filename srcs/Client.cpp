@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/26 01:21:42 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/27 00:43:34 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,8 @@ void	Client::clear_header()
 	this->_data.data_size = 0;
 	this->_data.fd = 0;
 	this->_data.header.clear();
+	if (this->_data.file != 0)
+		delete this->_data.file;
 	this->_data.file = NULL;
 	this->_ready = false;
 }
@@ -152,7 +154,7 @@ bool	Client::continue_client(fd_set *fdset)
 	{
 		if (this->send_data(this->_sock_fd))
 		{
-			this->_data.file->close();
+			//this->_data.file->close();
 			this->clear_header();
 			this->_index.clear();
 			this->_root.clear();
@@ -274,12 +276,12 @@ bool	Client::check_location()
 		std::cout << "Path of file is: " + path << std::endl;
 	#endif
 	this->_data.file = new std::ifstream(path, std::ios::binary);
-	if (!this->_data.file->is_open())
+	if (!this->_data.file->good())
 		return (false);
 	this->_data.file->seekg(0, this->_data.file->end);
 	this->_data.data_size = this->_data.file->tellg();
 	this->_data.file->seekg(0, this->_data.file->beg);
-	return (this->_data.file->is_open() ? true : false);
+	return (this->_data.file->good() ? true : false);
 }
 
 void	Client::simple_location(std::vector<struct s_location>::const_iterator &location)
