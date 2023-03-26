@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 20:09:47 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/26 03:03:40 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void	Webserv::prepare(config &instance)
 			fcntl(instance.sock_fd, F_SETFL, O_NONBLOCK);
 		}
 	}
-		else
+	else
 		std::cout << "Info: " + instance.name + " have already a socket!" << std::endl;
 }
 
@@ -434,8 +434,19 @@ void	Webserv::check_server()
 		for (; serv != this->_servers.end(); serv++)
 			if (serv->first.compare(head.Host) == 0)
 				break;
-		if (serv == this->_servers.end())
+		if (serv == this->_servers.end()) // If instance not found give a webserv page... // Header with postman don't work!
 		{
+/* 			try
+			{
+				Client *ret = new Client(this->_base, addr, socklen, sock_fd, head);
+				this->_client.insert(std::make_pair(sock_fd, *ret));
+				std::cout << GREEN << "New bad adress vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+				FD_CLR(this->_base.sock_fd, &this->readfd);
+			}
+			catch (std::exception &e)
+			{
+				std::cout << e.what() << std::endl;
+			} */
 			std::cout << PURPLE << "Vhost don't exist, connexion close." << RST << std::endl;
 			::close(sock_fd);
 		}

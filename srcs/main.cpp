@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 19:47:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/26 01:29:34 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,14 +68,14 @@ int main(int ac, char **av) //, char** ev)
 	}
 	file.close();
 
-#ifdef DEBUG
+/* #ifdef DEBUG
 	for (std::multimap<std::string, std::multimap<std::string, std::string> >::iterator it = pre_conf.begin(); it != pre_conf.end(); it++)
 	{
-		std::cout << "---> \033[0;31m" + it->first + "\033[0m <----\n";
+		std::cout << "---> " << RED << it->first << RST << " <----\n";
 		for (std::multimap<std::string, std::string>::iterator tt = it->second.begin(); tt != it->second.end(); tt++)
-			std::cout << "\033[0;32m" + tt->first + "\033[0m : \033[0;32m" + tt->second + "\033[0m\n";
+			std::cout << GREEN << tt->first << RST << " : " << GREEN << tt->second << RST << std::endl;
 	}
-#endif
+#endif */
 
 	Webserv server(pre_conf);
 	server.add(pre_conf);

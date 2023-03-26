@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/21 15:08:10 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/26 01:36:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,10 +101,10 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		#ifdef DEBUG
 		else
 		{
-			std::cout << "Unknown key " << it->first << " in config file" << std::endl;
+			std::cout << "Unknown key " << it->first << " in config file - s_config.cpp" << std::endl;
 			//throw ("Unknow parameter in config file!");
 		}
-		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
+		//std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 		#endif
 	}
 }

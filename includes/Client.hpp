@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 20:04:36 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/26 01:11:05 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <sys/socket.h>
 #include <cstring>
 #include <string>
-#include <time.h>
+#include <ctime>
 #include <sys/types.h>
 #include <map>
 #include <vector>
@@ -41,7 +41,7 @@ class Client
 		std::string					_reponse;
 		std::string					_root;
 		std::string					_index;
-		time_t						_timeout;
+		std::time_t					_timeout;
 		header						_header;
 		size_t						_max_body;
 		std::map<int, std::string>	_error_page;
