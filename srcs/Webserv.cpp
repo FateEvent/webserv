@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 14:44:41 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/27 13:37:28 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	std::multimap<std::string, std::string> it = itconfig->second;
 	this->_base.name.assign("Default");
 	this->_base.root.assign(it.find("root")->second);
-	this->_base.index.assign(it.find("index_page")->second);
+	this->_base.index.assign(it.find("index_page")->second);;
 	this->_base.port = std::stoul(it.find("listen")->second.data(), NULL, 10);
 	this->_base.addr.sin_addr.s_addr = INADDR_ANY;
 	this->_base.addr.sin_family = AF_INET;
@@ -36,9 +36,9 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
 	fcntl(this->_base.sock_fd, F_SETFL, O_NONBLOCK);
 	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
-		throw err_init(); // ("Server bind error.");
+		throw std::invalid_argument("Cannot bind port! Usualy already used."); // ("Server bind error.");
 	if (::listen(this->_base.sock_fd, this->_base.max_client) != 0)
-		throw err_init(); // ("Server listen error.");
+		throw std::invalid_argument("Cannot listen port! Usualy already used."); // ("Server listen error.");
 	// Set prepare and active on true
 	this->_base.prepare = true;
 	this->_base.active = false;
@@ -89,7 +89,7 @@ void	Webserv::prepare(config &instance)
 			fcntl(instance.sock_fd, F_SETFL, O_NONBLOCK);
 		}
 	}
-		else
+	else
 		std::cout << "Info: " + instance.name + " have already a socket!" << std::endl;
 }
 
@@ -131,7 +131,7 @@ void	Webserv::stop(config &server)
 		std::cout << "Closed..." << std::endl;
 	}
 	else
-		std::cout << "Not active, no need to close..." << std::endl;
+		std::cout << "Not active, not need to close..." << std::endl;
 //		throw ("Server was already shutdown.");
 }
 
@@ -250,14 +250,15 @@ void	Webserv::add(std::multimap<std::string, std::string> &server)
 {
 	config	ret(server);
 	_check_instance(ret);
+	ret._base = &this->_base;
 	this->_servers.insert(std::make_pair(ret.name, ret));
 	this->_nbr_server++;
 }
 
 /**
  * @brief Check if the instance have the right parameter
- * if some non important param is not present, then set
- * as default value in mainconfig
+ * if some non importante param is not present, then set
+ * as delfault value in mainconfig
  * 
  * @param conf Struct config to check
  */
@@ -312,29 +313,7 @@ void	Webserv::listen(config &instance)
 		throw ("Error on listen for " + instance.name + " with error " + std::to_string(errno));
 }
 
-void	Webserv::fd_rst()
-{
-	FD_ZERO(&this->writefd);
-	FD_ZERO(&this->readfd);
-	FD_ZERO(&this->errfd);
-	
-	// Set FD on all instances
-	// test if cgi true and if true add fd of cgi.
-	for (std::map<std::string, config>::const_iterator it = this->_servers.begin(); 
-			it != this->_servers.end(); it++)
-		if (it->second.active && it->second.sock_fd > 0)
-			FD_SET(it->second.sock_fd, &this->readfd);
-	// Set FD on client if exist
-	for (std::map<int, Client>::iterator it = this->_client.begin();
-		it != this->_client.end(); it++)
-	{
-		FD_SET(it->first, &this->readfd);
-		if (it->second.is_cgi())
-			FD_SET(it->second.get_fd_cgi(), &this->readfd);
-	}
-	// Set FD on Server default port
-	FD_SET(this->_base.sock_fd, &this->readfd);
-}
+
 
 unsigned	Webserv::get_nbr_server() const		{ return (this->_nbr_server);}
 
@@ -383,6 +362,28 @@ std::string	Webserv::get_info_instance() const
 	return (info);
 }
 
+void	Webserv::fd_rst()
+{
+	FD_ZERO(&this->writefd);
+	FD_ZERO(&this->readfd);
+	FD_ZERO(&this->errfd);
+
+	for (std::map<std::string, config>::const_iterator it = this->_servers.begin(); 
+			it != this->_servers.end(); it++)
+		if (it->second.active && it->second.sock_fd > 0)
+			FD_SET(it->second.sock_fd, &this->readfd);
+	// Set FD on client if exist
+	for (std::map<int, Client>::iterator it = this->_client.begin();
+			it != this->_client.end(); it++)
+	{
+		FD_SET(it->first, &this->readfd);
+		if (it->second.is_cgi())
+			FD_SET(it->second.get_fd_cgi(), &this->readfd);
+	}
+	// Set FD on Server default port
+	FD_SET(this->_base.sock_fd, &this->readfd);
+}
+
 int	Webserv::get_greaterfd() const
 {
 	int	nbr = this->_base.sock_fd + 1;
@@ -402,14 +403,10 @@ int	Webserv::get_greaterfd() const
 	return (nbr);
 }
 
-fd_set&	Webserv::get_writefd()	{ return (this->writefd);}
-fd_set&	Webserv::get_readfd()	{ return (this->readfd);}
-
-timeval&	Webserv::timeout()
-{
-	this->_timeout = (timeval){1,0};
-	return (this->_timeout);
-}
+fd_set&	Webserv::get_writefd()		{ return (this->writefd);}
+fd_set&	Webserv::get_readfd()		{ return (this->readfd);}
+void	Webserv::timeout(int sec)	{ this->_timeout = (timeval){sec,0};}
+timeval&	Webserv::timeout()		{ return (this->_timeout); }
 
 // Check if is a new connexion on main config or on vhost
 // If it's a new client create the client and set right variables.
@@ -417,48 +414,115 @@ void	Webserv::check_server()
 {
 	if (FD_ISSET(this->_base.sock_fd, &this->readfd))
 	{
-			// create a new constructor in client special for request come from server.
-			// WARNING: _ref_conf is a const reference!!!
-			// need todo header first to know the instance and after create client
-			// client constructor need to set _ref_conf in direct implementation it's const...
-			// ex: new Client(_base, 1)
-			// this->client.insert(std::make_pair(new Client->get_sockfd(), *new Client))
-			std::cout << "SUR SERVEUR PRINCIPAL" << std::endl;
+		int				sock_fd;
+		sockaddr_in		addr;
+		socklen_t		socklen;
+		header			head;
+
+		std::cout << "Ask of new client on vhost." << std::endl;
+		socklen = sizeof(addr);
+		sock_fd = accept(_base.sock_fd, reinterpret_cast<sockaddr *>(&addr), reinterpret_cast<socklen_t *>(&socklen));
+		if (sock_fd == -1)
+		{
+			std::cout << strerror(errno) << std::endl;
+			goto spring_block;
+			throw std::invalid_argument("Socket error in vhost!");
+		}
+		fcntl(sock_fd, F_SETFL, O_NONBLOCK);
+		if (!ft::parse_header(sock_fd, head))
+		{
+			::close(sock_fd);
+			goto spring_block;
+		}
+		std::map<std::string, config>::iterator serv = this->_servers.find(head.Host);
+		for (; serv != this->_servers.end(); serv++)
+			if (serv->first.compare(head.Host) == 0)
+				break;
+		if (serv == this->_servers.end()) // If instance not found give a webserv page... // Header with postman don't work??!!!
+		{
+			try
+			{
+				Client *ret = new Client(this->_base, addr, socklen, sock_fd, head);
+				this->_client.insert(std::make_pair(sock_fd, *ret));
+				std::cout << GREEN << "New bad adress vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+			}
+			catch (std::exception &e)
+			{
+				std::cout << e.what() << std::endl;
+			}
+		}
+		else
+		{
+			try
+			{
+				Client *ret = new Client(serv->second, addr, socklen, sock_fd, head);
+				this->_client.insert(std::make_pair(sock_fd, *ret));
+				std::cout << GREEN << "New vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+			}
+			catch (std::exception &e)
+			{
+				std::cout << e.what() << std::endl;
+			}
+		}
 	}
+	spring_block:
 	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd))
 		{
-			Client *ret = new Client(it->second);
-			this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
-			FD_CLR(it->second.sock_fd, &this->readfd);
+			std::cout << "Ask of new client." << std::endl;
+			try
+			{
+				Client *ret = new Client(it->second);
+				this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
+				std::cout << GREEN << "New client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+			}
+			catch (std::exception &e)
+			{
+				std::cout << e.what() << std::endl;
+			}
+			//FD_CLR(it->second.sock_fd, &this->readfd);
 		}
 }
 
-// Check client if exist and if working to call the right function
 void	Webserv::check_client()
 {
 	std::vector<int>	to_close;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
-		if ((FD_ISSET(it->second.get_sockfd(), &this->readfd) && it->second.is_working()) ||
+/* 		if ((FD_ISSET(it->second.get_sockfd(), &this->readfd) && it->second.is_working()) ||
 			(it->second.get_fd_cgi() > 0 && FD_ISSET(it->second.get_fd_cgi(), &this->readfd)))
 		{
 			it->second.continue_client(&this->readfd);
 			continue;
+		} */
+		if (FD_ISSET(it->second.get_sockfd(), &this->readfd) &&
+				!it->second.is_ready())
+		{
+			if (it->second.new_request())
+			{
+				//std::cout << GREEN << "Valid Header." << RST << std::endl;
+				FD_CLR(it->second.get_sockfd(), &this->readfd);
+			}
+			else
+			{
+				// send error 400 to client.
+				to_close.push_back(it->second.get_sockfd());
+			}
+			continue;
 		}
-		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd) && !it->second.new_request())
+		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd) &&
+					it->second.is_ready())// && it->second.is_ready())// ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
 		{
 			to_close.push_back(it->second.get_sockfd());
-			std::cout << "Connexion closed." << std::endl;
+			std::cout << YELLOW << "CLOSE CONNEXION" << RST << std::endl;
+			FD_CLR(it->second.get_sockfd(), &this->readfd);
 		}
-		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd))// ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
-			std::cout << "NEW REQUEST OK" << std::endl;
 	}
 	if (!to_close.empty())
 	{
-		for (std::vector<int>::iterator it = to_close.begin(); it != to_close.end(); it++)
+		for (std::vector<int>::iterator it = to_close.begin(); it != to_close.end(); ++it)
 		{
-			std::cout << "Connexion number: " << *it << std::endl;
+			std::cout << GREEN << "Connexion number: " << *it << " close" << RST << std::endl;
 			::close(*it);
 			this->_client.erase(*it);
 		}
@@ -467,20 +531,31 @@ void	Webserv::check_client()
 
 void	Webserv::exec_client()
 {
+	std::list<int> toclose;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
-		if (it->second.get_methode().compare("BAD") == 0 || it->second.get_methode().compare("CLOSE") == 0)
+		if (it->second.get_methode().empty())
+			continue;
+		if ((it->second.get_methode().compare("BAD") == 0 || it->second.get_methode().compare("CLOSE") == 0))
 		{
-			std::cout << "BAD HEADER! Only POST, GET and DELETE are available!" << std::endl;
 			send(it->second.get_sockfd(), "HTTP/1.1 400 Bad Request\r\nContent-Length: 60\r\n\r\n<html><head></head><body>BAD REQUEST ERROR 400</body></html>\0", 109, MSG_OOB); // , NULL, 0);
 			it->second.clear_header();
-			//::close(it->second.get_sockfd());
-			// maybe segfault... client not removed!
+			toclose.push_back(it->second.get_sockfd());
 		}
-		if (!it->second.get_methode().empty() && !it->second.is_working())
-		{
-			// VERIF AND SET LOCATION
+		else if (!it->second.is_seeding() && it->second.is_ready()) // else if (!it->second.get_methode().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
 			it->second.execute_client(it->second.check_location());
+		else if (it->second.is_seeding() && it->second.is_ready())
+		{
+			if (it->second.continue_client(&this->readfd))
+				toclose.push_back(it->first);	//check keep alive...
+			else
+				this->timeout(0);
 		}
+	}
+	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
+	{
+		::close(*it);
+		this->_client.erase(*it);
+		std::cout << BLUE << "Socket " << *it << " closed." << RST << std::endl;
 	}
 }

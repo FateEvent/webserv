@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 13:30:38 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/15 19:02:52 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/26 01:35:11 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ bool	ft::put_err_page(std::string& value, std::map<int, std::string>& err)
 	if (e_nbr == value.npos || s_string == value.npos || e_nbr == s_string)
 		return (false);
 	err.insert(std::pair<int, std::string>(std::stoul(value.substr(0, e_nbr), NULL,10), value.substr(s_string)));
-	#ifdef DEBUG
+/* 	#ifdef DEBUG
 		std::cout << "Error_page implementation: " << std::stoul(value.substr(0, e_nbr), NULL,10) << " - " << value.substr(s_string) << std::endl;
-	#endif
+	#endif */
 	return (true);
 }
 

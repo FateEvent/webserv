@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 19:06:43 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/13 14:45:17 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/25 01:57:31 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,8 @@ class Webserv
 		void			fd_rst();
 		fd_set&			get_writefd();
 		fd_set&			get_readfd();
+		void			timeout(int);
 		timeval&		timeout();
-
 		void			check_server();
 		void			check_client();
 		void			exec_client();

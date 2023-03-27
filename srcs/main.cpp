@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/13 23:31:30 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/27 12:16:04 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,9 @@ int main(int ac, char **av) //, char** ev)
 		std::cout << "Argument error.\nNeed " << av[0] << " [CONFIG FILE]" << std::endl;
 		return (1);
 	}
+
+	ft::make_header(0);
+	ft::make_content_type("");
 
 	// FIRST PARSE IN MAP STRING STRING
 	std::ifstream file;
@@ -65,14 +68,14 @@ int main(int ac, char **av) //, char** ev)
 	}
 	file.close();
 
-#ifdef DEBUG
+/* #ifdef DEBUG
 	for (std::multimap<std::string, std::multimap<std::string, std::string> >::iterator it = pre_conf.begin(); it != pre_conf.end(); it++)
 	{
-		std::cout << "---> \033[0;31m" + it->first + "\033[0m <----\n";
+		std::cout << "---> " << RED << it->first << RST << " <----\n";
 		for (std::multimap<std::string, std::string>::iterator tt = it->second.begin(); tt != it->second.end(); tt++)
-			std::cout << "\033[0;32m" + tt->first + "\033[0m : \033[0;32m" + tt->second + "\033[0m\n";
+			std::cout << GREEN << tt->first << RST << " : " << GREEN << tt->second << RST << std::endl;
 	}
-#endif
+#endif */
 
 	Webserv server(pre_conf);
 	server.add(pre_conf);
@@ -80,6 +83,7 @@ int main(int ac, char **av) //, char** ev)
 	server.prepare_all();
 	server.bind_all();
 	server.listen_all();
+	server.timeout(1);
 	std::cout << server.get_info_server() << std::endl;
 	std::cout << server.get_info_instance() << std::endl;
 
@@ -88,14 +92,15 @@ int main(int ac, char **av) //, char** ev)
 	while (1)
 	{	
 		server.fd_rst();
-		std::cout << "\rwait... " << wait[nbr++ % 8]  << std::flush;
+		std::cout << "wait... " << wait[nbr++ % 8] << "\r" << std::flush;
 		int recept = select(server.get_greaterfd(), &server.get_readfd(), &server.get_writefd(), NULL, &server.timeout());
 		if (recept)
 		{
-			std::cout << std::endl;
+			//std::cout << std::endl;
 			server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
 			server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
 		}
+		server.timeout(1);	
 		server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALY GOES ONE TIME/REQUEST
 		recept = 0;
 	}

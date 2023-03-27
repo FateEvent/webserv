@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 14:44:55 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/27 14:26:05 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <sys/socket.h>
 #include <cstring>
 #include <string>
-#include <time.h>
+#include <ctime>
 #include <sys/types.h>
 #include <map>
 #include <vector>
@@ -27,6 +27,7 @@
 #include <sys/un.h> // FOR LOCAL SOCKET
 // #include "../includes/Reponse.hpp"
 #include <fstream>
+#include <sstream>
 #include <fcntl.h>
 
 class Client
@@ -37,45 +38,56 @@ class Client
 		socklen_t					_socklen;
 //		sockaddr_un					_addr_local;	// sockaddr_un is a local socket
 		const config&				_ref_conf;
+		std::string					_reponse;
 		std::string					_root;
 		std::string					_index;
-		time_t						_timeout;
+		std::time_t					_timeout;
 		header						_header;
 		size_t						_max_body;
 		std::map<int, std::string>	_error_page;
+		std::string					_proxy;
+		std::map<std::string, std::string>	_cgi_call;
 		int							_fd_cgi;
 		bool						_working;
 		bool						_chunked;
 		bool						_cgi;
 		fd_set						_readfd;
+		bool						_sedding;
+		struct s_clt_data			_data;
+		bool						_ready;
 		std::map<std::string, std::string>	other;
 //		fd_set			_writefd;		
 		void			_make_struct();
 
 	public:
 		Client(const config&);
+		Client(const config&, sockaddr_in, socklen_t, int, header&);
 		~Client();
-		int				get_sockfd() const;
-		std::string		get_methode() const;
-		time_t			get_time_alive() const;
-		std::string		get_directory() const;
+		int							get_sockfd() const;
+		std::string					get_methode() const;
+		time_t						get_time_alive() const;
+		std::string					get_directory() const;
 		std::pair<std::string, std::string>	get_file() const;
-		header*			get_header();
-		const config*	get_config() const;
-		int				get_fd_cgi() const;
-		void			continue_client(fd_set*);
-		void			execute_client(bool);
-		bool			is_working() const;
-		bool			is_cgi() const;
-		bool			is_chunk() const;
-		bool			new_request();
-		void			clear_header();
-	
-		bool			check_location();
-		void			simple_location(std::vector<struct s_location>::const_iterator &);
-		void			condition_location(std::vector<struct s_location>::const_iterator &);
-		void			chunk(); // get chunked data
-		void			take_data(); // Get or search body data. count and put total in length variable
+		header*						get_header();
+		const config*				get_config() const;
+		int							get_fd_cgi() const;
+		bool						continue_client(fd_set*);
+		void						execute_client(bool);
+		bool						is_working() const;
+		bool						is_cgi() const;
+		bool						is_chunk() const;
+		bool						is_seeding() const;
+		bool						is_ready() const;
+		bool						new_request();
+		void						clear_header();
+		void						clear();
+		bool						check_location();
+		void						simple_location(std::vector<struct s_location>::const_iterator &);
+		void						condition_location(std::vector<struct s_location>::const_iterator &);
+		void						chunk(); // get chunked data
+		void						take_data(); // Get or search body data. count and put total in length variable
+		bool						send_data(int);
+		void						launch_cgi(std::string);
 		
 	protected:
 };

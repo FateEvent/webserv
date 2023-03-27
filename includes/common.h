@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   common.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 14:44:51 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/27 00:41:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,16 @@
 #include <vector>
 #include <netinet/in.h>
 #include "./utils.hpp"
+
+#define	RED "\033[0;31m"
+#define	BLUE "\033[0;34m"
+#define GREEN "\033[0;32m"
+#define	YELLOW "\033[0;33m"
+#define	PURPLE "\033[0;35m"
+#define	BLACK "\033[0;30m"
+#define WHITE "\033[0;37m"
+#define RST "\033[0m"
+
 
 typedef struct	s_config
 {
@@ -35,20 +45,22 @@ typedef struct	s_config
 	uint16_t							port;
 	std::string							error_log;
 	std::map<std::string, std::string>	cgi;
+	std::string							proxy;
 	std::vector<std::string>			allow;
 	unsigned int						max_client;
 	size_t								max_body;
 	bool								active;
 	bool								prepare;
-	std::vector<struct s_location>		location; // can have multiple location
+	std::vector<struct s_location>		location;
 	std::map<int, std::string>			error_page;
-	unsigned int						time_out;
+	std::time_t							time_out;
 	std::map<std::string, std::string>	other;
 	// Bind and socket
 	sockaddr_in							addr;
 	int									sock_fd;	// socket() return
 	int									domain;		// Type AF_INET, AF_LOCAL, AF_LINUX.... # We use only AF_INET
 	int									type;		// type TCP,UDP... SOCK_STREAM, SOCK_DGRAM
+	struct s_config						*_base;
 }	config;
 
 typedef struct s_header
@@ -81,5 +93,19 @@ typedef struct s_location
 	std::string								search;	// second before open bracket if exist"
 	std::multimap<std::string, std::string>	to; 	// what we do (name, directive).
 }	t_location;
+
+typedef struct s_clt_data
+{
+	s_clt_data();
+	std::istream	*file;
+	int				fd; // not need nore in moment....
+	std::string		header;
+	ssize_t			data_size;
+	ssize_t			data_sended;
+}	clt_data;
+
+namespace ft {
+	bool			parse_header(int, s_header&);
+};
 
 #endif

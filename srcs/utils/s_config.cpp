@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   s_config.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/20 14:44:47 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/26 01:36:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,13 +95,16 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		}
 		else if (!it->first.find("location"))
 			do_location(it->second);
+		else if (!it->first.find("cgi"))
+			this->cgi.insert(std::make_pair(it->second.substr(0, it->second.find_first_of(" \t\v\f")),
+											it->second.substr(it->second.find_last_of(" \t\v\f") + 1)));
 		#ifdef DEBUG
 		else
 		{
-			std::cout << "Unknown key " << it->first << " in config file" << std::endl;
+			std::cout << "Unknown key " << it->first << " in config file - s_config.cpp" << std::endl;
 			//throw ("Unknow parameter in config file!");
 		}
-		std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
+		//std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 		#endif
 	}
 }
@@ -127,9 +130,11 @@ void s_config::set_zero()
 	this->sock_fd = 0;
 	this->domain = 2;
 	this->type = 0;	
+	this->root.clear();
+	this->index.clear();
 }
 
-void	s_config::do_location(std::string loc)
+void s_config::do_location(std::string loc)
 {
 	t_location st;
 	size_t start , end;
