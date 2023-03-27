@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/27 14:26:54 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/27 14:49:14 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,7 +206,7 @@ void	Client::execute_client(bool path)
 		{
 			if (_ref_conf.cgi.find(this->_header.file.second) != this->_ref_conf.cgi.end())
 			{
-				//launch_cgi(this->_ref_conf.cgi.find(this->_header.file.second)->second);
+				launch_cgi(this->_ref_conf.cgi.find(this->_header.file.second)->second);
 				std::cout << "CGI on base" << std::endl;
 			}
 			else
@@ -249,6 +249,7 @@ void	Client::execute_client(bool path)
 
 void	Client::launch_cgi(std::string path)
 {
+	
 	(void)path;
 }
 
