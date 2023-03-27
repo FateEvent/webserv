@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/27 18:06:14 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/27 19:02:08 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,7 +278,6 @@ void	Client::launch_cgi(std::string path)
 	env.push_back("SERVER_ADMIN=" + STR); // 	Adresse électronique de l'administrateur du serveur
 	env.push_back("SERVER_SOFTWARE=" + STR); // 	Type (logiciel) du serveur web
 	env.push_back(0);
-	
 }
 
 bool	Client::check_location()
