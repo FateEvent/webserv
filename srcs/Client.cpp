@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/27 00:43:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/27 14:49:14 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,17 +129,13 @@ bool	Client::send_data(int fd)
 		return (false);
 	}
 	this->_data.file->seekg(this->_data.data_sended - 1, this->_data.file->beg);
-	char buff[size + 1] = {0};
+	char buff[size + 1];
+	std::memset(buff, 0, size + 1);
 	this->_data.file->read(buff, size);
-	//std::cout << YELLOW << "\nreturn size: " << size << RST << std::endl;
-	//std::cout << YELLOW << "return read: " << this->_data.file->gcount() << RST << std::endl;
-	//std::cout << RED << buff << RST << std::endl;
 
 	ssize_t s = send(fd, buff,  this->_data.file->gcount(), 0);
-	//std::cout << YELLOW << "return send: " << s << RST << std::endl;
 	if (s == -1 || s == 0)
 	{
-		//std::cout << std::endl << PURPLE << "Socket full, try next time." << RST << std::endl;
 		return (false);
 	}
 	this->_data.data_sended += s;
@@ -154,16 +150,15 @@ bool	Client::continue_client(fd_set *fdset)
 	{
 		if (this->send_data(this->_sock_fd))
 		{
-			//this->_data.file->close();
 			this->clear_header();
 			this->_index.clear();
 			this->_root.clear();
-			std::cout << std::endl << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
+			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
 		return (false);
 	}
-	if (this->_chunked)
+	else if (this->_chunked)
 		this->chunk();
 	else if (FD_ISSET(this->_cgi, fdset))
 		this->take_data();
@@ -172,7 +167,6 @@ bool	Client::continue_client(fd_set *fdset)
 		if (!_header.Methode.compare("GET"))
 		{
 			std::cout << "GET METHODE" << std::endl;
-			this->_working = false;
 		}
 		else if (!_header.Methode.compare("POST"))
 		{
@@ -203,19 +197,21 @@ void	Client::execute_client(bool path)
 		header.append("\r\n\r\n");
 		send(this->_sock_fd, header.c_str(), header.length(), 0);
 	}
-
-	if (_header.Methode.compare("GET") == 0)
+	else if (_header.Methode.compare("GET") == 0)
 	{
 		std::cout << "GET METHODE" << std::endl;
-		if (!this->_ref_conf.cgi.empty()) // && cgi->first == _header->file.second
+		if (!this->_ref_conf.cgi.empty() &&
+				(_ref_conf.cgi.find(_header.file.second) != _ref_conf.cgi.end() ||
+				_cgi_call.find(_header.file.second) != _cgi_call.end()))
 		{
-			for(std::map<std::string, std::string>::const_iterator it = this->_ref_conf.cgi.begin(); it != this->_ref_conf.cgi.end(); it++)
+			if (_ref_conf.cgi.find(this->_header.file.second) != this->_ref_conf.cgi.end())
 			{
-				if (!this->_header.file.second.compare(it->first))
-				{
-					std::cout << "CGI......." << std::endl; //ft::do_cgi(); // Call cgi function
-					break;
-				}
+				launch_cgi(this->_ref_conf.cgi.find(this->_header.file.second)->second);
+				std::cout << "CGI on base" << std::endl;
+			}
+			else
+			{
+				std::cout << "CGI on location" << std::endl;
 			}
 		}
 		else
@@ -224,7 +220,7 @@ void	Client::execute_client(bool path)
 			this->_data.header = ft::make_header(200);
 			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
 			this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
-			int check;
+			int check = 0;
 			check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
 			if (check == -1)
 			{
@@ -249,6 +245,12 @@ void	Client::execute_client(bool path)
 		std::cout << "DELETE METHODE" << std::endl;
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl;
+}
+
+void	Client::launch_cgi(std::string path)
+{
+	
+	(void)path;
 }
 
 bool	Client::check_location()
@@ -281,7 +283,7 @@ bool	Client::check_location()
 	this->_data.file->seekg(0, this->_data.file->end);
 	this->_data.data_size = this->_data.file->tellg();
 	this->_data.file->seekg(0, this->_data.file->beg);
-	return (this->_data.file->good() ? true : false);
+	return (true);
 }
 
 void	Client::simple_location(std::vector<struct s_location>::const_iterator &location)

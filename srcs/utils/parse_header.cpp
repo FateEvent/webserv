@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/26 12:49:11 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/27 11:52:37 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ bool	ft::parse_header(int fd, s_header &head)
 	while (tmp.find("\r\n\r\n") == tmp.npos)
 	{
 		recept = recv(fd, &buffer, 1, 0);
-		if (recept < 1 || buffer[0] == 0)
+ 		if (recept == -1)
+			continue;
+		if (recept == 0 || buffer[0] == 0)
 			break;
 		tmp.push_back(buffer[0]);
 	}
@@ -59,11 +61,11 @@ std::cout << PURPLE << tmp << RST << std::endl;
 	std::vector<std::string>::iterator it = header.begin();
 	if (it->find(" HTTP/1.1"))
 	{
-		if (!it->compare(0, 5, "GET /"))
+		if (it->find("GET /") != it->npos)
 			head.Methode = "GET";
-		else if (!it->compare(0, 6, "POST /"))
+		else if (it->find("POST /") != it->npos)
 			head.Methode = "POST";
-		else if (!it->compare(0, 8, "DELETE /"))
+		else if (it->find("DELETE /") != it->npos)
 			head.Methode = "DELETE";
 		else
 		{

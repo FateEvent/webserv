@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/26 13:00:18 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/27 13:37:28 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -450,9 +450,6 @@ void	Webserv::check_server()
 			{
 				std::cout << e.what() << std::endl;
 			}
-			//FD_CLR(this->_base.sock_fd, &this->readfd);
-			/* std::cout << PURPLE << "Vhost don't exist, connexion close." << RST << std::endl;
-			::close(sock_fd); */
 		}
 		else
 		{

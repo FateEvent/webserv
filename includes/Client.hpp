@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/26 01:11:05 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/27 14:26:05 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,30 +63,31 @@ class Client
 		Client(const config&);
 		Client(const config&, sockaddr_in, socklen_t, int, header&);
 		~Client();
-		int				get_sockfd() const;
-		std::string		get_methode() const;
-		time_t			get_time_alive() const;
-		std::string		get_directory() const;
+		int							get_sockfd() const;
+		std::string					get_methode() const;
+		time_t						get_time_alive() const;
+		std::string					get_directory() const;
 		std::pair<std::string, std::string>	get_file() const;
-		header*			get_header();
-		const config*	get_config() const;
-		int				get_fd_cgi() const;
-		bool			continue_client(fd_set*);
-		void			execute_client(bool);
-		bool			is_working() const;
-		bool			is_cgi() const;
-		bool			is_chunk() const;
-		bool			is_seeding() const;
-		bool			is_ready() const;
-		bool			new_request();
-		void			clear_header();
-		void			clear();
-		bool			check_location();
-		void			simple_location(std::vector<struct s_location>::const_iterator &);
-		void			condition_location(std::vector<struct s_location>::const_iterator &);
-		void			chunk(); // get chunked data
-		void			take_data(); // Get or search body data. count and put total in length variable
-		bool			send_data(int);
+		header*						get_header();
+		const config*				get_config() const;
+		int							get_fd_cgi() const;
+		bool						continue_client(fd_set*);
+		void						execute_client(bool);
+		bool						is_working() const;
+		bool						is_cgi() const;
+		bool						is_chunk() const;
+		bool						is_seeding() const;
+		bool						is_ready() const;
+		bool						new_request();
+		void						clear_header();
+		void						clear();
+		bool						check_location();
+		void						simple_location(std::vector<struct s_location>::const_iterator &);
+		void						condition_location(std::vector<struct s_location>::const_iterator &);
+		void						chunk(); // get chunked data
+		void						take_data(); // Get or search body data. count and put total in length variable
+		bool						send_data(int);
+		void						launch_cgi(std::string);
 		
 	protected:
 };

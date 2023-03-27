@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/26 01:29:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/27 12:16:04 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,11 @@ int main(int ac, char **av) //, char** ev)
 	while (1)
 	{	
 		server.fd_rst();
-		std::cout << "\b\rwait... " << wait[nbr++ % 8]  << std::flush;
+		std::cout << "wait... " << wait[nbr++ % 8] << "\r" << std::flush;
 		int recept = select(server.get_greaterfd(), &server.get_readfd(), &server.get_writefd(), NULL, &server.timeout());
 		if (recept)
 		{
-			std::cout << std::endl;
+			//std::cout << std::endl;
 			server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
 			server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
 		}
