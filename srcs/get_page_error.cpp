@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 14:06:17 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/21 15:23:59 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/28 17:03:22 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,12 @@
 
 std::string	ft::get_page_error(int nbr_error, std::string dir)
 {
-	std::fstream	file(dir);
+	std::ifstream	file(dir);
 	if (file.is_open())
 	{
 		std::string	data;
 		file >> data;
-		return ("Content-Length: " + std::to_string(data.length()) + "/r/n/r/n" + data);
+		return ("Content-Length: " + std::to_string(data.length()) + "\r\n\r\n" + data);
 	}
-	return ("Content-Length: " + std::to_string(ft::make_header(nbr_error).substr(9).length()) + "/r/n/r/n" + ft::make_header(nbr_error).substr(9));
+	return ("Content-Length: " + std::to_string(ft::make_header(nbr_error).substr(9).length()) + "\r\n\r\n" + ft::make_header(nbr_error).substr(9)); // Generation de lerreur.. A refaire sur une generation standard
 }
