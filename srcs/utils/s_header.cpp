@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/24 00:51:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/28 17:36:11 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	s_header::clear()
 	Cookie.clear(); // change to a ref of cookie in instance
 	//Keep_Alive = 0;
 	//time_out = 0;
+	get_var.clear();
 	Connexion.clear();
 	// A voir MISS some directives...
 	file.first.clear();
@@ -58,6 +59,7 @@ void	s_header::print_all()
 	std::cout << "Keep_Alive     : \"" << Keep_Alive << "\"" << std::endl; // ok
 	std::cout << "Connection     : \"" << Connexion << "\"" << std::endl; // ok
 	std::cout << "Time Out       : \"" << time_out << "\"" << std::endl;
+	std::cout << "Get variables  : \"" << get_var << "\"" << std::endl;
 	std::cout << "FILE FIRST     : \"" << file.first << "\"" << std::endl;
 	std::cout << "FILE SECOND    : \"" << file.second << "\"" << std::endl << std::endl;
 	for (std::map<std::string, std::string>::iterator it = other.begin(); it != other.end(); it++) // ok

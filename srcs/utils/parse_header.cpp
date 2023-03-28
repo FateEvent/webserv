@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/27 11:52:37 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/28 17:42:51 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,8 @@ std::cout << PURPLE << tmp << RST << std::endl;
 		}
 		head.Dir = it->substr(s_str, it->find_first_of(" \v\t\f\n\r\?", s_str) - s_str);
 		if (it->find_first_of("?") != it->npos && !head.Methode.compare("GET"))
-			ft::split_to_mapss(head.other, it->substr(it->find_first_of("?") + 1, it->find_last_of(" ") - it->find_last_of("?") - 1), '&');
+			head.get_var = it->substr(it->find_first_of("?") + 1, it->find_last_of(" ") - it->find_last_of("?") - 1);
+			//ft::split_to_mapss(head.other, it->substr(it->find_first_of("?") + 1, it->find_last_of(" ") - it->find_last_of("?") - 1), '&');
 	}
 	else
 	{

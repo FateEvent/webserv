@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/28 11:19:21 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/28 17:58:07 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,16 +186,21 @@ void	Client::execute_client(bool path)
 {
 	if (!path && !this->is_working())
 	{
-		std::cout << PURPLE << "File not found or can't open!" << RST << std::endl;
-		std::string body, header;
+		#ifdef DEBUG
+			std::cout << PURPLE << "File not found or can't open!" << RST << std::endl;
+		#endif
+		std::string header;
+		this->_data.file = new std::stringstream();
 		header = ft::make_header(404);
-		body = ft::get_page_error(404, this->_error_page[404].empty() ?
+		send(this->_sock_fd, header.c_str(), header.length(), 0);
+		*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(404, this->_error_page[404].empty() ?
 					(this->_ref_conf.error_page.find(404)->second.empty() ?
 					this->_ref_conf._base->error_page.find(404)->second : this->_ref_conf.error_page.find(404)->second) :
 					this->_error_page[404]);
-		header.append(body);
-		header.append("\r\n\r\n");
-		send(this->_sock_fd, header.c_str(), header.length(), 0);
+		this->_data.file->seekg(0, this->_data.file->end);
+		this->_data.data_size = this->_data.file->tellg();
+		this->_data.file->seekg(0, this->_data.file->beg);
+		this->_sedding = true;
 	}
 	else if (_header.Methode.compare("GET") == 0)
 	{
@@ -204,7 +209,7 @@ void	Client::execute_client(bool path)
 				(_ref_conf.cgi.find(_header.file.second) != _ref_conf.cgi.end() ||
 				_cgi_call.find(_header.file.second) != _cgi_call.end()))
 		{
-			if (_ref_conf.cgi.find(this->_header.file.second) != this->_ref_conf.cgi.end())
+			if (_ref_conf.cgi.find(this->_header.file.second) != this->_ref_conf.cgi.end()) // Tester en premier les gci dans location... switch if and else..
 			{
 				launch_cgi(this->_ref_conf.cgi.find(this->_header.file.second)->second);
 				std::cout << "CGI on base" << std::endl;
@@ -254,11 +259,13 @@ void	Client::launch_cgi(std::string path)
 	env.push_back("REQUEST_METHOD=" + this->get_methode()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
 	env.push_back("SERVER_PROTOCOL=HTTP1.1");
 	env.push_back("PATH_INFO=");
-	
+
+	env.push_back("REQUEST_URI=" + STR); // SHOULD BY cgi_tester
+	env.push_back("SCRIPT_NAME=" + STR); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
+
 	env.push_back("SERVER_NAME=" + this->_header.Host); // Le nom du serveur web.
 	env.push_back("SERVER_PORT=" + std::to_string(this->_ref_conf.port)); // Le port sur lequel le serveur web écoute les requêtes.
 	env.push_back("SERVER_SOFTWARE=" + STR); // Le nom et la version du serveur web utilisé.
-	env.push_back("SCRIPT_NAME=" + STR); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
 	env.push_back("SCRIPT_FILENAME=" + path); // Le chemin d'accès absolu du script CGI sur le serveur.
 	env.push_back("DOCUMENT_ROOT=" + this->_root); // Le chemin d'accès absolu du répertoire racine du site web.
 	env.push_back("QUERY_STRING=" + STR); // La chaîne de requête (paramètres de la requête) envoyée avec la requête HTTP.
