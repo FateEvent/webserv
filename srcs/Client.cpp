@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/27 14:49:14 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/28 11:15:20 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,8 +249,35 @@ void	Client::execute_client(bool path)
 
 void	Client::launch_cgi(std::string path)
 {
+	std::string STR = 0;
+	std::vector<std::string> env;
+	env.push_back("REQUEST_METHOD=" + this->get_methode()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
+	env.push_back("SERVER_PROTOCOL=HTTP1.1");
+	env.push_back("PATH_INFO=");
 	
-	(void)path;
+	env.push_back("SERVER_NAME=" + this->_header.Host); // Le nom du serveur web.
+	env.push_back("SERVER_PORT=" + std::to_string(this->_ref_conf.port)); // Le port sur lequel le serveur web écoute les requêtes.
+	env.push_back("SERVER_SOFTWARE=" + STR); // Le nom et la version du serveur web utilisé.
+	env.push_back("SCRIPT_NAME=" + STR); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
+	env.push_back("SCRIPT_FILENAME=" + path); // Le chemin d'accès absolu du script CGI sur le serveur.
+	env.push_back("DOCUMENT_ROOT=" + this->_root); // Le chemin d'accès absolu du répertoire racine du site web.
+	env.push_back("QUERY_STRING=" + STR); // La chaîne de requête (paramètres de la requête) envoyée avec la requête HTTP.
+	env.push_back("HTTP_COOKIE=" + STR); // Les cookies HTTP envoyés avec la requête.
+	env.push_back("HTTP_USER_AGENT=" + this->_header.User_Agent); // Le nom et la version du navigateur ou du client HTTP utilisé pour envoyer la requête.
+	env.push_back("HTTP_REFERER=" + STR); // L'URL de la page précédente qui a conduit à la requête actuelle.
+	env.push_back("REMOTE_ADDR=" + STR); // L'adresse IP de l'utilisateur qui a envoyé la requête.
+	env.push_back("REMOTE_HOST=" + STR); // Le nom d'hôte de l'utilisateur qui a envoyé la requête.
+	env.push_back("REMOTE_USER=" + STR); // Le nom d'utilisateur fourni par l'utilisateur dans le cadre d'une authentification HTTP.
+	//env.push_back("CONTENT_TYPE=" + this->_header.Content_Type.begin()->data()); // Le type MIME du corps de la requête HTTP (par exemple, application/json).
+	env.push_back("CONTENT_LENGTH=" + std::to_string(this->_header.Content_Length)); // La longueur (en octets) du corps de la requête HTTP.
+	env.push_back("DATE_GMT=" + STR); // 	Date actuelle au format GMT
+	env.push_back("DATE_LOCAL=" + STR); // 	Date actuelle au format local
+	env.push_back("DOCUMENT_ROOT=" + this->_root); // 	Racine des documents Web sur le serveur
+	env.push_back("GATEWAY_INTERFACE=" + STR); // 	Version des spécifications CGI utilisées par le serveur
+	env.push_back("HTTP_HOST=" + this->_header.Host); // 	Nom de domaine du serveur
+	env.push_back("SERVER_ADMIN=" + STR); // 	Adresse électronique de l'administrateur du serveur
+	env.push_back("SERVER_SOFTWARE=" + STR); // 	Type (logiciel) du serveur web
+	env.push_back(0);
 }
 
 bool	Client::check_location()
