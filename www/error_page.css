@@ -12,7 +12,6 @@ body {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;	/* ? */
-	justify-content: space-between;
 	align-items: stretch;
 	height: 100%;
 	width: 100%;
@@ -95,11 +94,6 @@ img {
 	flex-wrap: wrap;
 }
 
-.products {
-	display: flex;
-	flex-wrap: wrap;
-  }
-  
 .product-card {
 	padding: 2%;
 	flex-grow: 1;
