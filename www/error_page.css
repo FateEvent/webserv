@@ -5,6 +5,17 @@ html{
 body {
 	font-family: Harrington, 'Permanent Marker', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 	background-color: whitesmoke;
+	height: 100%;
+}
+
+.parent {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;	/* ? */
+	justify-content: space-between;
+	align-items: stretch;
+	height: 100%;
+	width: 100%;
 }
 
 .container {
@@ -14,13 +25,13 @@ body {
 	justify-content: space-between;
 	align-items: stretch;
 	height: 100%;
-	width: 100%;
+	width: 75%;
 }
 
 .title {
 	flex-grow: 4;
 	align-self: center;
-	font-size: 2.8rem;
+	font-size: 1.5vw;
 	text-align: center;
 }
 
@@ -38,13 +49,43 @@ p {
 }
 
 .pic {
-/*	flex-grow: 4;	*/
+	display: flex;
+	justify-content: center;
 	align-self: center;
-	font-size: 2.8rem;
 }
 
-.pic-right {
-/*	flex-grow: 4;	*/
+img {
+	width: 45vw;
+	align-self: center;
+}
+
+.ads {
+	display: flex;
+	flex-flow: column wrap;
+	justify-content: flex-start;
+	align-self: center;
+	height: 100%;
+	width: 25%;
+	background-color: aquamarine;
+}
+
+.header {
 	align-self: center;
 	font-size: 2.8rem;
+	text-align: center;
+	padding-top: 5rem;
+}
+
+.ads h3 {
+	font-size: 1.5vw;
+	text-align: center;
+}
+
+.ads .pic {
+	align-self: center;
+}
+
+.ads img {
+	align-self: center;
+	width: 20vw;
 }
