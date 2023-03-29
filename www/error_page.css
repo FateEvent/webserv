@@ -2,6 +2,10 @@ html{
 	font-size: 10px;
 }
 
+* {
+	box-sizing: border-box;
+}
+
 body {
 	font-family: Harrington, 'Permanent Marker', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 	background: url("assets/images/golden-white-marble-textured-background.jpg");
@@ -103,8 +107,7 @@ img {
 	background-color: azure;
 }
 
-.product-image img,
-.product-image-42 img {
+.product-image img {
 	max-width: 100%;
 }
 
@@ -125,20 +128,38 @@ img {
 .block42 {
 	display: flex;
 	flex-flow: row nowrap;
+	height: 33%;
+	background-color: blueviolet;	/* to debug */
+	padding: 2%;	/* to debug */
+	height: 33%;
+}
+
+.col42 {
+	background-color: red;	/* to debug */
+	height: auto;
 }
 
 .product-image-42 {
-	padding: 2%;
-	flex-grow: 2;
-	flex-basis: 16%;
+	padding: 1.5%;
 	background-color: azure;
 }
 
 .product-cards-42 .col42:first-child {
-	flex: 2 46%;
+	flex: 2 63.56%;
 }
 
 .product-cards-42 .col42:nth-child(2),
 .product-cards-42 .col42:nth-child(3) {
-	flex: 2 23%;
+	flex: 1 36.44%;
+}
+
+.product-image-42 img {
+	width: 100%;
+	transition: transform .2s;
+}
+
+.product-image-42 img:hover {
+	-ms-transform: scale(1.05);
+	-webkit-transform: scale(1.05);
+	transform: scale(1.05);
 }
