@@ -103,7 +103,8 @@ img {
 	background-color: azure;
 }
 
-.product-image img {
+.product-image img,
+.product-image-42 img {
 	max-width: 100%;
 }
 
@@ -114,4 +115,30 @@ img {
 .products .product-card:first-child,
 .products .product-card:nth-child(2) {
 	flex: 2 46%;
+}
+
+.product-cards-42 {
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+.block42 {
+	display: flex;
+	flex-flow: row nowrap;
+}
+
+.product-image-42 {
+	padding: 2%;
+	flex-grow: 2;
+	flex-basis: 16%;
+	background-color: azure;
+}
+
+.product-cards-42 .col42:first-child {
+	flex: 2 46%;
+}
+
+.product-cards-42 .col42:nth-child(2),
+.product-cards-42 .col42:nth-child(3) {
+	flex: 2 23%;
 }
