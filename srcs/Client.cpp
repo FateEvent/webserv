@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/28 17:58:07 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/29 23:00:36 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,7 @@ bool	Client::continue_client(fd_set *fdset)
 	return (false);
 }
 
-void	Client::execute_client(bool path)
+bool	Client::execute_client(bool path)
 {
 	if (!path && !this->is_working())
 	{
@@ -206,7 +206,7 @@ void	Client::execute_client(bool path)
 	{
 		std::cout << "GET METHODE" << std::endl;
 		if (!this->_ref_conf.cgi.empty() &&
-				(_ref_conf.cgi.find(_header.file.second) != _ref_conf.cgi.end() ||
+				(_ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end() ||
 				_cgi_call.find(_header.file.second) != _cgi_call.end()))
 		{
 			if (_ref_conf.cgi.find(this->_header.file.second) != this->_ref_conf.cgi.end()) // Tester en premier les gci dans location... switch if and else..
@@ -243,13 +243,29 @@ void	Client::execute_client(bool path)
 	else if (_header.Methode.compare("POST") == 0)
 	{
 		std::cout << "POST METHODE" << std::endl;
-		send(this->_sock_fd, "HTTP/1.1 404 Not Found\r\nContent-Length: 53\r\n\r\n<html><head></head><body>POST ERROR 404</body></html>\0", 100, MSG_OOB); // , NULL, 0);
+		char buff[2];
+		memset(buff, 0, 2);
+		int recept = 0;
+		recept = recv(this->_sock_fd, &buff, 1, 0);
+		while (recept > 0)
+		{
+			std::cout << buff;
+			recept = recv(this->_sock_fd, &buff, 1, 0);
+		}
+		std::cout << std::endl;
+		std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
+		//close(this->_sock_fd);
+		this->clear_header();
+		this->_index.clear();
+		this->_root.clear();
 		this->_working = true;
+		return (true);
 	}
 	else if (_header.Methode.compare("DELETE") == 0)
 		std::cout << "DELETE METHODE" << std::endl;
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl;
+	return (false);
 }
 
 void	Client::launch_cgi(std::string path)
@@ -260,7 +276,7 @@ void	Client::launch_cgi(std::string path)
 	env.push_back("SERVER_PROTOCOL=HTTP1.1");
 	env.push_back("PATH_INFO=");
 
-	env.push_back("REQUEST_URI=" + STR); // SHOULD BY cgi_tester
+	//env.push_back("REQUEST_URI=" + STR); // SHOULD BY cgi_tester
 	env.push_back("SCRIPT_NAME=" + STR); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
 
 	env.push_back("SERVER_NAME=" + this->_header.Host); // Le nom du serveur web.
@@ -285,6 +301,10 @@ void	Client::launch_cgi(std::string path)
 	env.push_back("SERVER_ADMIN=" + STR); // 	Adresse électronique de l'administrateur du serveur
 	env.push_back("SERVER_SOFTWARE=" + STR); // 	Type (logiciel) du serveur web
 	env.push_back(0);
+
+
+	
+	this->_cgi = true;
 }
 
 bool	Client::check_location()

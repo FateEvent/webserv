@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/27 13:37:28 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/29 15:17:43 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -538,12 +538,20 @@ void	Webserv::exec_client()
 			continue;
 		if ((it->second.get_methode().compare("BAD") == 0 || it->second.get_methode().compare("CLOSE") == 0))
 		{
-			send(it->second.get_sockfd(), "HTTP/1.1 400 Bad Request\r\nContent-Length: 60\r\n\r\n<html><head></head><body>BAD REQUEST ERROR 400</body></html>\0", 109, MSG_OOB); // , NULL, 0);
+			std::cout << "PAS OK" << std::endl;
+			std::cout << "Send: " << send(it->second.get_sockfd(), "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
+			//send(it->second.get_sockfd(), "HTTP/1.1 400 Bad Request\r\nContent-Length: 60\r\n\r\n<html><head></head><body>BAD REQUEST ERROR 400</body></html>\0", 109, MSG_OOB); // , NULL, 0);
 			it->second.clear_header();
 			toclose.push_back(it->second.get_sockfd());
 		}
 		else if (!it->second.is_seeding() && it->second.is_ready()) // else if (!it->second.get_methode().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
-			it->second.execute_client(it->second.check_location());
+		{
+			if (it->second.execute_client(it->second.check_location()))
+			{
+				it->second.clear_header();
+				toclose.push_back(it->second.get_sockfd());
+			}
+		}
 		else if (it->second.is_seeding() && it->second.is_ready())
 		{
 			if (it->second.continue_client(&this->readfd))

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/27 14:26:05 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/29 15:04:38 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ class Client
 		const config*				get_config() const;
 		int							get_fd_cgi() const;
 		bool						continue_client(fd_set*);
-		void						execute_client(bool);
+		bool						execute_client(bool);
 		bool						is_working() const;
 		bool						is_cgi() const;
 		bool						is_chunk() const;
