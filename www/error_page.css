@@ -4,11 +4,11 @@ html{
 
 body {
 	font-family: Harrington, 'Permanent Marker', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-	background-color: whitesmoke;
+	background: url("assets/images/golden-white-marble-textured-background.jpg");
 	height: 100%;
 }
 
-.parent {
+.container {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;	/* ? */
@@ -17,14 +17,14 @@ body {
 	width: 100%;
 }
 
-.container {
+.principal {
 	display: flex;
 	flex-direction: column;
 	flex-wrap: wrap;	/* ? */
 	justify-content: space-between;
 	align-items: stretch;
 	height: 100%;
-	width: 65%;
+	width: 60%;
 }
 
 .title {
@@ -64,7 +64,7 @@ img {
 	justify-content: flex-start;
 	align-self: center;
 	height: 100%;
-	width: 35%;
+	width: 40%;
 	background-color: aquamarine;
 }
 
