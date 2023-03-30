@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/29 23:00:36 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/30 17:11:19 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ Client::Client(const config &config, sockaddr_in sock, socklen_t len, int fd, he
 {
 	this->_working = false;
 	this->_chunked = false;
-	this->_fd_cgi = 0;
+	this->_fd_cgi[0] = 0;
+	this->_fd_cgi[1] = 1;
 	this->_cgi = false;
 	this->_sedding = false;
 	this->_reponse.clear();
@@ -76,7 +77,7 @@ std::pair<std::string, std::string>	Client::get_file() const
 int	Client::get_fd_cgi() const
 {
 	if (this->is_cgi())
-		return (this->_fd_cgi);
+		return (this->_fd_cgi[0]); // SHOULD CORRECT, if not put _fd_cgi[1]
 	return (0);
 }
 
@@ -85,7 +86,9 @@ void	Client::clear_header()
 	this->_header.clear();
 	this->_working = false;
 	this->_chunked = false;
-	this->_fd_cgi = 0;
+	this->_fd_cgi[0] = 0;
+	this->_fd_cgi[1] = 0;
+	this->_pid_cgi = 0;
 	this->_cgi = false;
 	this->_sedding = false;
 	this->_reponse.clear();
@@ -205,17 +208,19 @@ bool	Client::execute_client(bool path)
 	else if (_header.Methode.compare("GET") == 0)
 	{
 		std::cout << "GET METHODE" << std::endl;
-		if (!this->_ref_conf.cgi.empty() &&
-				(_ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end() ||
-				_cgi_call.find(_header.file.second) != _cgi_call.end()))
+		if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
+			(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end()))
 		{
 			if (_ref_conf.cgi.find(this->_header.file.second) != this->_ref_conf.cgi.end()) // Tester en premier les gci dans location... switch if and else..
 			{
-				launch_cgi(this->_ref_conf.cgi.find(this->_header.file.second)->second);
+				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
+				this->launch_cgi(this->_ref_conf.cgi.find(_index.substr(_index.find_last_of(".")))->second);
 				std::cout << "CGI on base" << std::endl;
 			}
 			else
 			{
+				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
+				this->launch_cgi(this->_cgi_call.find(_index.substr(_index.find_last_of(".")))->second);
 				std::cout << "CGI on location" << std::endl;
 			}
 		}
@@ -264,7 +269,7 @@ bool	Client::execute_client(bool path)
 	else if (_header.Methode.compare("DELETE") == 0)
 		std::cout << "DELETE METHODE" << std::endl;
 	else
-		std::cout << "BAD REQUEST / BAD HEADER" << std::endl;
+		std::cout << "BAD REQUEST / BAD HEADER" << std::endl; // Should not goto inside.
 	return (false);
 }
 
@@ -272,39 +277,80 @@ void	Client::launch_cgi(std::string path)
 {
 	std::string STR = 0;
 	std::vector<std::string> env;
+	char hostName[NI_MAXHOST];
+
 	env.push_back("REQUEST_METHOD=" + this->get_methode()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
-	env.push_back("SERVER_PROTOCOL=HTTP1.1");
-	env.push_back("PATH_INFO=");
-
-	//env.push_back("REQUEST_URI=" + STR); // SHOULD BY cgi_tester
-	env.push_back("SCRIPT_NAME=" + STR); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
-
-	env.push_back("SERVER_NAME=" + this->_header.Host); // Le nom du serveur web.
+	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	if (this->_header.Dir.empty())
+	{
+		env.push_back("PATH_INFO=/" + this->_index); // NOT REALY GOOD... SHOULD BE AFTER THIS CALLING FILE
+		env.push_back("REQUEST_URI=/" + this->_index + (!this->_header.get_var.empty()?("?" + this->_header.get_var):""));
+	}
+	else
+	{
+		env.push_back("PATH_INFO=/" + this->_header.Dir + "/" + this->_index); // NOT REALY GOOD... SHOULD BE AFTER THIS CALLING FILE
+		env.push_back("REQUEST_URI=/" + this->_header.Dir + "/" + this->_index + (!this->_header.get_var.empty()?("?" + this->_header.get_var):"")); // SHOULD BY cgi_tester
+	}
+	env.push_back("SCRIPT_NAME=" + this->_root + this->_index); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
+	env.push_back("SERVER_NAME=Webserv"); // Le nom du serveur web.
 	env.push_back("SERVER_PORT=" + std::to_string(this->_ref_conf.port)); // Le port sur lequel le serveur web écoute les requêtes.
-	env.push_back("SERVER_SOFTWARE=" + STR); // Le nom et la version du serveur web utilisé.
-	env.push_back("SCRIPT_FILENAME=" + path); // Le chemin d'accès absolu du script CGI sur le serveur.
+	env.push_back("SERVER_SOFTWARE=0.2"); // Le nom et la version du serveur web utilisé.
+	env.push_back("SCRIPT_FILENAME=" + this->_root + "." + this->_index); // Le chemin d'accès absolu du script CGI sur le serveur.
 	env.push_back("DOCUMENT_ROOT=" + this->_root); // Le chemin d'accès absolu du répertoire racine du site web.
-	env.push_back("QUERY_STRING=" + STR); // La chaîne de requête (paramètres de la requête) envoyée avec la requête HTTP.
-	env.push_back("HTTP_COOKIE=" + STR); // Les cookies HTTP envoyés avec la requête.
-	env.push_back("HTTP_USER_AGENT=" + this->_header.User_Agent); // Le nom et la version du navigateur ou du client HTTP utilisé pour envoyer la requête.
-	env.push_back("HTTP_REFERER=" + STR); // L'URL de la page précédente qui a conduit à la requête actuelle.
-	env.push_back("REMOTE_ADDR=" + STR); // L'adresse IP de l'utilisateur qui a envoyé la requête.
-	env.push_back("REMOTE_HOST=" + STR); // Le nom d'hôte de l'utilisateur qui a envoyé la requête.
-	env.push_back("REMOTE_USER=" + STR); // Le nom d'utilisateur fourni par l'utilisateur dans le cadre d'une authentification HTTP.
-	//env.push_back("CONTENT_TYPE=" + this->_header.Content_Type.begin()->data()); // Le type MIME du corps de la requête HTTP (par exemple, application/json).
+	env.push_back("QUERY_STRING=" + this->_header.get_var); // La chaîne de requête (paramètres de la requête) envoyée avec la requête HTTP.
 	env.push_back("CONTENT_LENGTH=" + std::to_string(this->_header.Content_Length)); // La longueur (en octets) du corps de la requête HTTP.
-	env.push_back("DATE_GMT=" + STR); // 	Date actuelle au format GMT
-	env.push_back("DATE_LOCAL=" + STR); // 	Date actuelle au format local
+	env.push_back("HTTP_USER_AGENT=" + this->_header.User_Agent); // Le nom et la version du navigateur ou du client HTTP utilisé pour envoyer la requête.
 	env.push_back("DOCUMENT_ROOT=" + this->_root); // 	Racine des documents Web sur le serveur
-	env.push_back("GATEWAY_INTERFACE=" + STR); // 	Version des spécifications CGI utilisées par le serveur
+	env.push_back("GATEWAY_INTERFACE=CGI/1.1"); // 	Version des spécifications CGI utilisées par le serveur
 	env.push_back("HTTP_HOST=" + this->_header.Host); // 	Nom de domaine du serveur
-	env.push_back("SERVER_ADMIN=" + STR); // 	Adresse électronique de l'administrateur du serveur
-	env.push_back("SERVER_SOFTWARE=" + STR); // 	Type (logiciel) du serveur web
-	env.push_back(0);
+	env.push_back("SERVER_ADMIN=noname@nomail.com"); // 	Adresse électronique de l'administrateur du serveur
+	env.push_back("SERVER_SOFTWARE=Webserv/0.2"); // 	Type (logiciel) du serveur web
+	if (this->_header.other.find("Referer") != this->_header.other.end())
+		env.push_back("HTTP_REFERER=" + this->_header.other.find("Referer")->second); // L'URL de la page précédente qui a conduit à la requête actuelle.
+	env.push_back("REMOTE_USER=" + STR); // Le nom d'utilisateur fourni par l'utilisateur dans le cadre d'une authentification HTTP.
+	//env.push_back("CONTENT_TYPE=" + this->_header.Content_Type.front()); // Le type MIME du corps de la requête HTTP (par exemple, application/json).
+	if (!this->_header.Cookie.empty())
+	{
+		std::string cookie;
+		for (std::map<std::string, std::string>::iterator it = this->_header.Cookie.begin();
+				it != this->_header.Cookie.end(); ++it)
+			if (it->first != "")
+				cookie.append(it->first + "=" + it->second + "; ");
+		cookie.resize(cookie.size() - 2);
+		env.push_back("HTTP_COOKIE=" + cookie); // Les cookies HTTP envoyés avec la requête.
+	}
+	env.push_back("REMOTE_ADDR=" + *inet_ntoa(this->_addr.sin_addr)); // L'adresse IP de l'utilisateur qui a envoyé la requête.
+    if (!getnameinfo((struct sockaddr*)&this->_addr, sizeof(this->_addr), hostName, sizeof(hostName), NULL, 0, 0))
+		env.push_back(std::string("REMOTE_HOST=") + hostName); // Le nom d'hôte de l'utilisateur qui a envoyé la requête.
 
+	env.push_back("DATE_GMT="); // 	Date actuelle au format GMT
+	env.push_back("DATE_LOCAL="); // 	Date actuelle au format local
 
-	
-	this->_cgi = true;
+	char **env = ft::vector_to_tab(env);
+
+	if (pipe(this->_fd_cgi) == -1)
+	{
+		// DO ERROR AND ERROR 503
+	}
+	else
+	{
+		this->_pid_cgi = fork();
+		if (this->_pid_cgi == 0)
+		{
+			// in cgi
+		}
+		else if (this->_pid_cgi == -1)
+		{
+			// DO ERROR AND ERROR 503
+			// CLOSE PIPE
+		}
+		else
+		{
+			// EXECVE
+			this->_cgi = true;
+		}
+	}
+	//delete all in env;
 }
 
 bool	Client::check_location()

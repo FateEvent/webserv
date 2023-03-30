@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/28 17:36:11 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/30 00:48:49 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	s_header::clear()
 	Cookie.clear(); // change to a ref of cookie in instance
 	//Keep_Alive = 0;
 	//time_out = 0;
+	header_clt.clear();
 	get_var.clear();
 	Connexion.clear();
 	// A voir MISS some directives...

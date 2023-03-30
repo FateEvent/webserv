@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/29 15:04:38 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/30 12:22:25 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <cstring>
 #include <string>
 #include <ctime>
@@ -47,7 +50,8 @@ class Client
 		std::map<int, std::string>	_error_page;
 		std::string					_proxy;
 		std::map<std::string, std::string>	_cgi_call;
-		int							_fd_cgi;
+		int							_fd_cgi[2];
+		pid_t						_pid_cgi;
 		bool						_working;
 		bool						_chunked;
 		bool						_cgi;
