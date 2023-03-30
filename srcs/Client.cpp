@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/30 12:34:36 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/30 18:58:18 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,7 +273,7 @@ bool	Client::execute_client(bool path)
 	return (false);
 }
 
-void	Client::launch_cgi(std::string path)
+int	Client::launch_cgi(std::string path)
 {
 	std::string STR = 0;
 	std::vector<std::string> env;
@@ -326,31 +326,31 @@ void	Client::launch_cgi(std::string path)
 	env.push_back("DATE_GMT="); // 	Date actuelle au format GMT
 	env.push_back("DATE_LOCAL="); // 	Date actuelle au format local
 
-	char **env = ft::vector_to_tab(env);
-
 	if (pipe(this->_fd_cgi) == -1)
+		return (503);
+	delete this->_data.file;
+	char **env = ft::vector_to_tab(env);
+	this->_pid_cgi = fork();
+	if (this->_pid_cgi == 0)
 	{
-		// DO ERROR AND ERROR 503
+		// in cgi
+		dup2(1, this->_fd_cgi[1]);
+		dup2(0, this->_fd_cgi[0]);
+	}
+	else if (this->_pid_cgi == -1)
+	{
+		// CLOSE PIPE
+		return (503);
 	}
 	else
 	{
-		this->_pid_cgi = fork();
-		if (this->_pid_cgi == 0)
-		{
-			// in cgi
-		}
-		else if (this->_pid_cgi == -1)
-		{
-			// DO ERROR AND ERROR 503
-			// CLOSE PIPE
-		}
-		else
-		{
-			// EXECVE
-			this->_cgi = true;
-		}
+		// EXECVE
+		this->_data.file = new std::stringstream();
+
+		this->_cgi = true;
 	}
 	//delete all in env;
+	return (0);
 }
 
 bool	Client::check_location()
