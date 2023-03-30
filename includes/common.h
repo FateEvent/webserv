@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/28 17:36:31 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/30 00:47:39 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ typedef struct s_header
 	long int							time_out;
 	std::string							Connexion;
 	std::string							get_var;
+	std::string							header_clt;
 	// A voir MISS some directives...
 	std::pair<std::string, std::string>	file;
 	std::map<std::string, std::string>	other; // Need change to a map<string, string>

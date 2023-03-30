@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/29 14:49:09 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/30 00:49:26 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ std::cout << PURPLE << tmp << RST << std::endl;
 		std::cout << RED << "Not HTTP/1.1 request, connexion closed!" << RST << std::endl;
 		return (false);
 	}
-
+	head.header_clt = tmp;
 	// SET HEADER IN VECTOR BY LINE
 	for (std::string::iterator it = tmp.begin(); it != tmp.end() && *it != 0; it++)
 	{
@@ -110,11 +110,11 @@ std::cout << PURPLE << tmp << RST << std::endl;
 			head.Connexion = it->substr(it->find_last_of(' ') + 1, it->find_last_of('\r') - it->find_last_of(" ") - 1);
 		else if (it->find("Content-Length:") == 0)
 			head.Content_Length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
-		else if (!it->find("Content_Type:")) 
+		else if (!it->find("Content-Type:")) 
 			ft::split_to_vectors(head.Content_Type, it->data());
-		else if (!it->find("Content_Encoding:")) 
+		else if (!it->find("Content-Encoding:")) 
 			ft::split_to_vectors(head.Content_Encoding, it->data());
-		else if (!it->find("Transfer_Encoding:")) 
+		else if (!it->find("Transfer-Encoding:")) 
 			ft::split_to_vectors(head.Transfer_Encoding, it->data());
 		else
 			ft::split_to_maposs(head.other, it->data());
