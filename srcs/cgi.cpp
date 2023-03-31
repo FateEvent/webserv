@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 21:54:07 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 22:03:45 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 
 int	Client::launch_cgi(std::string path)
 {
+	(void)path;
+	/*
 	std::string STR = 0;
 	std::vector<std::string> env;
 	char hostName[NI_MAXHOST];
 
-	env.push_back("REQUEST_METHOD=" + this->get_methode()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
+	env.push_back("REQUEST_METHOD=" + this->get_method()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	if (this->_header.Dir.empty())
 	{
@@ -58,7 +60,9 @@ int	Client::launch_cgi(std::string path)
 		cookie.resize(cookie.size() - 2);
 		env.push_back("HTTP_COOKIE=" + cookie); // Les cookies HTTP envoyés avec la requête.
 	}
-	env.push_back("REMOTE_ADDR=" + *inet_ntoa(this->_addr.sin_addr)); // L'adresse IP de l'utilisateur qui a envoyé la requête.
+	std::string remote = "REMOTE_ADDR=";
+	remote += inet_ntoa(this->_addr.sin_addr);
+	env.push_back(remote); // L'adresse IP de l'utilisateur qui a envoyé la requête.
     if (!getnameinfo((struct sockaddr*)&this->_addr, sizeof(this->_addr), hostName, sizeof(hostName), NULL, 0, 0))
 		env.push_back(std::string("REMOTE_HOST=") + hostName); // Le nom d'hôte de l'utilisateur qui a envoyé la requête.
 	env.push_back("DATE_GMT="); // 	Date actuelle au format GMT

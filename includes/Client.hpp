@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 20:57:11 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 22:04:12 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ class Client
 		Client(const config&, sockaddr_in, socklen_t, int, header&);
 		~Client();
 		int							get_sockfd() const;
-		std::string					get_methode() const;
+		std::string					get_method() const;
 		time_t						get_time_alive() const;
 		std::string					get_directory() const;
 		std::pair<std::string, std::string>	get_file() const;

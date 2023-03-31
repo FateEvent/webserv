@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 15:58:39 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 17:43:47 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -534,9 +534,9 @@ void	Webserv::exec_client()
 	std::list<int> toclose;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
-		if (it->second.get_methode().empty())
+		if (it->second.get_method().empty())
 			continue;
-		if ((it->second.get_methode().compare("BAD") == 0 || it->second.get_methode().compare("CLOSE") == 0))
+		if ((it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
 		{
 			std::cout << "PAS OK" << std::endl;
 			std::cout << "Send: " << send(it->second.get_sockfd(), "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
@@ -544,7 +544,7 @@ void	Webserv::exec_client()
 			it->second.clear_header();
 			toclose.push_back(it->second.get_sockfd());
 		}
-		else if (!it->second.is_seeding() && it->second.is_ready() && !it->second.get_fd_cgi()) // else if (!it->second.get_methode().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
+		else if (!it->second.is_seeding() && it->second.is_ready() && !it->second.get_fd_cgi()) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
 		{
 			if (it->second.execute_client(it->second.check_location()))
 			{

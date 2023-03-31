@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 21:56:26 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 22:04:30 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,7 +224,7 @@ bool	Client::execute_client(bool path)
 	// MAY BE TEST CGI HERE AND NOT IN GET,POST OR DELETE METHODE
 	else if (_header.Methode.compare("GET") == 0)
 	{
-		std::cout << "GET METHODE" << std::endl;
+		std::cout << "GET METHOD" << std::endl;
 		if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
 			(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end()))
 		{
@@ -262,9 +262,9 @@ bool	Client::execute_client(bool path)
 			//this->_working = true;
 		}
 	}
-	else if (_header.Methode.compare("POST") == 0)
+	else if (_header.Method.compare("POST") == 0)
 	{
-		std::cout << "POST METHODE" << std::endl;
+		std::cout << "POST METHOD" << std::endl;
 		char buff[2];
 		memset(buff, 0, 2);
 		int recept = 0;
@@ -283,8 +283,8 @@ bool	Client::execute_client(bool path)
 		this->_working = true;
 		return (true);
 	}
-	else if (_header.Methode.compare("DELETE") == 0)
-		std::cout << "DELETE METHODE" << std::endl;
+	else if (_header.Method.compare("DELETE") == 0)
+		std::cout << "DELETE METHOD" << std::endl;
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl; // Should not goto inside.
 	return (false);

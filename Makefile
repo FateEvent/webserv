@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: stissera <stissera@student.42.fr>          +#+  +:+       +#+         #
+#    By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/03/31 15:19:55 by stissera         ###   ########.fr        #
+#    Updated: 2023/03/31 17:38:50 by faventur         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	webserv
 CC			=	c++
-FLAGS		=	-Wall -Werror -Wextra #-std=c++11 -g -fsanitize=address
+FLAGS		=	-Wall -Werror -Wextra -std=c++11 -g -fsanitize=address
 INCLUDES	=	./includes/utils.h
 FILES		=	utils/file_to_map.cpp \
 				utils/multi_to_config.cpp \
@@ -33,16 +33,20 @@ FILES		=	utils/file_to_map.cpp \
 				Webserv.cpp
 RM			=	rm -rf
 SRCS		=	$(addprefix ./srcs/, $(FILES))
-OBJS		=	$(SRCS:%.c=%.o)
+OBJS		=	$(SRCS:%.cpp=%.o)
 
 $(NAME)		:	$(OBJS)
 				$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
+.cpp.o		:
+	$(CC) $(FLAGS) -c $< -o ${<:.cpp=.o}
+
 all			:	$(NAME)
 
-clean		:	$(RM) $(OBJS)
+clean:
+	$(RM) $(OBJS)
 
-flcean		:	clean
+fclean		:	clean
 				$(RM) $(NAME)
 
 re			:	fclean all

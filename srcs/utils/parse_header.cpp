@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_header.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:48:08 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 17:45:32 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ std::cout << PURPLE << tmp << RST << std::endl;
 	}
 	if (header.data() == 0)
 	{
-		head.Methode = "CLOSE";
+		head.Method = "CLOSE";
 		return (false);
 	}
 
@@ -62,32 +62,32 @@ std::cout << PURPLE << tmp << RST << std::endl;
 	if (it->find(" HTTP/1.1"))
 	{
 		if (it->find("GET /") != it->npos)
-			head.Methode = "GET";
+			head.Method = "GET";
 		else if (it->find("POST /") != it->npos)
-			head.Methode = "POST";
+			head.Method = "POST";
 		else if (it->find("DELETE /") != it->npos)
-			head.Methode = "DELETE";
+			head.Method = "DELETE";
 		else
 		{
-			head.Methode = "BAD";
+			head.Method = "BAD";
 			return (true);
 		}
 		s_str = it->find_first_of("/");
 		e_str = it->find_first_of(" \r\v\t\f\n", s_str);
 		if (s_str == e_str || s_str == it->npos || e_str == it->npos)
 		{
-			std::cout << RED << "unvailable header!" << RST << std::endl;
+			std::cout << RED << "unavailable header!" << RST << std::endl;
 			return (false);
 		}
 		head.Dir = it->substr(s_str, it->find_first_of(" \v\t\f\n\r\?", s_str) - s_str);
-		if (it->find_first_of("?") != it->npos && !head.Methode.compare("GET"))
+		if (it->find_first_of("?") != it->npos && !head.Method.compare("GET"))
 			head.get_var = it->substr(it->find_first_of("?") + 1, it->find_last_of(" ") - it->find_last_of("?") - 1);
 			//ft::split_to_mapss(head.other, it->substr(it->find_first_of("?") + 1, it->find_last_of(" ") - it->find_last_of("?") - 1), '&');
 	}
 	else
 	{
 		std::cout << RED << "Header not supported!" << RST << std::endl;
-		head.Methode = "NOT_SUPPORTED";
+		head.Method = "NOT_SUPPORTED";
 		return (false);
 	}
 

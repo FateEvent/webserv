@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 21:41:48 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 22:04:20 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ s_header::s_header()
 
 void	s_header::clear()
 {
-	Methode.clear();
+	Method.clear();
 	Dir.clear();
 	Host.clear();
 	User_Agent.clear();
@@ -43,7 +43,7 @@ void	s_header::clear()
 
 void	s_header::print_all()
 {
-	std::cout << "Methode        : \"" + Methode + "\"" << std::endl; // ok
+	std::cout << "Method        : \"" + Method + "\"" << std::endl; // ok
 	std::cout << "Directory      : \"" + Dir + "\"" << std::endl; // ok
 	std::cout << "Host           : \"" + Host + "\"" << std::endl; // ok
 	std::cout << "UserAgent      : \"" + User_Agent + "\"" << std::endl; // ok
