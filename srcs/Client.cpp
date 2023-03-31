@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 16:56:19 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 21:56:26 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ Client::Client(const config &config) : _ref_conf(config)
 {
 	this->clear_header();
 	_socklen = sizeof(this->_addr);
-	//FD_ZERO(&this->_readfd); // maybe don't need
 	this->_sock_fd = accept(_ref_conf.sock_fd, reinterpret_cast<sockaddr *>(&this->_addr), reinterpret_cast<socklen_t *>(&this->_socklen));
 	if (this->_sock_fd == -1)
 	{
@@ -30,8 +29,10 @@ Client::Client(const config &config, sockaddr_in sock, socklen_t len, int fd, he
 {
 	this->_working = false;
 	this->_chunked = false;
-	this->_fd_cgi[0] = 0;
-	this->_fd_cgi[1] = 1;
+	this->_pipe_cgi_in[0] = 0;
+	this->_pipe_cgi_in[1] = 0;
+	this->_pipe_cgi_out[0] = 0;
+	this->_pipe_cgi_out[1] = 0;
 	this->_cgi = false;
 	this->_sedding = false;
 	this->_reponse.clear();
@@ -46,7 +47,6 @@ Client::Client(const config &config, sockaddr_in sock, socklen_t len, int fd, he
 	this->_data.data_size = 0;
 	this->_data.header.clear();
 	this->_data.file = NULL;
-	
 	this->_sock_fd = fd;
 	this->_addr = sock;
 	this->_socklen = len;
@@ -55,38 +55,15 @@ Client::Client(const config &config, sockaddr_in sock, socklen_t len, int fd, he
 	this->_ready = true;
 }
 
-Client::~Client() {}
-int	Client::get_sockfd() const 				{ return (this->_sock_fd);}
-time_t	Client::get_time_alive() const		{ return (this->_timeout);}
-std::string Client::get_methode() const		{ return (this->_header.Methode);}
-std::string	Client::get_directory() const	{ return (this->_header.Dir);}
-bool	Client::is_working() const			{ return (this->_working);}
-bool	Client::is_chunk() const			{ return(this->_chunked);}
-header*	Client::get_header()				{ return (&this->_header);}
-const config*	Client::get_config() const	{ return (&this->_ref_conf);}
-bool	Client::is_cgi() const				{ return (this->_cgi?true:false);}
-
-std::pair<std::string, std::string>	Client::get_file() const
-{
-	if (this->_header.file.first.empty())
-		throw;
-	return (this->_header.file);
-}
-
-int	Client::get_fd_cgi() const
-{
-	if (this->is_cgi())
-		return (this->_fd_cgi[1]); // SHOULD CORRECT, if not put _fd_cgi[1]
-	return (0);
-}
-
 void	Client::clear_header()
 {
 	this->_header.clear();
 	this->_working = false;
 	this->_chunked = false;
-	this->_fd_cgi[0] = 0;
-	this->_fd_cgi[1] = 0;
+	this->_pipe_cgi_in[0] = 0;
+	this->_pipe_cgi_in[1] = 0;
+	this->_pipe_cgi_out[0] = 0;
+	this->_pipe_cgi_out[1] = 0;
 	this->_pid_cgi = 0;
 	this->_cgi = false;
 	this->_sedding = false;
@@ -107,6 +84,33 @@ void	Client::clear_header()
 	this->_ready = false;
 }
 
+Client::~Client() {}
+int				Client::get_sockfd() const 		{ return (this->_sock_fd);}
+time_t			Client::get_time_alive() const	{ return (this->_timeout);}
+std::string 	Client::get_methode() const		{ return (this->_header.Methode);}
+std::string		Client::get_directory() const	{ return (this->_header.Dir);}
+bool			Client::is_working() const		{ return (this->_working);}
+bool			Client::is_chunk() const		{ return(this->_chunked);}
+header*			Client::get_header()			{ return (&this->_header);}
+const config*	Client::get_config() const		{ return (&this->_ref_conf);}
+bool			Client::is_cgi() const			{ return (this->_cgi?true:false);}
+bool			Client::is_seeding() const		{ return (this->_sedding?true:false); }
+bool			Client::is_ready() const		{ return (this->_ready?true:false); }
+
+std::pair<std::string, std::string>	Client::get_file() const
+{
+	if (this->_header.file.first.empty())
+		throw;
+	return (this->_header.file);
+}
+
+int	Client::get_fd_cgi() const
+{
+	if (this->is_cgi())
+		return (this->_pipe_cgi_in[1]); // SHOULD CORRECT, if not put _fd_cgi[1]
+	return (0);
+}
+
 bool	Client::new_request()
 {
 	if (!ft::parse_header(this->_sock_fd, this->_header))
@@ -116,9 +120,6 @@ bool	Client::new_request()
 	this->_ready = true;
 	return (true);
 }
-
-bool	Client::is_seeding() const	{ return (this->_sedding?true:false); }
-bool	Client::is_ready() const	{ return (this->_ready?true:false); }
 
 bool	Client::send_data(int fd)
 {
@@ -136,9 +137,7 @@ bool	Client::send_data(int fd)
 
 	ssize_t s = send(fd, buff,  this->_data.file->gcount(), 0);
 	if (s == -1 || s == 0)
-	{
 		return (false);
-	}
 	this->_data.data_sended += s;
 	if (this->_data.data_sended >= this->_data.data_size)
 		return (true);
@@ -160,33 +159,44 @@ bool	Client::continue_client(fd_set *fdset)
 		}
 		return (false);
 	}
-	else if (this->_chunked)
-		this->chunk(); // need put data of chunked in s_clt_data::body_in
 	else if (this->is_cgi())
 	{
+		if (this->_chunked)
+		{
+			// chunk by paquet
+		}
+		else if (this->_data.rrecv != 1)
+		{
+			int size;
+			socklen_t len = sizeof(size);
+			if (getsockopt(this->_sock_fd, SOL_SOCKET, SO_SNDBUF, &size, &len) == -1)
+			{
+				std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
+				return (false);
+			}
+			char buff[size + 1];
+			std::memset(buff, 0, size + 1);
+			recv(this->_sock_fd, &buff, size, MSG_DONTWAIT);
+			if ((this->_data.rrecv = std::strlen(buff)) > 0)
+				write(this->_pipe_cgi_out[0], buff, this->_data.rrecv);
+			else
+			{
+				close(this->_pipe_cgi_out[0]);
+				this->_data.rrecv = -1;
+			}
+		}
 		if (waitpid(this->_pid_cgi, &this->_data.wsatus, WNOHANG) == this->_pid_cgi) // Should means cgi ad finish.
 		{
-			this->take_data();
-			// end if cgi
+			this->take_data();	// end if cgi
+			this->_sedding = true;
 		}
-		
 	}
+	else if (this->_chunked)
+		this->chunk(); // need put data of chunked in s_clt_data::body_in
 	else
 	{
-		if (!_header.Methode.compare("GET"))
-		{
-			std::cout << "GET METHODE" << std::endl;
-		}
-		else if (!_header.Methode.compare("POST"))
-		{
-			std::cout << "POST METHODE" << std::endl;
-		}
-		else if (!_header.Methode.compare("DELETE"))
-		{
-			std::cout << "DELETE METHODE" << std::endl;
-		}
-		else
-			std::cout << "PROBLEME EXIST IF ON SCREEN!!!!!continue_client" << std::endl;
+		std::cout << "PROBLEME EXIST IF ON SCREEN!!!!!continue_client" << std::endl;
+		return (true);
 	}
 	return (false);
 }
@@ -211,6 +221,7 @@ bool	Client::execute_client(bool path)
 		this->_data.file->seekg(0, this->_data.file->beg);
 		this->_sedding = true;
 	}
+	// MAY BE TEST CGI HERE AND NOT IN GET,POST OR DELETE METHODE
 	else if (_header.Methode.compare("GET") == 0)
 	{
 		std::cout << "GET METHODE" << std::endl;
@@ -282,5 +293,5 @@ bool	Client::execute_client(bool path)
 void	Client::chunk()
 {}
 
-void	Client::take_data()
+void	Client::take_data() // the data should stay in pipe_in
 {}

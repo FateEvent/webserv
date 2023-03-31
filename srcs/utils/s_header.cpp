@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 15:36:23 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 21:41:48 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ void	s_header::print_all()
 	std::cout << "Directory      : \"" + Dir + "\"" << std::endl; // ok
 	std::cout << "Host           : \"" + Host + "\"" << std::endl; // ok
 	std::cout << "UserAgent      : \"" + User_Agent + "\"" << std::endl; // ok
+	std::cout << "Boundary       : \"" + Boundary + "\"" << std::endl; // ok
 	std::cout << "Content Length : \"" << Content_Length << "\"" << std::endl; // ok
 	for (std::vector<std::string>::iterator it = Content_Type.begin(); it != Content_Type.end(); it++) // ok
 		std::cout << "Content Type   : \"" << it->data() << "\""<< std::endl;	

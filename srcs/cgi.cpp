@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 16:55:37 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 21:54:07 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,31 +63,37 @@ int	Client::launch_cgi(std::string path)
 		env.push_back(std::string("REMOTE_HOST=") + hostName); // Le nom d'hôte de l'utilisateur qui a envoyé la requête.
 	env.push_back("DATE_GMT="); // 	Date actuelle au format GMT
 	env.push_back("DATE_LOCAL="); // 	Date actuelle au format local
-	char **tab = ft::vector_to_tab(env);
+	
+	char **ENVP = ft::vector_to_tab(env);
+	char *ARGV[2] = {const_cast<char*>(path.c_str()), 0}; 
 	delete this->_data.file;
 
-	if (pipe(this->_fd_cgi) == -1)
+	if (pipe(this->_pipe_cgi_out) == -1)
+		return (503);
+	if (pipe(this->_pipe_cgi_in) == -1)
 		return (503);
 
-	this->_data.cgi_return = std::tmpfile();
+/* 	this->_data.cgi_return = std::tmpfile();
 	if (this->_data.cgi_return == nullptr)
-        return (503);
+        return (503); */
 
 	this->_pid_cgi = fork();
 	if (this->_pid_cgi == 0)
 	{
-		// in cgi
-		close(this->_fd_cgi[1]);
-		dup2(this->_fd_cgi[0], STDIN_FILENO);
-		dup2(fileno(this->_data.cgi_return), STDOUT_FILENO);
-/* 		if (execve(path.c_str(), NULL, tab) < 0)
+		close(this->_pipe_cgi_out[1]);
+		close(this->_pipe_cgi_in[0]);
+		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
+		dup2(this->_pipe_cgi_in[1], STDOUT_FILENO);
+		//dup2(fileno(this->_data.cgi_return), STDOUT_FILENO);
+		if (execve(path.c_str(), ARGV, ENVP) < 0)
 		{
-	        close(this->_fd_cgi[0]);
+	        close(this->_pipe_cgi_out[0]);
 			std::exit(EXIT_FAILURE);
-      	} */
+      	}
 	}
 	else if (this->_pid_cgi == -1)
 	{
+		std::cout << RED << "Fork error: can't create a fork!" << RST << std::endl;
 		this->_pid_cgi = 0;
 		// CLOSE PIPE
 		return (503);
@@ -95,11 +101,16 @@ int	Client::launch_cgi(std::string path)
 	else
 	{
 		// EXECVE
-		close(this->_fd_cgi[0]);
+		close(this->_pipe_cgi_out[1]);
+		if (this->_header.Methode.find("GET") != this->_header.Methode.npos ||
+			this->_header.Content_Length == 0)
+		{
+			this->_data.rrecv = -1;
+			close(this->_pipe_cgi_out[0]);
+		}
 		this->_cgi = true;
 	}
-	//delete all in env;
-	(void)path;
-	(void)tab;
+//	ft::free_tab(ENVP);
+	delete[] ENVP;
 	return (0);
 }

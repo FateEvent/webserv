@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:26:03 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:16:12 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/31 21:38:52 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,5 +43,6 @@ namespace ft {
 	void			do_cgi();
 	std::string		return_content_type(char *);
 	char			**vector_to_tab(std::vector<std::string>&);
+	//void			free_tab(char **);
 };
 #endif

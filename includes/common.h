@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 16:53:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 21:54:04 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,10 +104,9 @@ typedef struct s_clt_data
 	std::string			header;
 	ssize_t				data_size;
 	ssize_t				data_sended;
-	int					wsatus;
-	std::istream		*cgi_in;
-	//std::filebuf		cgi_buff;
-	std::FILE			*cgi_return;
+	int					wsatus; // status du fork
+	int					rrecv; // status de la reception
+	//std::FILE			*cgi_return;
 }	clt_data;
 
 namespace ft {
