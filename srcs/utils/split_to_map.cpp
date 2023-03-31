@@ -6,13 +6,13 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 12:01:53 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/31 13:15:32 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/utils.hpp"
 
-bool	ft::split_to_vector_ct(std::vector<std::string> &svector, std::string &Boundary, std::string line)
+bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string &Boundary, std::string line)
 {
 	line = line.substr(line.find_first_of(" ") + 1);
 	size_t i = line.find_first_of(";\r");
