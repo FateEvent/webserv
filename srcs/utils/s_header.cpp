@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:48:07 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 15:36:23 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ void	s_header::clear()
 	header_clt.clear();
 	get_var.clear();
 	Connexion.clear();
+	Boundary.clear();
 	// A voir MISS some directives...
 	file.first.clear();
 	file.second.clear();

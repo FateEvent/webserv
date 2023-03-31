@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:47:37 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 15:04:14 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,6 @@ int	Client::launch_cgi(std::string path)
 	if (this->_data.cgi_return == nullptr)
         return (503);
 
-	this->_data.cgi_buff.open(this->_fd_cgi[1], std::ios::in);//this->_data.cgi_buff = std::filebuf(this->_fd_cgi[0]);
-	this->_data.cgi_in.rdbuf(&this->_data.cgi_buff);
-
 	this->_pid_cgi = fork();
 	if (this->_pid_cgi == 0)
 	{
@@ -83,9 +80,11 @@ int	Client::launch_cgi(std::string path)
 		close(this->_fd_cgi[1]);
 		dup2(this->_fd_cgi[0], STDIN_FILENO);
 		dup2(fileno(this->_data.cgi_return), STDOUT_FILENO);
-		execve(path.c_str(), NULL, tab);
-		close(this->_fd_cgi[0]);
-		std::exit(EXIT_FAILURE);
+/* 		if (execve(path.c_str(), NULL, tab) < 0)
+		{
+	        close(this->_fd_cgi[0]);
+			std::exit(EXIT_FAILURE);
+      	} */
 	}
 	else if (this->_pid_cgi == -1)
 	{

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 10:52:46 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 15:06:44 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -552,7 +552,7 @@ void	Webserv::exec_client()
 				toclose.push_back(it->second.get_sockfd());
 			}
 		}
-		else if (it->second.is_seeding() && it->second.is_ready() || it->second.get_fd_cgi())
+		else if (it->second.is_seeding() && (it->second.is_ready() || it->second.get_fd_cgi()))
 		{
 			if (it->second.continue_client(&this->readfd))
 				toclose.push_back(it->first);	//check keep alive...

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:47:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 15:07:35 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,7 @@ bool	Client::send_data(int fd)
 
 bool	Client::continue_client(fd_set *fdset)
 {
+	(void)fdset;
 	if (this->_sedding)
 	{
 		if (this->send_data(this->_sock_fd))

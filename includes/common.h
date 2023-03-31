@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:48:12 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 14:10:15 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ typedef struct s_clt_data
 	ssize_t				data_size;
 	ssize_t				data_sended;
 	int					wsatus;
-	std::stringstream	cgi_in;
+	std::istream		*cgi_in;
 	std::filebuf		cgi_buff;
 	std::FILE*			cgi_return;
 }	clt_data;
