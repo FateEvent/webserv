@@ -6,7 +6,7 @@
 #    By: stissera <stissera@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/03/30 12:35:07 by stissera         ###   ########.fr        #
+#    Updated: 2023/03/31 10:49:05 by stissera         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,6 +24,8 @@ FILES		=	utils/s_config.cpp \
 				utils/parse_header.cpp \
 				utils/s_clt_data.cpp \
 				utils/vector_to_tab.cpp \
+				cgi.cpp \
+				location.cpp \
 				make_header.cpp \
 				get_page_error.cpp \
 				cgi.cpp \

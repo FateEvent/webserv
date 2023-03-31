@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/30 15:34:19 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 11:36:54 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 #include <list>
 #include "../includes/common.h"
 #include <sys/un.h> // FOR LOCAL SOCKET
+#include <sys/wait.h>
 // #include "../includes/Reponse.hpp"
 #include <fstream>
 #include <sstream>

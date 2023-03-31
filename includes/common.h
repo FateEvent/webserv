@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/30 00:47:39 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 12:52:57 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,11 +99,14 @@ typedef struct s_location
 typedef struct s_clt_data
 {
 	s_clt_data();
-	std::istream	*file;
-	int				fd; // not need nore in moment....
-	std::string		header;
-	ssize_t			data_size;
-	ssize_t			data_sended;
+	std::istream		*file;
+	std::string			header;
+	ssize_t				data_size;
+	ssize_t				data_sended;
+	int					wsatus;
+	std::stringstream	cgi_in;
+	std::filebuf		cgi_buff;
+	std::FILE*			cgi_return;
 }	clt_data;
 
 namespace ft {

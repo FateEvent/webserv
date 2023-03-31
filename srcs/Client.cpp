@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/30 18:58:18 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 11:47:56 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ Client::Client(const config &config, sockaddr_in sock, socklen_t len, int fd, he
 	this->other.clear();
 	this->_data.data_sended = 1;
 	this->_data.data_size = 0;
-	this->_data.fd = 0;
 	this->_data.header.clear();
 	this->_data.file = NULL;
 	
@@ -77,7 +76,7 @@ std::pair<std::string, std::string>	Client::get_file() const
 int	Client::get_fd_cgi() const
 {
 	if (this->is_cgi())
-		return (this->_fd_cgi[0]); // SHOULD CORRECT, if not put _fd_cgi[1]
+		return (this->_fd_cgi[1]); // SHOULD CORRECT, if not put _fd_cgi[1]
 	return (0);
 }
 
@@ -101,7 +100,6 @@ void	Client::clear_header()
 	this->other.clear();
 	this->_data.data_sended = 1;
 	this->_data.data_size = 0;
-	this->_data.fd = 0;
 	this->_data.header.clear();
 	if (this->_data.file != 0)
 		delete this->_data.file;
@@ -162,9 +160,16 @@ bool	Client::continue_client(fd_set *fdset)
 		return (false);
 	}
 	else if (this->_chunked)
-		this->chunk();
-	else if (FD_ISSET(this->_cgi, fdset))
-		this->take_data();
+		this->chunk(); // need put data of chunked in s_clt_data::body_in
+	else if (this->is_cgi())
+	{
+		if (waitpid(this->_pid_cgi, &this->_data.wsatus, WNOHANG) == this->_pid_cgi) // Should means cgi ad finish.
+		{
+			this->take_data();
+			// end if cgi
+		}
+		
+	}
 	else
 	{
 		if (!_header.Methode.compare("GET"))
@@ -273,170 +278,8 @@ bool	Client::execute_client(bool path)
 	return (false);
 }
 
-int	Client::launch_cgi(std::string path)
-{
-	std::string STR = 0;
-	std::vector<std::string> env;
-	char hostName[NI_MAXHOST];
-
-	env.push_back("REQUEST_METHOD=" + this->get_methode()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
-	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
-	if (this->_header.Dir.empty())
-	{
-		env.push_back("PATH_INFO=/" + this->_index); // NOT REALY GOOD... SHOULD BE AFTER THIS CALLING FILE
-		env.push_back("REQUEST_URI=/" + this->_index + (!this->_header.get_var.empty()?("?" + this->_header.get_var):""));
-	}
-	else
-	{
-		env.push_back("PATH_INFO=/" + this->_header.Dir + "/" + this->_index); // NOT REALY GOOD... SHOULD BE AFTER THIS CALLING FILE
-		env.push_back("REQUEST_URI=/" + this->_header.Dir + "/" + this->_index + (!this->_header.get_var.empty()?("?" + this->_header.get_var):"")); // SHOULD BY cgi_tester
-	}
-	env.push_back("SCRIPT_NAME=" + this->_root + this->_index); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
-	env.push_back("SERVER_NAME=Webserv"); // Le nom du serveur web.
-	env.push_back("SERVER_PORT=" + std::to_string(this->_ref_conf.port)); // Le port sur lequel le serveur web écoute les requêtes.
-	env.push_back("SERVER_SOFTWARE=0.2"); // Le nom et la version du serveur web utilisé.
-	env.push_back("SCRIPT_FILENAME=" + this->_root + "." + this->_index); // Le chemin d'accès absolu du script CGI sur le serveur.
-	env.push_back("DOCUMENT_ROOT=" + this->_root); // Le chemin d'accès absolu du répertoire racine du site web.
-	env.push_back("QUERY_STRING=" + this->_header.get_var); // La chaîne de requête (paramètres de la requête) envoyée avec la requête HTTP.
-	env.push_back("CONTENT_LENGTH=" + std::to_string(this->_header.Content_Length)); // La longueur (en octets) du corps de la requête HTTP.
-	env.push_back("HTTP_USER_AGENT=" + this->_header.User_Agent); // Le nom et la version du navigateur ou du client HTTP utilisé pour envoyer la requête.
-	env.push_back("DOCUMENT_ROOT=" + this->_root); // 	Racine des documents Web sur le serveur
-	env.push_back("GATEWAY_INTERFACE=CGI/1.1"); // 	Version des spécifications CGI utilisées par le serveur
-	env.push_back("HTTP_HOST=" + this->_header.Host); // 	Nom de domaine du serveur
-	env.push_back("SERVER_ADMIN=noname@nomail.com"); // 	Adresse électronique de l'administrateur du serveur
-	env.push_back("SERVER_SOFTWARE=Webserv/0.2"); // 	Type (logiciel) du serveur web
-	if (this->_header.other.find("Referer") != this->_header.other.end())
-		env.push_back("HTTP_REFERER=" + this->_header.other.find("Referer")->second); // L'URL de la page précédente qui a conduit à la requête actuelle.
-	env.push_back("REMOTE_USER=" + STR); // Le nom d'utilisateur fourni par l'utilisateur dans le cadre d'une authentification HTTP.
-	//env.push_back("CONTENT_TYPE=" + this->_header.Content_Type.front()); // Le type MIME du corps de la requête HTTP (par exemple, application/json).
-	if (!this->_header.Cookie.empty())
-	{
-		std::string cookie;
-		for (std::map<std::string, std::string>::iterator it = this->_header.Cookie.begin();
-				it != this->_header.Cookie.end(); ++it)
-			if (it->first != "")
-				cookie.append(it->first + "=" + it->second + "; ");
-		cookie.resize(cookie.size() - 2);
-		env.push_back("HTTP_COOKIE=" + cookie); // Les cookies HTTP envoyés avec la requête.
-	}
-	env.push_back("REMOTE_ADDR=" + *inet_ntoa(this->_addr.sin_addr)); // L'adresse IP de l'utilisateur qui a envoyé la requête.
-    if (!getnameinfo((struct sockaddr*)&this->_addr, sizeof(this->_addr), hostName, sizeof(hostName), NULL, 0, 0))
-		env.push_back(std::string("REMOTE_HOST=") + hostName); // Le nom d'hôte de l'utilisateur qui a envoyé la requête.
-
-	env.push_back("DATE_GMT="); // 	Date actuelle au format GMT
-	env.push_back("DATE_LOCAL="); // 	Date actuelle au format local
-
-	if (pipe(this->_fd_cgi) == -1)
-		return (503);
-	delete this->_data.file;
-	char **env = ft::vector_to_tab(env);
-	this->_pid_cgi = fork();
-	if (this->_pid_cgi == 0)
-	{
-		// in cgi
-		dup2(1, this->_fd_cgi[1]);
-		dup2(0, this->_fd_cgi[0]);
-	}
-	else if (this->_pid_cgi == -1)
-	{
-		// CLOSE PIPE
-		return (503);
-	}
-	else
-	{
-		// EXECVE
-		this->_data.file = new std::stringstream();
-
-		this->_cgi = true;
-	}
-	//delete all in env;
-	return (0);
-}
-
-bool	Client::check_location()
-{
-	std::string	path;
-	for (std::vector<struct s_location>::const_iterator it = this->_ref_conf.location.begin();
-				it != this->_ref_conf.location.end(); it++)
-	{
-		if (it->search.empty())
-			this->simple_location(it);
-		else
-			this->condition_location(it);
-	}
-	if (this->_root.empty())
-		this->_root = this->_ref_conf.root + this->_header.Dir;
-	if (this->_index.empty())
-	{
-		if (this->_header.file.second.empty())
-			this->_index = this->_ref_conf.index;
-		else
-			this->_index = this->_header.file.first + "." + this->_header.file.second; // ????
-	}
-	path = this->_root + "/" + this->_index;
-	#ifdef DEBUG
-		std::cout << "Path of file is: " + path << std::endl;
-	#endif
-	this->_data.file = new std::ifstream(path, std::ios::binary);
-	if (!this->_data.file->good())
-		return (false);
-	this->_data.file->seekg(0, this->_data.file->end);
-	this->_data.data_size = this->_data.file->tellg();
-	this->_data.file->seekg(0, this->_data.file->beg);
-	return (true);
-}
-
-void	Client::simple_location(std::vector<struct s_location>::const_iterator &location)
-{
-	if (location->base.length() > this->_header.Dir.length())
-		return ;
-	if (std::strncmp((location->base + "/").c_str(), this->_header.Dir.c_str(), location->base.length()) == 0)
-		for (std::multimap<std::string, std::string>::const_iterator it = location->to.begin(); it != location->to.end(); it++)
-		{
-			if (!it->first.find("root"))
-			{
-				this->_root = it->second;
-				this->_root.append(this->_header.Dir, location->base.length());
-			}
-			else if (!it->first.find("index_page"))
-			{
-				if (this->_header.file.first.empty())
-					this->_index = it->second;
-				else
-					this->_index = this->_header.file.first + "." + this->_header.file.second;
-			}
-			else if (!it->first.find("error_page"))
-			{
-				std::string err = it->second;
-				ft::put_err_page(err, this->_error_page);
-			}
- 			else if (!it->first.find("proxy_pass"))
-			{
-				this->_proxy = it->second;
-			}
-			else if (!it->first.find("cgi"))
-			{
-				this->_cgi_call.insert(std::make_pair(it->second.substr(0, it->second.find_first_of(" \t\v\f")),
-													it->second.substr(it->second.find_last_of(" \t\v\f") + 1)));
-			}
-		}
-}
-
-void	Client::condition_location(std::vector<struct s_location>::const_iterator &location)
-{
-	if (std::strncmp((location->base + "/").c_str(), this->_header.Dir.c_str(), location->base.length()) == 0)
-		std::cout << "Location double condition can't work! Please fix this in your config file" << std::endl;
-//	for (std::map<std::string, std::string>::const_iterator it = location->to.begin(); it != location->to.end(); it++)
-//	{
-//	}	
-}
-
 void	Client::chunk()
-{
-	
-}
+{}
 
 void	Client::take_data()
-{
-	
-}
+{}
