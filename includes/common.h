@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   common.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 11:43:34 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/31 16:53:27 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,11 +100,14 @@ typedef struct s_location
 typedef struct s_clt_data
 {
 	s_clt_data();
-	std::istream	*file;
-	int				fd; // not need nore in moment....
-	std::string		header;
-	ssize_t			data_size;
-	ssize_t			data_sended;
+	std::istream		*file;
+	std::string			header;
+	ssize_t				data_size;
+	ssize_t				data_sended;
+	int					wsatus;
+	std::istream		*cgi_in;
+	//std::filebuf		cgi_buff;
+	std::FILE			*cgi_return;
 }	clt_data;
 
 namespace ft {
