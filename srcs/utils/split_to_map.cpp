@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 11:51:43 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/31 12:01:53 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ bool	ft::split_to_vector_ct(std::vector<std::string> &svector, std::string &Boun
 	{
 		svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i)); // Possible problem when false
 		line = line.substr(i + 1);
-		std::cout << "supercalifragilistichespiralidoso: " << i << ", npos: " << line.npos << std::endl;
 	}
 	for (std::vector<std::string>::iterator first = svector.begin(); first != svector.end(); ++first)
 	{
@@ -30,7 +29,6 @@ bool	ft::split_to_vector_ct(std::vector<std::string> &svector, std::string &Boun
 		if ((*first).find("boundary=") != std::string::npos)
 			Boundary = (*first).substr((*first).find_first_not_of("boundary="));
 	}
-	std::cout << "Boundary: " << Boundary << std::endl;
 	return (true);
 }
 
@@ -45,9 +43,6 @@ bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line)
 		svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i )); // Possible problem when false
 		line = line.substr(i + 1);
 	}
-	std::cout << "supercalifragilistichespiralidoso: " << i << ", npos: " << line.npos << std::endl;
-//	std::cout << line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i ) << std::endl;
-//	svector.push_back(line.substr(0, i));
 	return (true);
 }
 
