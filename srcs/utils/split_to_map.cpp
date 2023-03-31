@@ -3,14 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   split_to_map.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/25 01:17:07 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 11:51:43 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/utils.hpp"
+
+bool	ft::split_to_vector_ct(std::vector<std::string> &svector, std::string &Boundary, std::string line)
+{
+	line = line.substr(line.find_first_of(" ") + 1);
+	size_t i = line.find_first_of(";\r");
+
+	for (; i != line.npos; i = line.find_first_of(";\r"))
+	{
+		svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i)); // Possible problem when false
+		line = line.substr(i + 1);
+		std::cout << "supercalifragilistichespiralidoso: " << i << ", npos: " << line.npos << std::endl;
+	}
+	for (std::vector<std::string>::iterator first = svector.begin(); first != svector.end(); ++first)
+	{
+		while (std::isspace((*first)[0]))
+			(*first).erase(0, 1);
+		if ((*first).find("boundary=") != std::string::npos)
+			Boundary = (*first).substr((*first).find_first_not_of("boundary="));
+	}
+	std::cout << "Boundary: " << Boundary << std::endl;
+	return (true);
+}
 
 bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line)
 {
@@ -23,8 +45,9 @@ bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line)
 		svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i )); // Possible problem when false
 		line = line.substr(i + 1);
 	}
-	//std::cout << line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i ) << std::endl;
-	svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : line.length()));
+	std::cout << "supercalifragilistichespiralidoso: " << i << ", npos: " << line.npos << std::endl;
+//	std::cout << line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i ) << std::endl;
+//	svector.push_back(line.substr(0, i));
 	return (true);
 }
 

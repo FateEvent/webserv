@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 10:11:47 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/31 10:13:00 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,6 +275,8 @@ bool	Client::execute_client(bool path)
 
 int	Client::launch_cgi(std::string path)
 {
+	(void)path;
+	/*
 	std::string STR = 0;
 	std::vector<std::string> env;
 	char hostName[NI_MAXHOST];
@@ -349,6 +351,7 @@ int	Client::launch_cgi(std::string path)
 
 		this->_cgi = true;
 	}
+	*/
 	//delete all in env;
 	return (0);
 }

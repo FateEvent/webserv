@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/30 17:11:16 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/31 11:43:34 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ typedef struct s_header
 	std::string							User_Agent;
 	size_t								Content_Length;
 	std::vector<std::string>			Content_Type;
+	std::string							Boundary;
 	std::vector<std::string>			Content_Encoding;
 	std::vector<std::string>			Transfer_Encoding;
 	std::vector<std::string>			Accept;

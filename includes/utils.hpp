@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:26:03 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/30 12:12:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 11:45:52 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ namespace ft {
 	void			parse_err_page(std::map<int, std::string>&, std::multimap<std::string, std::string>&);
 	bool			put_err_page(std::string&, std::map<int, std::string>&);
 	bool			split_to_vectors(std::vector<std::string> &, std::string);
+	bool			split_to_vector_ct(std::vector<std::string> &svector, std::string &Boundary, std::string line);
 	bool			split_to_mapss(std::map<std::string, std::string> &, std::string, char sep = ';');
 	bool			split_to_maposs(std::map<std::string, std::string> &, std::string);
 
