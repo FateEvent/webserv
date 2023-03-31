@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_header.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/30 00:49:26 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 13:16:29 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ std::cout << PURPLE << tmp << RST << std::endl;
 		else if (it->find("Content-Length:") == 0)
 			head.Content_Length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
 		else if (!it->find("Content-Type:")) 
-			ft::split_to_vectors(head.Content_Type, it->data());
+			ft::split_to_vectors(head.Content_Type, head.Boundary, it->data());
 		else if (!it->find("Content-Encoding:")) 
 			ft::split_to_vectors(head.Content_Encoding, it->data());
 		else if (!it->find("Transfer-Encoding:")) 

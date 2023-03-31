@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 12:52:57 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 13:36:22 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ typedef struct s_header
 	std::string							User_Agent;
 	size_t								Content_Length;
 	std::vector<std::string>			Content_Type;
+	std::string							Boundary;
 	std::vector<std::string>			Content_Encoding;
 	std::vector<std::string>			Transfer_Encoding;
 	std::vector<std::string>			Accept;
