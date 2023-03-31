@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 16:55:37 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 17:21:34 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 int	Client::launch_cgi(std::string path)
 {
+	(void)path;
+	/*
 	std::string STR = 0;
 	std::vector<std::string> env;
 	char hostName[NI_MAXHOST];
@@ -58,7 +60,9 @@ int	Client::launch_cgi(std::string path)
 		cookie.resize(cookie.size() - 2);
 		env.push_back("HTTP_COOKIE=" + cookie); // Les cookies HTTP envoyés avec la requête.
 	}
-	env.push_back("REMOTE_ADDR=" + *inet_ntoa(this->_addr.sin_addr)); // L'adresse IP de l'utilisateur qui a envoyé la requête.
+	std::string remote = "REMOTE_ADDR=";
+	remote += inet_ntoa(this->_addr.sin_addr);
+	env.push_back(remote); // L'adresse IP de l'utilisateur qui a envoyé la requête.
     if (!getnameinfo((struct sockaddr*)&this->_addr, sizeof(this->_addr), hostName, sizeof(hostName), NULL, 0, 0))
 		env.push_back(std::string("REMOTE_HOST=") + hostName); // Le nom d'hôte de l'utilisateur qui a envoyé la requête.
 	env.push_back("DATE_GMT="); // 	Date actuelle au format GMT
@@ -80,11 +84,14 @@ int	Client::launch_cgi(std::string path)
 		close(this->_fd_cgi[1]);
 		dup2(this->_fd_cgi[0], STDIN_FILENO);
 		dup2(fileno(this->_data.cgi_return), STDOUT_FILENO);
+*/
 /* 		if (execve(path.c_str(), NULL, tab) < 0)
 		{
 	        close(this->_fd_cgi[0]);
 			std::exit(EXIT_FAILURE);
-      	} */
+      	}
+*/
+/*
 	}
 	else if (this->_pid_cgi == -1)
 	{
@@ -101,5 +108,6 @@ int	Client::launch_cgi(std::string path)
 	//delete all in env;
 	(void)path;
 	(void)tab;
+	*/
 	return (0);
 }
