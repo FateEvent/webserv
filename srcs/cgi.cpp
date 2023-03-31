@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 17:21:34 by faventur         ###   ########.fr       */
+/*   Updated: 2023/03/31 17:43:47 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	Client::launch_cgi(std::string path)
 	std::vector<std::string> env;
 	char hostName[NI_MAXHOST];
 
-	env.push_back("REQUEST_METHOD=" + this->get_methode()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
+	env.push_back("REQUEST_METHOD=" + this->get_method()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	if (this->_header.Dir.empty())
 	{

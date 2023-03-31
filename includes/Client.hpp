@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 16:55:57 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 17:43:47 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ class Client
 		Client(const config&, sockaddr_in, socklen_t, int, header&);
 		~Client();
 		int							get_sockfd() const;
-		std::string					get_methode() const;
+		std::string					get_method() const;
 		time_t						get_time_alive() const;
 		std::string					get_directory() const;
 		std::pair<std::string, std::string>	get_file() const;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   common.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 16:53:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 17:43:47 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ typedef struct s_header
 	void								clear();
 	void								print_all();
 	bool								split_dir();
-	std::string							Methode;
+	std::string							Method;
 	std::string							Dir;
 	std::string							Host;
 	std::string							User_Agent;

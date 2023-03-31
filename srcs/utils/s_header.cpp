@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   s_header.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 15:36:23 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 17:43:47 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ s_header::s_header()
 
 void	s_header::clear()
 {
-	Methode.clear();
+	Method.clear();
 	Dir.clear();
 	Host.clear();
 	User_Agent.clear();
@@ -43,7 +43,7 @@ void	s_header::clear()
 
 void	s_header::print_all()
 {
-	std::cout << "Methode        : \"" + Methode + "\"" << std::endl; // ok
+	std::cout << "Method        : \"" + Method + "\"" << std::endl; // ok
 	std::cout << "Directory      : \"" + Dir + "\"" << std::endl; // ok
 	std::cout << "Host           : \"" + Host + "\"" << std::endl; // ok
 	std::cout << "UserAgent      : \"" + User_Agent + "\"" << std::endl; // ok

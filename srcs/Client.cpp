@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 16:56:19 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 17:43:09 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ Client::Client(const config &config, sockaddr_in sock, socklen_t len, int fd, he
 Client::~Client() {}
 int	Client::get_sockfd() const 				{ return (this->_sock_fd);}
 time_t	Client::get_time_alive() const		{ return (this->_timeout);}
-std::string Client::get_methode() const		{ return (this->_header.Methode);}
+std::string Client::get_method() const		{ return (this->_header.Method);}
 std::string	Client::get_directory() const	{ return (this->_header.Dir);}
 bool	Client::is_working() const			{ return (this->_working);}
 bool	Client::is_chunk() const			{ return(this->_chunked);}
@@ -173,17 +173,17 @@ bool	Client::continue_client(fd_set *fdset)
 	}
 	else
 	{
-		if (!_header.Methode.compare("GET"))
+		if (!_header.Method.compare("GET"))
 		{
-			std::cout << "GET METHODE" << std::endl;
+			std::cout << "GET METHOD" << std::endl;
 		}
-		else if (!_header.Methode.compare("POST"))
+		else if (!_header.Method.compare("POST"))
 		{
-			std::cout << "POST METHODE" << std::endl;
+			std::cout << "POST METHOD" << std::endl;
 		}
-		else if (!_header.Methode.compare("DELETE"))
+		else if (!_header.Method.compare("DELETE"))
 		{
-			std::cout << "DELETE METHODE" << std::endl;
+			std::cout << "DELETE METHOD" << std::endl;
 		}
 		else
 			std::cout << "PROBLEME EXIST IF ON SCREEN!!!!!continue_client" << std::endl;
@@ -211,9 +211,9 @@ bool	Client::execute_client(bool path)
 		this->_data.file->seekg(0, this->_data.file->beg);
 		this->_sedding = true;
 	}
-	else if (_header.Methode.compare("GET") == 0)
+	else if (_header.Method.compare("GET") == 0)
 	{
-		std::cout << "GET METHODE" << std::endl;
+		std::cout << "GET METHOD" << std::endl;
 		if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
 			(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end()))
 		{
@@ -251,9 +251,9 @@ bool	Client::execute_client(bool path)
 			//this->_working = true;
 		}
 	}
-	else if (_header.Methode.compare("POST") == 0)
+	else if (_header.Method.compare("POST") == 0)
 	{
-		std::cout << "POST METHODE" << std::endl;
+		std::cout << "POST METHOD" << std::endl;
 		char buff[2];
 		memset(buff, 0, 2);
 		int recept = 0;
@@ -272,8 +272,8 @@ bool	Client::execute_client(bool path)
 		this->_working = true;
 		return (true);
 	}
-	else if (_header.Methode.compare("DELETE") == 0)
-		std::cout << "DELETE METHODE" << std::endl;
+	else if (_header.Method.compare("DELETE") == 0)
+		std::cout << "DELETE METHOD" << std::endl;
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl; // Should not goto inside.
 	return (false);
