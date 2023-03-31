@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/30 12:22:25 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/30 15:34:19 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ class Client
 		void						chunk(); // get chunked data
 		void						take_data(); // Get or search body data. count and put total in length variable
 		bool						send_data(int);
-		void						launch_cgi(std::string);
+		int							launch_cgi(std::string);
 		
 	protected:
 };
