@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: stissera <stissera@student.42.fr>          +#+  +:+       +#+         #
+#    By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/03/30 12:35:07 by stissera         ###   ########.fr        #
+#    Updated: 2023/03/31 13:22:54 by faventur         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,16 +32,20 @@ FILES		=	utils/s_config.cpp \
 				main.cpp
 RM			=	rm -rf
 SRCS		=	$(addprefix ./srcs/, $(FILES))
-OBJS		=	$(SRCS:%.c=%.o)
+OBJS		=	$(SRCS:%.cpp=%.o)
 
 $(NAME)		:	$(OBJS)
 				$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
+.cpp.o		:
+	$(CC) $(FLAGS) -c $< -o ${<:.cpp=.o}
+
 all			:	$(NAME)
 
-clean		:	$(RM) $(OBJS)
+clean:
+	$(RM) $(OBJS)
 
-flcean		:	clean
+fclean		:	clean
 				$(RM) $(NAME)
 
 re			:	fclean all
