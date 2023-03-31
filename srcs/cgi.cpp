@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 22:03:45 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 22:08:05 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 int	Client::launch_cgi(std::string path)
 {
-	(void)path;
-	/*
 	std::string STR = 0;
 	std::vector<std::string> env;
 	char hostName[NI_MAXHOST];
@@ -106,7 +104,7 @@ int	Client::launch_cgi(std::string path)
 	{
 		// EXECVE
 		close(this->_pipe_cgi_out[1]);
-		if (this->_header.Methode.find("GET") != this->_header.Methode.npos ||
+		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
 			this->_header.Content_Length == 0)
 		{
 			this->_data.rrecv = -1;

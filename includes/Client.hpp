@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 22:04:12 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 22:11:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ class Client
 		struct s_clt_data			_data;
 		bool						_ready;
 		std::map<std::string, std::string>	other;
-//		fd_set			_writefd;		
-		void			_make_struct();
+//		fd_set						_writefd;		
+		void						_make_struct();
 
 	public:
 		Client(const config&);

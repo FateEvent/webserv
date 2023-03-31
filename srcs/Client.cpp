@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 22:04:30 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 22:08:57 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void	Client::clear_header()
 Client::~Client() {}
 int				Client::get_sockfd() const 		{ return (this->_sock_fd);}
 time_t			Client::get_time_alive() const	{ return (this->_timeout);}
-std::string 	Client::get_methode() const		{ return (this->_header.Methode);}
+std::string 	Client::get_method() const		{ return (this->_header.Method);}
 std::string		Client::get_directory() const	{ return (this->_header.Dir);}
 bool			Client::is_working() const		{ return (this->_working);}
 bool			Client::is_chunk() const		{ return(this->_chunked);}
@@ -222,7 +222,7 @@ bool	Client::execute_client(bool path)
 		this->_sedding = true;
 	}
 	// MAY BE TEST CGI HERE AND NOT IN GET,POST OR DELETE METHODE
-	else if (_header.Methode.compare("GET") == 0)
+	else if (_header.Method.compare("GET") == 0)
 	{
 		std::cout << "GET METHOD" << std::endl;
 		if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
