@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 15:07:35 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 16:56:19 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,7 +220,7 @@ bool	Client::execute_client(bool path)
 			if (_ref_conf.cgi.find(this->_header.file.second) != this->_ref_conf.cgi.end()) // Tester en premier les gci dans location... switch if and else..
 			{
 				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
-				this->launch_cgi(this->_ref_conf.cgi.find(_index.substr(_index.find_last_of(".")))->second);
+				//this->launch_cgi(this->_ref_conf.cgi.find(_index.substr(_index.find_last_of(".")))->second);
 				std::cout << "CGI on base" << std::endl;
 			}
 			else
