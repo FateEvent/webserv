@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 22:03:20 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/02 14:16:10 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,9 @@
 #define	BLACK "\033[0;30m"
 #define WHITE "\033[0;37m"
 #define RST "\033[0m"
+
+#define BUFFER_SIZE_KB 1024
+#define BUFFER_SIZE_MB 1024 * 1024
 
 
 typedef struct	s_config
@@ -101,11 +104,12 @@ typedef struct s_clt_data
 {
 	s_clt_data();
 	std::istream		*file;
+	int					minus_header; // substract this number on data_size before make header (for content-length)
 	std::string			header;
 	ssize_t				data_size;
 	ssize_t				data_sended;
 	int					wsatus; // status du fork
-	int					rrecv; // status de la reception
+	int					wpid; // status de la reception
 	//std::FILE			*cgi_return;
 }	clt_data;
 

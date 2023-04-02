@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 22:08:05 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/02 18:32:20 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 
 int	Client::launch_cgi(std::string path)
 {
-	std::string STR = 0;
+	std::string STR;
 	std::vector<std::string> env;
 	char hostName[NI_MAXHOST];
+	this->_cgi = true;
 
 	env.push_back("REQUEST_METHOD=" + this->get_method()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
@@ -66,18 +67,12 @@ int	Client::launch_cgi(std::string path)
 	env.push_back("DATE_GMT="); // 	Date actuelle au format GMT
 	env.push_back("DATE_LOCAL="); // 	Date actuelle au format local
 	
+	std::string file(this->_root + "/" + this->_index);
 	char **ENVP = ft::vector_to_tab(env);
-	char *ARGV[2] = {const_cast<char*>(path.c_str()), 0}; 
-	delete this->_data.file;
+	char *ARGV[] = {const_cast<char*>(path.c_str()), const_cast<char*>(file.c_str()), NULL};
 
-	if (pipe(this->_pipe_cgi_out) == -1)
+	if (pipe(this->_pipe_cgi_out) == -1 || pipe(this->_pipe_cgi_in) == -1)
 		return (503);
-	if (pipe(this->_pipe_cgi_in) == -1)
-		return (503);
-
-/* 	this->_data.cgi_return = std::tmpfile();
-	if (this->_data.cgi_return == nullptr)
-        return (503); */
 
 	this->_pid_cgi = fork();
 	if (this->_pid_cgi == 0)
@@ -86,8 +81,8 @@ int	Client::launch_cgi(std::string path)
 		close(this->_pipe_cgi_in[0]);
 		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
 		dup2(this->_pipe_cgi_in[1], STDOUT_FILENO);
-		//dup2(fileno(this->_data.cgi_return), STDOUT_FILENO);
-		if (execve(path.c_str(), ARGV, ENVP) < 0)
+		//if (execve(path.c_str(), ARGV, ENVP) < 0) //FOR TEST CAN PUT ENVP WITH PHP
+		if (execve(path.c_str(), ARGV, NULL) < 0)
 		{
 	        close(this->_pipe_cgi_out[0]);
 			std::exit(EXIT_FAILURE);
@@ -103,13 +98,17 @@ int	Client::launch_cgi(std::string path)
 	else
 	{
 		// EXECVE
-		close(this->_pipe_cgi_out[1]);
-		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
+		close(this->_pipe_cgi_out[0]);
+		close(this->_pipe_cgi_in[1]);
+		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
+		//dup2(this->_pipe_cgi_out[1], STDOUT_FILENO);
+		fcntl(this->_pipe_cgi_in[0], F_SETFL, O_NONBLOCK);
+// Try cgi_tester without follow line.. if don't work uncomment...
+/* 		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
 			this->_header.Content_Length == 0)
 		{
-			this->_data.rrecv = -1;
-			close(this->_pipe_cgi_out[0]);
-		}
+			close(this->_pipe_cgi_out[1]);
+		} */
 		this->_cgi = true;
 	}
 //	ft::free_tab(ENVP);

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 22:11:17 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/02 12:13:52 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -77,6 +78,7 @@ class Client
 		header*						get_header();
 		const config*				get_config() const;
 		int							get_fd_cgi() const;
+		int							get_pid_cgi() const;
 		bool						continue_client(fd_set*);
 		bool						execute_client(bool);
 		bool						is_working() const;
@@ -91,7 +93,8 @@ class Client
 		void						simple_location(std::vector<struct s_location>::const_iterator &);
 		void						condition_location(std::vector<struct s_location>::const_iterator &);
 		void						chunk(); // get chunked data
-		void						take_data(); // Get or search body data. count and put total in length variable
+		int							take_data();
+		void						cgi_prepare_to_send();
 		bool						send_data(int);
 		int							launch_cgi(std::string);
 		

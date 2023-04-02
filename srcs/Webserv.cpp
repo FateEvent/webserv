@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 17:43:47 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/02 16:08:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -377,8 +377,8 @@ void	Webserv::fd_rst()
 			it != this->_client.end(); it++)
 	{
 		FD_SET(it->first, &this->readfd);
-		if (it->second.is_cgi())
-			FD_SET(it->second.get_fd_cgi(), &this->readfd);
+		//if (it->second.is_cgi()) // without in test in moment
+		//	FD_SET(it->second.get_fd_cgi(), &this->readfd);
 	}
 	// Set FD on Server default port
 	FD_SET(this->_base.sock_fd, &this->readfd);
@@ -397,8 +397,8 @@ int	Webserv::get_greaterfd() const
 	{
 		if (it->first >= nbr)
 			nbr = it->first + 1;
-		if (it->second.get_fd_cgi() >= nbr)
-			nbr = it->second.get_fd_cgi() + 1;
+		//if (it->second.get_fd_cgi() >= nbr)
+		//	nbr = it->second.get_fd_cgi() + 1;
 	}
 	return (nbr);
 }
@@ -544,7 +544,7 @@ void	Webserv::exec_client()
 			it->second.clear_header();
 			toclose.push_back(it->second.get_sockfd());
 		}
-		else if (!it->second.is_seeding() && it->second.is_ready() && !it->second.get_fd_cgi()) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
+		else if (!it->second.is_seeding() && it->second.is_ready() && !it->second.get_fd_cgi() && it->second.get_pid_cgi() == 0) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
 		{
 			if (it->second.execute_client(it->second.check_location()))
 			{
@@ -552,12 +552,13 @@ void	Webserv::exec_client()
 				toclose.push_back(it->second.get_sockfd());
 			}
 		}
-		else if (it->second.is_seeding() && (it->second.is_ready() || it->second.get_fd_cgi()))
+		else if ((it->second.is_seeding() && it->second.is_ready()) || it->second.is_cgi())
 		{
 			if (it->second.continue_client(&this->readfd))
 				toclose.push_back(it->first);	//check keep alive...
 			else
 				this->timeout(0);
+//usleep(50); /// only for test
 		}
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)

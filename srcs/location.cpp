@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 16:54:48 by stissera         ###   ########.fr       */
+/*   Updated: 2023/03/31 22:46:56 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ bool	Client::check_location()
 	}
 	path = this->_root + "/" + this->_index;
 	#ifdef DEBUG
-		std::cout << "Path of file is: " + path << std::endl;
+		std::cout << "Path of file is: \"" + path + "\"" << std::endl;
 	#endif
 	this->_data.file = new std::ifstream(path, std::ios::binary);
 	if (!this->_data.file->good())
@@ -70,14 +70,10 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 				ft::put_err_page(err, this->_error_page);
 			}
  			else if (!it->first.find("proxy_pass"))
-			{
 				this->_proxy = it->second;
-			}
 			else if (!it->first.find("cgi"))
-			{
 				this->_cgi_call.insert(std::make_pair(it->second.substr(0, it->second.find_first_of(" \t\v\f")),
 													it->second.substr(it->second.find_last_of(" \t\v\f") + 1)));
-			}
 		}
 }
 

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 22:08:57 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/02 18:30:47 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ int				Client::get_sockfd() const 		{ return (this->_sock_fd);}
 time_t			Client::get_time_alive() const	{ return (this->_timeout);}
 std::string 	Client::get_method() const		{ return (this->_header.Method);}
 std::string		Client::get_directory() const	{ return (this->_header.Dir);}
+int				Client::get_pid_cgi() const	 	{ return (this->_pid_cgi);}
 bool			Client::is_working() const		{ return (this->_working);}
 bool			Client::is_chunk() const		{ return(this->_chunked);}
 header*			Client::get_header()			{ return (&this->_header);}
@@ -107,7 +108,7 @@ std::pair<std::string, std::string>	Client::get_file() const
 int	Client::get_fd_cgi() const
 {
 	if (this->is_cgi())
-		return (this->_pipe_cgi_in[1]); // SHOULD CORRECT, if not put _fd_cgi[1]
+		return (this->_pipe_cgi_in[1]);
 	return (0);
 }
 
@@ -134,13 +135,14 @@ bool	Client::send_data(int fd)
 	char buff[size + 1];
 	std::memset(buff, 0, size + 1);
 	this->_data.file->read(buff, size);
-
-	ssize_t s = send(fd, buff,  this->_data.file->gcount(), 0);
-	if (s == -1 || s == 0)
-		return (false);
-	this->_data.data_sended += s;
+	this->_data.file->clear();
+	ssize_t s = send(fd, buff, this->_data.file->gcount(), 0);
+	if (s > 0)
+		this->_data.data_sended += s;
 	if (this->_data.data_sended >= this->_data.data_size)
 		return (true);
+	//if (s <= 0)
+	//	return (false);
 	return (false);
 }
 
@@ -157,7 +159,6 @@ bool	Client::continue_client(fd_set *fdset)
 			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
-		return (false);
 	}
 	else if (this->is_cgi())
 	{
@@ -165,30 +166,26 @@ bool	Client::continue_client(fd_set *fdset)
 		{
 			// chunk by paquet
 		}
-		else if (this->_data.rrecv != 1)
+		else
 		{
-			int size;
-			socklen_t len = sizeof(size);
-			if (getsockopt(this->_sock_fd, SOL_SOCKET, SO_SNDBUF, &size, &len) == -1)
+			if (this->_data.wpid == this->_pid_cgi)
 			{
-				std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
-				return (false);
+				int taking = this->take_data();
+				if (taking == 0)
+				{
+					cgi_prepare_to_send();
+					close(this->_pipe_cgi_out[1]);
+					close(this->_pipe_cgi_in[0]);
+					this->_sedding = true;
+				}
+				else if (taking == -1)
+					std::cout << RED << "Read error for cgi" << RST << std::endl;
 			}
-			char buff[size + 1];
-			std::memset(buff, 0, size + 1);
-			recv(this->_sock_fd, &buff, size, MSG_DONTWAIT);
-			if ((this->_data.rrecv = std::strlen(buff)) > 0)
-				write(this->_pipe_cgi_out[0], buff, this->_data.rrecv);
 			else
 			{
-				close(this->_pipe_cgi_out[0]);
-				this->_data.rrecv = -1;
+				this->take_data();
+				this->_data.wpid = waitpid(this->_pid_cgi, &this->_data.wsatus, WNOHANG);
 			}
-		}
-		if (waitpid(this->_pid_cgi, &this->_data.wsatus, WNOHANG) == this->_pid_cgi) // Should means cgi ad finish.
-		{
-			this->take_data();	// end if cgi
-			this->_sedding = true;
 		}
 	}
 	else if (this->_chunked)
@@ -228,6 +225,9 @@ bool	Client::execute_client(bool path)
 		if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
 			(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end()))
 		{
+			(*static_cast<std::ifstream*>(this->_data.file)).close();
+			this->_data.file = 0;
+			this->_data.file = new std::stringstream();
 			if (_ref_conf.cgi.find(this->_header.file.second) != this->_ref_conf.cgi.end()) // Tester en premier les gci dans location... switch if and else..
 			{
 				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
@@ -236,9 +236,9 @@ bool	Client::execute_client(bool path)
 			}
 			else
 			{
+				std::cout << "CGI on location" << std::endl;
 				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
 				this->launch_cgi(this->_cgi_call.find(_index.substr(_index.find_last_of(".")))->second);
-				std::cout << "CGI on location" << std::endl;
 			}
 		}
 		else
@@ -293,5 +293,41 @@ bool	Client::execute_client(bool path)
 void	Client::chunk()
 {}
 
-void	Client::take_data() // the data should stay in pipe_in
-{}
+int	Client::take_data() // the data should stay in pipe_in
+{
+	int size = BUFFER_SIZE_MB * 4;
+	char buff[size + 1];
+	std::memset(buff, 0, size + 1);
+
+	int reading = read(this->_pipe_cgi_in[0], &buff, size);
+	if (reading > 0)
+	{
+		*static_cast<std::stringstream*>(_data.file) << buff;
+		this->_data.file->seekg(0, this->_data.file->end);
+		this->_data.data_size = this->_data.file->tellg();
+		this->_data.file->seekg(0, this->_data.file->beg);
+	}
+//	else if (reading < 0)
+		//std::cout << RED << "Read cgi pipe error!" << RST << std::endl;
+		//std::cout << PURPLE << "Receipt again.." << RST << std::endl;
+	return (reading);
+}
+
+void	Client::cgi_prepare_to_send()
+{
+	char	buff[BUFFER_SIZE_KB * 8 + 1];
+	std::memset(buff, 0, BUFFER_SIZE_KB * 8 + 1);
+	this->_data.file->seekg(0, this->_data.file->beg);
+	this->_data.file->read(buff, BUFFER_SIZE_KB * 8);
+	std::string header_test = buff;
+	if (header_test.find("HTTP/1.1") == 0) // Means complete header stay stringstream
+		return;
+	this->_data.minus_header = header_test.find("\r\n\r\n");
+	this->_data.minus_header >= 0 ? this->_data.minus_header += 4 : this->_data.minus_header = 0;
+	this->_data.header = ft::make_header(200);
+	if (header_test.find("Content-Length:") == header_test.npos)
+		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size - this->_data.minus_header) + "\r\n");
+	send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
+	this->_sedding = true;
+	return ;
+}
