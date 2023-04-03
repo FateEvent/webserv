@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/02 12:13:52 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 15:11:24 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 #include "../includes/common.h"
 #include <sys/un.h> // FOR LOCAL SOCKET
 #include <sys/wait.h>
+#include <signal.h>
 // #include "../includes/Reponse.hpp"
 #include <fstream>
 #include <sstream>
@@ -97,6 +98,7 @@ class Client
 		void						cgi_prepare_to_send();
 		bool						send_data(int);
 		int							launch_cgi(std::string);
+		void						kill_cgi();
 		
 	protected:
 };

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/27 12:16:04 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 16:04:36 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,13 @@ bool Webserv::created = false;
 fd_set          Webserv::readfd;
 fd_set          Webserv::writefd;
 fd_set          Webserv::errfd;
+bool _SIGNAL_END = true;
 
+void	false_while(int type)
+{
+	std::cout << YELLOW << "Stopping server by signal " << type << RST << std::endl;
+	_SIGNAL_END = false;
+}
 
 int main(int ac, char **av) //, char** ev)
 {
@@ -87,9 +93,11 @@ int main(int ac, char **av) //, char** ev)
 	std::cout << server.get_info_server() << std::endl;
 	std::cout << server.get_info_instance() << std::endl;
 
+	signal(SIGINT, false_while);
+
 	char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
 	unsigned int	nbr = 0;
-	while (1)
+	while (_SIGNAL_END)
 	{	
 		server.fd_rst();
 		std::cout << "wait... " << wait[nbr++ % 8] << "\r" << std::flush;

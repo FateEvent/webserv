@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/02 14:16:10 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 11:54:40 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ typedef struct s_clt_data
 {
 	s_clt_data();
 	std::istream		*file;
-	int					minus_header; // substract this number on data_size before make header (for content-length)
+	size_t				minus_header; // substract this number on data_size before make header (for content-length)
 	std::string			header;
 	ssize_t				data_size;
 	ssize_t				data_sended;

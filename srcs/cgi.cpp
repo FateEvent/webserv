@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/02 18:32:20 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 16:41:36 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@ int	Client::launch_cgi(std::string path)
 	}
 	else
 	{
-		env.push_back("PATH_INFO=/" + this->_header.Dir + "/" + this->_index); // NOT REALY GOOD... SHOULD BE AFTER THIS CALLING FILE
-		env.push_back("REQUEST_URI=/" + this->_header.Dir + "/" + this->_index + (!this->_header.get_var.empty()?("?" + this->_header.get_var):"")); // SHOULD BY cgi_tester
+		env.push_back("PATH_INFO=" + this->_header.Dir + "/" + this->_index); // NOT REALY GOOD... SHOULD BE AFTER THIS CALLING FILE
+		env.push_back("REQUEST_URI=" + this->_header.Dir + "/" + this->_index + (!this->_header.get_var.empty()?("?" + this->_header.get_var):"")); // SHOULD BY cgi_tester
 	}
 	env.push_back("SCRIPT_NAME=" + this->_root + this->_index); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
 	env.push_back("SERVER_NAME=Webserv"); // Le nom du serveur web.
@@ -48,7 +48,9 @@ int	Client::launch_cgi(std::string path)
 	if (this->_header.other.find("Referer") != this->_header.other.end())
 		env.push_back("HTTP_REFERER=" + this->_header.other.find("Referer")->second); // L'URL de la page précédente qui a conduit à la requête actuelle.
 	env.push_back("REMOTE_USER=" + STR); // Le nom d'utilisateur fourni par l'utilisateur dans le cadre d'une authentification HTTP.
-	//env.push_back("CONTENT_TYPE=" + this->_header.Content_Type.front()); // Le type MIME du corps de la requête HTTP (par exemple, application/json).
+	
+	if (!this->_header.Content_Type.empty())
+		env.push_back("CONTENT_TYPE=" + this->_header.Content_Type.front()); // Le type MIME du corps de la requête HTTP (par exemple, application/json).
 	if (!this->_header.Cookie.empty())
 	{
 		std::string cookie;
@@ -75,18 +77,21 @@ int	Client::launch_cgi(std::string path)
 		return (503);
 
 	this->_pid_cgi = fork();
-	if (this->_pid_cgi == 0)
+	if (this->_pid_cgi > 0)
 	{
-		close(this->_pipe_cgi_out[1]);
-		close(this->_pipe_cgi_in[0]);
+		// EXECVE
+		close(this->_pipe_cgi_out[0]);
 		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
-		dup2(this->_pipe_cgi_in[1], STDOUT_FILENO);
-		//if (execve(path.c_str(), ARGV, ENVP) < 0) //FOR TEST CAN PUT ENVP WITH PHP
-		if (execve(path.c_str(), ARGV, NULL) < 0)
+		close(this->_pipe_cgi_in[1]);
+		//dup2(this->_pipe_cgi_out[1], STDOUT_FILENO);
+		fcntl(this->_pipe_cgi_in[0], F_SETFL, O_NONBLOCK);
+// Try cgi_tester without follow line.. if don't work uncomment...
+/* 		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
+			this->_header.Content_Length == 0)
 		{
-	        close(this->_pipe_cgi_out[0]);
-			std::exit(EXIT_FAILURE);
-      	}
+			close(this->_pipe_cgi_out[1]);
+		} */
+		this->_cgi = true;
 	}
 	else if (this->_pid_cgi == -1)
 	{
@@ -97,19 +102,21 @@ int	Client::launch_cgi(std::string path)
 	}
 	else
 	{
-		// EXECVE
-		close(this->_pipe_cgi_out[0]);
-		close(this->_pipe_cgi_in[1]);
+		close(this->_pipe_cgi_out[1]);
+		close(this->_pipe_cgi_in[0]);
 		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
-		//dup2(this->_pipe_cgi_out[1], STDOUT_FILENO);
-		fcntl(this->_pipe_cgi_in[0], F_SETFL, O_NONBLOCK);
-// Try cgi_tester without follow line.. if don't work uncomment...
-/* 		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
-			this->_header.Content_Length == 0)
+		dup2(this->_pipe_cgi_in[1], STDOUT_FILENO);
+		if (execve(path.c_str(), ARGV, ENVP) < 0) //FOR TEST CAN PUT ENVP WITH PHP //if (execve(path.c_str(), ARGV, NULL) < 0)
 		{
-			close(this->_pipe_cgi_out[1]);
-		} */
-		this->_cgi = true;
+			close(this->_pipe_cgi_out[0]);
+			std::string header(ft::make_header(500));
+			header.append(ft::get_page_error(500, this->_error_page[500].empty() ?
+					(this->_ref_conf.error_page.find(500)->second.empty() ?
+					this->_ref_conf._base->error_page.find(500)->second : this->_ref_conf.error_page.find(500)->second) :
+					this->_error_page[500]));
+			std::cout << header;
+			std::exit(EXIT_FAILURE);
+      	}
 	}
 //	ft::free_tab(ENVP);
 	delete[] ENVP;

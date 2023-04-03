@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/02 18:36:01 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 16:34:18 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -323,11 +323,27 @@ void	Client::cgi_prepare_to_send()
 	if (header_test.find("HTTP/1.1") == 0) // Means complete header stay stringstream
 		return;
 	this->_data.minus_header = header_test.find("\r\n\r\n");
-	this->_data.minus_header >= 0 ? this->_data.minus_header += 4 : this->_data.minus_header = 0;
 	this->_data.header = ft::make_header(200);
 	if (header_test.find("Content-Length:") == header_test.npos)
-		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size - this->_data.minus_header) + "\r\n");
+		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size - (this->_data.minus_header != header_test.npos ? this->_data.minus_header + 4 : 0)) + "\r\n");
+	if (header_test.find("Content-Type:") == header_test.npos)
+		this->_data.header.append("Content-Type: text/html\r\n");
+	if (this->_data.minus_header == header_test.npos)
+		this->_data.header.append("\r\n");
+
 	send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
 	this->_sedding = true;
 	return ;
+}
+
+void	Client::kill_cgi()
+{
+	if (this->_pipe_cgi_in[0] > 0)
+	{
+		kill(this->_pid_cgi, 2);
+		close(this->_pipe_cgi_in[0]);
+		close(this->_pipe_cgi_in[1]);
+		close(this->_pipe_cgi_out[0]);
+		close(this->_pipe_cgi_out[1]);
+	}
 }
