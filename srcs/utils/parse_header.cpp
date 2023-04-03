@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 16:44:07 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/03 17:16:45 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,8 +110,11 @@ std::cout << PURPLE << tmp << RST << std::endl;
 			head.Connexion = it->substr(it->find_last_of(' ') + 1, it->find_last_of('\r') - it->find_last_of(" ") - 1);
 		else if (it->find("Content-Length:") == 0)
 			head.Content_Length = std::strtol(it->substr(it->find(' ') + 1).c_str(), NULL, 10);
-		else if (!it->find("Content-Type:")) 
-			ft::split_to_vectors(head.Content_Type, head.Boundary, it->data());
+		else if (!it->find("Content-Type:"))
+		{
+			ft::split_to_vectors(head.Content_Type, it->data(), ';');
+			ft::find_val(head.Content_Type, head.Boundary, "boundary");
+		}
 		else if (!it->find("Content-Encoding:")) 
 			ft::split_to_vectors(head.Content_Encoding, it->data(), ',');
 		else if (!it->find("Transfer-Encoding:")) 

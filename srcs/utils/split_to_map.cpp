@@ -6,30 +6,27 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 16:46:10 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/03 17:15:07 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/utils.hpp"
 
-bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string &Boundary, std::string line)
+bool	ft::find_val(std::vector<std::string> &vector, std::string &var, std::string key)
 {
-	line = line.substr(line.find_first_of(" ") + 1);
-	size_t i = line.find_first_of(";\r");
+	std::vector<std::string>::iterator first = vector.begin(), last = vector.end();
 
-	for (; i != line.npos; i = line.find_first_of(";\r"))
-	{
-		svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i)); // Possible problem when false
-		line = line.substr(i + 1);
-	}
-	for (std::vector<std::string>::iterator first = svector.begin(); first != svector.end(); ++first)
+	for (first = vector.begin(); first != last; ++first)
 	{
 		while (std::isspace((*first)[0]))
 			(*first).erase(0, 1);
-		if ((*first).find("boundary=") != std::string::npos)
-			Boundary = (*first).substr((*first).find_first_not_of("boundary="));
+		if ((*first).find(key + "=") != std::string::npos)
+		{
+			var = (*first).substr((*first).find_first_not_of(key + "="));
+			return (true);
+		}
 	}
-	return (true);
+	return (false);
 }
 
 bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line, char sep)
