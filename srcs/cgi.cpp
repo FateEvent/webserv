@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 16:41:36 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 18:30:29 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,11 +86,11 @@ int	Client::launch_cgi(std::string path)
 		//dup2(this->_pipe_cgi_out[1], STDOUT_FILENO);
 		fcntl(this->_pipe_cgi_in[0], F_SETFL, O_NONBLOCK);
 // Try cgi_tester without follow line.. if don't work uncomment...
-/* 		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
+ 		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
 			this->_header.Content_Length == 0)
 		{
 			close(this->_pipe_cgi_out[1]);
-		} */
+		} 
 		this->_cgi = true;
 	}
 	else if (this->_pid_cgi == -1)
@@ -118,7 +118,6 @@ int	Client::launch_cgi(std::string path)
 			std::exit(EXIT_FAILURE);
       	}
 	}
-//	ft::free_tab(ENVP);
 	delete[] ENVP;
 	return (0);
 }

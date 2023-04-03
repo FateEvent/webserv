@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 16:34:18 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 17:19:01 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,8 +237,13 @@ bool	Client::execute_client(bool path)
 			else
 			{
 				std::cout << "CGI on location" << std::endl;
+				if (!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end())
+					this->launch_cgi(this->_cgi_call.find(_index.substr(_index.find_last_of(".")))->second);
+				else
+					this->launch_cgi(this->_ref_conf.cgi.find(_index.substr(_index.find_last_of(".")))->second);
+				
 				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
-				this->launch_cgi(this->_cgi_call.find(_index.substr(_index.find_last_of(".")))->second);
+				
 			}
 		}
 		else
