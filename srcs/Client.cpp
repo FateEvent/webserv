@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 15:18:12 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/03 16:48:14 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -287,13 +287,15 @@ bool	Client::execute_client(bool path)
 		}
 		else
 		{
-			FILE	*temporary;
-			char	buffer[256];
+			FILE		*temporary;
+			std::string	file_buf;
+			std::string	line;
+			char		buff[256];
+			size_t		pos;
 
 			temporary = tmpfile();
 			std::cout << "POST METHOD" << std::endl;
-			char buff[2];
-			memset(buff, 0, 2);
+			memset(buff, 0, 256);
 			int recept = 0;
 			recept = recv(this->_sock_fd, &buff, 1, 0);
 			fputs(&buff[0], temporary);
@@ -303,12 +305,26 @@ bool	Client::execute_client(bool path)
 				fputs(&buff[0], temporary);
 			}
 			rewind(temporary);
-			while (!feof(temporary)) {
-				if (fgets(buffer, 256, temporary) == NULL) break;
-				fputs(buffer, stdout);
+			while (!feof(temporary))
+			{
+				if (fgets(buff, 255, temporary) == NULL)
+					break;
+				file_buf += buff;
+				pos = file_buf.find("\r\n");
+				/*
+				if (pos != std::string::npos)
+				{
+					line = file_buf.substr(0, pos + 1);
+					file_buf.erase(0, pos + 1);
+					if (line.find("Content-Disposition") != std::string::npos)
+					{
+						;
+					}
+				}
+//				fputs(buff, stdout);
+				*/
 			}
-
-			
+			std::cout << file_buf << std::endl;
 			std::cout << std::endl;
 			std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
 			//close(this->_sock_fd);

@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:15:32 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/03 16:46:10 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,15 @@ bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string &Bounda
 	return (true);
 }
 
-bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line)
+bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string line, char sep)
 {
-	line = line.substr(line.find_first_of(" ") + 1);
-	size_t i = line.find_first_of(",\r");
+	std::string	separator;
 
-	for (; i != line.npos; i = line.find_first_of(",\r"))
+	separator += sep;
+	line = line.substr(line.find_first_of(" ") + 1);
+	size_t i = line.find_first_of(separator + "\r");
+
+	for (; i != line.npos; i = line.find_first_of(separator + "\r"))
 	{
 		//std::cout << line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i ) << std::endl;
 		svector.push_back(line.substr(0, line.find_first_of(";") < i ? line.find_first_of(";") : i )); // Possible problem when false

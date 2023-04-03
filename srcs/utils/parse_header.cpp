@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 17:45:32 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/03 16:44:07 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ std::cout << PURPLE << tmp << RST << std::endl;
 		if (!it->find("Host:"))
 			head.Host = it->substr(it->find_first_of(' ') + 1, it->find_last_not_of("\r\n") - it->find_first_of(" "));
 		else if (!it->find("Accept:")) 
-			ft::split_to_vectors(head.Accept, it->data());
+			ft::split_to_vectors(head.Accept, it->data(), ',');
 		else if (!it->find("User-Agent:"))
 			head.User_Agent = it->substr(it->find_last_of(' ') + 1, it->find_last_of('\r') - it->find_last_of(" ") - 1);
 		else if (!it->find("Cookie:"))
@@ -113,9 +113,9 @@ std::cout << PURPLE << tmp << RST << std::endl;
 		else if (!it->find("Content-Type:")) 
 			ft::split_to_vectors(head.Content_Type, head.Boundary, it->data());
 		else if (!it->find("Content-Encoding:")) 
-			ft::split_to_vectors(head.Content_Encoding, it->data());
+			ft::split_to_vectors(head.Content_Encoding, it->data(), ',');
 		else if (!it->find("Transfer-Encoding:")) 
-			ft::split_to_vectors(head.Transfer_Encoding, it->data());
+			ft::split_to_vectors(head.Transfer_Encoding, it->data(), ',');
 		else
 			ft::split_to_maposs(head.other, it->data());
 	}
