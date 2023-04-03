@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   s_header.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 22:04:20 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 14:16:27 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ void	s_header::clear()
 	User_Agent.clear();
 	Content_Length = 0;
 	Content_Type.clear();
+	Boundary.clear();
+	Content_Disposition.clear();
 	Content_Encoding.clear();
 	Transfer_Encoding.clear();
 	Accept.clear();
@@ -33,8 +35,8 @@ void	s_header::clear()
 	//time_out = 0;
 	header_clt.clear();
 	get_var.clear();
+	body_var.clear();
 	Connexion.clear();
-	Boundary.clear();
 	// A voir MISS some directives...
 	file.first.clear();
 	file.second.clear();

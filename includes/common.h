@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   common.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/02 14:16:10 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 14:15:37 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ typedef struct s_header
 	size_t								Content_Length;
 	std::vector<std::string>			Content_Type;
 	std::string							Boundary;
+	std::vector<std::string>			Content_Disposition;
 	std::vector<std::string>			Content_Encoding;
 	std::vector<std::string>			Transfer_Encoding;
 	std::vector<std::string>			Accept;
@@ -87,6 +88,7 @@ typedef struct s_header
 	long int							time_out;
 	std::string							Connexion;
 	std::string							get_var;
+	std::map<std::string, std::string>	body_var;
 	std::string							header_clt;
 	// A voir MISS some directives...
 	std::pair<std::string, std::string>	file;

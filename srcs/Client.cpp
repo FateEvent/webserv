@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/02 18:36:01 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/03 14:25:42 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,24 +264,51 @@ bool	Client::execute_client(bool path)
 	}
 	else if (_header.Method.compare("POST") == 0)
 	{
-		std::cout << "POST METHOD" << std::endl;
-		char buff[2];
-		memset(buff, 0, 2);
-		int recept = 0;
-		recept = recv(this->_sock_fd, &buff, 1, 0);
-		while (recept > 0)
+		if (_header.Boundary == "")
 		{
-			std::cout << buff;
+			std::cout << "POST METHOD NO BOUNDARY" << std::endl;
+			char buff[2];
+			memset(buff, 0, 2);
+			int recept = 0;
 			recept = recv(this->_sock_fd, &buff, 1, 0);
+			while (recept > 0)
+			{
+				std::cout << buff;
+				recept = recv(this->_sock_fd, &buff, 1, 0);
+			}
+			std::cout << std::endl;
+			std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
+			//close(this->_sock_fd);
+			this->clear_header();
+			this->_index.clear();
+			this->_root.clear();
+			this->_working = true;
+			return (true);
 		}
-		std::cout << std::endl;
-		std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
-		//close(this->_sock_fd);
-		this->clear_header();
-		this->_index.clear();
-		this->_root.clear();
-		this->_working = true;
-		return (true);
+		else
+		{
+			std::cout << "POST METHOD" << std::endl;
+			char buff[2];
+			memset(buff, 0, 2);
+			int recept = 0;
+			recept = recv(this->_sock_fd, &buff, 1, 0);
+			std::string	str_buf(buff);
+			std::cout << "ciao " << std::endl;
+			while (recept > 0)
+			{
+				std::cout << str_buf;
+				recept = recv(this->_sock_fd, &buff, 1, 0);
+				str_buf += buff;
+			}
+			std::cout << std::endl;
+			std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
+			//close(this->_sock_fd);
+			this->clear_header();
+			this->_index.clear();
+			this->_root.clear();
+			this->_working = true;
+			return (true);
+		}
 	}
 	else if (_header.Method.compare("DELETE") == 0)
 		std::cout << "DELETE METHOD" << std::endl;
