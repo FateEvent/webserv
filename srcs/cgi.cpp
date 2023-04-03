@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 18:30:29 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 00:27:28 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,9 +115,39 @@ int	Client::launch_cgi(std::string path)
 					this->_ref_conf._base->error_page.find(500)->second : this->_ref_conf.error_page.find(500)->second) :
 					this->_error_page[500]));
 			std::cout << header;
+/*
+=================================================================
+==1490163==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 8768 byte(s) in 8 object(s) allocated from:
+    #0 0x7f6a4c097647 in operator new(unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:99
+    #1 0x55b145799aad in Webserv::check_server() srcs/Webserv.cpp:475
+    #2 0x55b14577fe6b in main srcs/main.cpp:109
+
+Direct leak of 2768 byte(s) in 96 object(s) allocated from:
+    #0 0x7f6a4c0977a7 in operator new[](unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:102
+    #1 0x55b14575f348 in ft::vector_to_tab(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&) srcs/utils/vector_to_tab.cpp:21
+
+Direct leak of 2080 byte(s) in 4 object(s) allocated from:
+    #0 0x7f6a4c097647 in operator new(unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:99
+    #1 0x55b14577e18a in Client::check_location() srcs/location.cpp:39
+
+Direct leak of 200 byte(s) in 1 object(s) allocated from:
+    #0 0x7f6a4c0977a7 in operator new[](unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:102
+    #1 0x55b14575f292 in ft::vector_to_tab(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&) srcs/utils/vector_to_tab.cpp:18
+    #2 0x55b145773815 in Client::execute_client(bool) srcs/Client.cpp:241
+    #3 0x7ffc8301a12f  ([stack]+0x40112f)
+
+Indirect leak of 750 byte(s) in 24 object(s) allocated from:
+    #0 0x7f6a4c0977a7 in operator new[](unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:102
+    #1 0x55b14575f348 in ft::vector_to_tab(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&) srcs/utils/vector_to_tab.cpp:21
+
+SUMMARY: AddressSanitizer: 14566 byte(s) leaked in 133 allocation(s).
+*/
+			delete[] ENVP; // not good lot of new inside ENVP
 			std::exit(EXIT_FAILURE);
       	}
 	}
-	delete[] ENVP;
+	delete[] ENVP; // not good lot of new inside ENVP
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 16:04:36 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 00:27:45 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,3 +116,26 @@ int main(int ac, char **av) //, char** ev)
 
 	return (0);
 }
+
+/*
+=================================================================
+==1493934==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 4384 byte(s) in 4 object(s) allocated from:
+    #0 0x7f2b6c9d8647 in operator new(unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:99
+    #1 0x5589f2707aad in Webserv::check_server() srcs/Webserv.cpp:475
+    #2 0x5589f26ede6b in main srcs/main.cpp:109
+
+Direct leak of 2084 byte(s) in 72 object(s) allocated from:
+    #0 0x7f2b6c9d87a7 in operator new[](unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:102
+    #1 0x5589f26cd348 in ft::vector_to_tab(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >&) srcs/utils/vector_to_tab.cpp:21
+
+Direct leak of 1560 byte(s) in 3 object(s) allocated from:
+    #0 0x7f2b6c9d8647 in operator new(unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:99
+    #1 0x5589f26ec18a in Client::check_location() srcs/location.cpp:39
+
+Direct leak of 392 byte(s) in 1 object(s) allocated from:
+    #0 0x7f2b6c9d8647 in operator new(unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:99
+    #1 0x5589f26dfd4b in Client::execute_client(bool) srcs/Client.cpp:230
+    #2 0x7ffc3e880a8f  ([stack]+0x401a8f)
+*/
