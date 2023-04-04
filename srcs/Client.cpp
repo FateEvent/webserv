@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 12:31:20 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/04 17:22:18 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -328,13 +328,23 @@ bool	Client::execute_client(bool path)
 					file_buf.clear();
 					if (!line.find("Content-Disposition"))
 					{
-						std::cout << line << std::endl;
-//						line = file_buf.erase(line.length() - (_header.Boundary.length() + 4));
-//						ft::split_to_vectors(_header.Content_Disposition, line, ';');
+						ft::split_to_vectors(_header.Content_Disposition, line, ';');
 //						ft::find_val(head.Content_Type, head.Boundary, "boundary");
 //						ft::split_to_maposs(_header.other, line);
-						std::cout << "HERE!!!!!!!!!!!!!!!!!!!!!!1!!!!!!!!!@@@@2" << std::endl;
+						line.erase(0, line.find("\r\n") + 2);
+						std::cout << line << std::endl;
 					}
+					if (!line.find("Content-Type"))
+					{
+						line.erase(0, line.find("\r\n") + 2);
+					}
+					if (!line.find("\r\n"))
+					{
+						line.erase(0, 2);
+					}
+					std::cout << "===================================" << std::endl;
+					std::cout << line << std::endl;
+					std::cout << "FIRST!=============================" << std::endl;
 				}
 				else if (file_buf.find("--" + _header.Boundary + "--\r\n") != std::string::npos)
 				{
@@ -342,16 +352,28 @@ bool	Client::execute_client(bool path)
 					file_buf.clear();
 					if (!line.find("Content-Disposition"))
 					{
-						std::cout << line << std::endl;
-//						line = file_buf.erase(line.length() - (_header.Boundary.length() + 4));
-//						ft::split_to_vectors(_header.Content_Disposition, line, ';');
+						ft::split_to_vectors(_header.Content_Disposition, line, ';');
 //						ft::find_val(head.Content_Type, head.Boundary, "boundary");
 //						ft::split_to_maposs(_header.other, line);
-						std::cout << "HERE!!!!!!!!!!!!!!!!!!!!!!12" << std::endl;
+						line.erase(0, line.find("\r\n") + 2);
+						std::cout << line << std::endl;
 					}
+					if (!line.find("Content-Type"))
+					{
+						line.erase(0, line.find("\r\n") + 2);
+					}
+					if (!line.find("\r\n"))
+					{
+						line.erase(0, 2);
+					}
+					std::cout << "===================================" << std::endl;
+					std::cout << line << std::endl;
+					std::cout << "SECOND!============================" << std::endl;
 				}
 			}
-			std::cout << file_buf << std::endl;
+			std::cout << "======================================================================" << std::endl;
+			std::cout << line << std::endl;
+			std::cout << "======================================================================" << std::endl;
 			for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
 				std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
 			std::cout << std::endl;
