@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/13 20:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 14:16:27 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/04 18:14:39 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ void	s_header::clear()
 	Content_Type.clear();
 	Boundary.clear();
 	Content_Disposition.clear();
+	entry_name.clear();
+	filename.clear();
 	Content_Encoding.clear();
 	Transfer_Encoding.clear();
 	Accept.clear();

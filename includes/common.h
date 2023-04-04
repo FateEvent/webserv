@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 10:06:38 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/04 18:14:06 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ typedef struct s_header
 	std::vector<std::string>			Content_Type;
 	std::string							Boundary;
 	std::vector<std::string>			Content_Disposition;
+	std::string							entry_name;
+	std::string							filename;
 	std::vector<std::string>			Content_Encoding;
 	std::vector<std::string>			Transfer_Encoding;
 	std::vector<std::string>			Accept;

@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 17:22:18 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/04 18:15:42 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -329,10 +329,10 @@ bool	Client::execute_client(bool path)
 					if (!line.find("Content-Disposition"))
 					{
 						ft::split_to_vectors(_header.Content_Disposition, line, ';');
-//						ft::find_val(head.Content_Type, head.Boundary, "boundary");
+						ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
+						ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 //						ft::split_to_maposs(_header.other, line);
 						line.erase(0, line.find("\r\n") + 2);
-						std::cout << line << std::endl;
 					}
 					if (!line.find("Content-Type"))
 					{
@@ -342,9 +342,11 @@ bool	Client::execute_client(bool path)
 					{
 						line.erase(0, 2);
 					}
-					std::cout << "===================================" << std::endl;
-					std::cout << line << std::endl;
 					std::cout << "FIRST!=============================" << std::endl;
+					std::cout << "name: " << _header.entry_name << std::endl;
+					std::cout << "filename: " << _header.entry_name << std::endl;
+					std::cout << line << std::endl;
+					std::cout << "===================================" << std::endl;
 				}
 				else if (file_buf.find("--" + _header.Boundary + "--\r\n") != std::string::npos)
 				{
@@ -353,10 +355,10 @@ bool	Client::execute_client(bool path)
 					if (!line.find("Content-Disposition"))
 					{
 						ft::split_to_vectors(_header.Content_Disposition, line, ';');
-//						ft::find_val(head.Content_Type, head.Boundary, "boundary");
+						ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
+						ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 //						ft::split_to_maposs(_header.other, line);
 						line.erase(0, line.find("\r\n") + 2);
-						std::cout << line << std::endl;
 					}
 					if (!line.find("Content-Type"))
 					{
@@ -366,9 +368,11 @@ bool	Client::execute_client(bool path)
 					{
 						line.erase(0, 2);
 					}
-					std::cout << "===================================" << std::endl;
-					std::cout << line << std::endl;
 					std::cout << "SECOND!============================" << std::endl;
+					std::cout << "name: " << _header.entry_name << std::endl;
+					std::cout << "filename: " << _header.entry_name << std::endl;
+					std::cout << line << std::endl;
+					std::cout << "===================================" << std::endl;
 				}
 			}
 			std::cout << "======================================================================" << std::endl;
