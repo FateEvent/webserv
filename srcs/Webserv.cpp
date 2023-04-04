@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/02 16:08:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 08:20:15 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ void	Webserv::stop_all()
 	{
 		try
 		{
-			std::cout << "Stopping server " << it->second.name << "...." << std::endl;
+			std::cout << PURPLE << "Stopping server " << it->second.name << "..." << RST << std::endl;
 			this->stop(it->second);
 		}
 		catch (std::exception &e)
@@ -155,7 +155,7 @@ void	Webserv::stop_all()
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	std::cout << "All server stopped!" << std::endl;
+	std::cout << GREEN << "All server stopped!" << RST << std::endl;
 }
 
 /**
@@ -419,12 +419,12 @@ void	Webserv::check_server()
 		socklen_t		socklen;
 		header			head;
 
-		std::cout << "Ask of new client on vhost." << std::endl;
+		//std::cout << "Ask of new client on vhost." << std::endl;
 		socklen = sizeof(addr);
 		sock_fd = accept(_base.sock_fd, reinterpret_cast<sockaddr *>(&addr), reinterpret_cast<socklen_t *>(&socklen));
 		if (sock_fd == -1)
 		{
-			std::cout << strerror(errno) << std::endl;
+			//std::cout << strerror(errno) << std::endl;
 			goto spring_block;
 			throw std::invalid_argument("Socket error in vhost!");
 		}
@@ -469,24 +469,23 @@ void	Webserv::check_server()
 	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd))
 		{
-			std::cout << "Ask of new client." << std::endl;
+			//std::cout << "Ask of new client." << std::endl;
 			try
 			{
 				Client *ret = new Client(it->second);
 				this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
-				std::cout << GREEN << "New client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+				//std::cout << GREEN << "New client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
 			}
 			catch (std::exception &e)
 			{
 				std::cout << e.what() << std::endl;
 			}
-			//FD_CLR(it->second.sock_fd, &this->readfd);
 		}
 }
 
 void	Webserv::check_client()
 {
-	std::vector<int>	to_close;
+	std::map<int, Client*>	to_close;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
 /* 		if ((FD_ISSET(it->second.get_sockfd(), &this->readfd) && it->second.is_working()) ||
@@ -506,25 +505,28 @@ void	Webserv::check_client()
 			else
 			{
 				// send error 400 to client.
-				to_close.push_back(it->second.get_sockfd());
+				to_close.insert(std::make_pair(it->second.get_sockfd(), &it->second));
 			}
 			continue;
 		}
 		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd) &&
 					it->second.is_ready())// && it->second.is_ready())// ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
 		{
-			to_close.push_back(it->second.get_sockfd());
+			to_close.insert(std::make_pair(it->second.get_sockfd(), &it->second));
 			std::cout << YELLOW << "CLOSE CONNEXION" << RST << std::endl;
 			FD_CLR(it->second.get_sockfd(), &this->readfd);
 		}
 	}
 	if (!to_close.empty())
 	{
-		for (std::vector<int>::iterator it = to_close.begin(); it != to_close.end(); ++it)
+		for (std::map<int, Client*>::iterator it = to_close.begin(); it != to_close.end(); ++it)
 		{
-			std::cout << GREEN << "Connexion number: " << *it << " close" << RST << std::endl;
-			::close(*it);
-			this->_client.erase(*it);
+			if (it->second->is_seeding() == false)
+				it->second->kill_cgi();
+			std::cout << GREEN << "Connexion number: " << it->first << " close" << RST << std::endl;
+			::close(it->first);
+			//delete this->_client(it->first)->second;
+			this->_client.erase(it->first);
 		}
 	}
 }
@@ -558,7 +560,6 @@ void	Webserv::exec_client()
 				toclose.push_back(it->first);	//check keep alive...
 			else
 				this->timeout(0);
-//usleep(50); /// only for test
 		}
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)

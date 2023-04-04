@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:26:03 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 17:11:36 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/04 10:06:49 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ namespace ft {
 	void			do_cgi();
 	std::string		return_content_type(char *);
 	char			**vector_to_tab(std::vector<std::string>&);
+	
 	//void			free_tab(char **);
 };
 #endif

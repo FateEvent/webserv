@@ -6,13 +6,13 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 16:48:14 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/04 10:06:52 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Client.hpp"
 
-Client::Client(const config &config) : _ref_conf(config)
+Client::Client(config &config) : _ref_conf(config)
 {
 	this->clear_header();
 	_socklen = sizeof(this->_addr);
@@ -25,7 +25,7 @@ Client::Client(const config &config) : _ref_conf(config)
 	fcntl(this->_sock_fd, F_SETFL, O_NONBLOCK);
 }
 
-Client::Client(const config &config, sockaddr_in sock, socklen_t len, int fd, header& head) : _ref_conf(config), _header(head)
+Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& head) : _ref_conf(config), _header(head)
 {
 	this->_working = false;
 	this->_chunked = false;
@@ -209,10 +209,12 @@ bool	Client::execute_client(bool path)
 		this->_data.file = new std::stringstream();
 		header = ft::make_header(404);
 		send(this->_sock_fd, header.c_str(), header.length(), 0);
-		*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(404, this->_error_page[404].empty() ?
-					(this->_ref_conf.error_page.find(404)->second.empty() ?
-					this->_ref_conf._base->error_page.find(404)->second : this->_ref_conf.error_page.find(404)->second) :
-					this->_error_page[404]);
+		*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(404,
+				this->_error_page[404].empty() ?
+					(this->_ref_conf.error_page[404].empty() ?
+						(this->_ref_conf._base->error_page[404].empty() ? "\n" : this->_ref_conf._base->error_page.find(404)->second) :
+					this->_ref_conf.error_page.find(404)->second) :
+				this->_error_page[404]);
 		this->_data.file->seekg(0, this->_data.file->end);
 		this->_data.data_size = this->_data.file->tellg();
 		this->_data.file->seekg(0, this->_data.file->beg);
@@ -237,8 +239,13 @@ bool	Client::execute_client(bool path)
 			else
 			{
 				std::cout << "CGI on location" << std::endl;
+				if (!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end())
+					this->launch_cgi(this->_cgi_call.find(_index.substr(_index.find_last_of(".")))->second);
+				else
+					this->launch_cgi(this->_ref_conf.cgi.find(_index.substr(_index.find_last_of(".")))->second);
+				
 				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
-				this->launch_cgi(this->_cgi_call.find(_index.substr(_index.find_last_of(".")))->second);
+				
 			}
 		}
 		else
@@ -375,11 +382,27 @@ void	Client::cgi_prepare_to_send()
 	if (header_test.find("HTTP/1.1") == 0) // Means complete header stay stringstream
 		return;
 	this->_data.minus_header = header_test.find("\r\n\r\n");
-	this->_data.minus_header >= 0 ? this->_data.minus_header += 4 : this->_data.minus_header = 0;
 	this->_data.header = ft::make_header(200);
 	if (header_test.find("Content-Length:") == header_test.npos)
-		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size - this->_data.minus_header) + "\r\n");
+		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size - (this->_data.minus_header != header_test.npos ? this->_data.minus_header + 4 : 0)) + "\r\n");
+	if (header_test.find("Content-Type:") == header_test.npos)
+		this->_data.header.append("Content-Type: text/html\r\n");
+	if (this->_data.minus_header == header_test.npos)
+		this->_data.header.append("\r\n");
+
 	send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
 	this->_sedding = true;
 	return ;
+}
+
+void	Client::kill_cgi()
+{
+	if (this->_pipe_cgi_in[0] > 0)
+	{
+		kill(this->_pid_cgi, 2);
+		close(this->_pipe_cgi_in[0]);
+		close(this->_pipe_cgi_in[1]);
+		close(this->_pipe_cgi_out[0]);
+		close(this->_pipe_cgi_out[1]);
+	}
 }

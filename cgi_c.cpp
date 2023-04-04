@@ -5,7 +5,7 @@
 int main(void)
 {
 	std::ifstream	file;
-	file.open("./video.html");
+	file.open("site/video.html");
 	std::string		text="<html><head><head/><body><p>Page not found!<p/><body/><html/>";
 	std::string		buff;
 
