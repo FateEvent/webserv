@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 09:17:55 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 18:35:33 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,19 +84,25 @@ void	Client::clear_header()
 	this->_ready = false;
 }
 
-Client::~Client() {}
-int				Client::get_sockfd() const 		{ return (this->_sock_fd);}
-time_t			Client::get_time_alive() const	{ return (this->_timeout);}
-std::string 	Client::get_method() const		{ return (this->_header.Method);}
-std::string		Client::get_directory() const	{ return (this->_header.Dir);}
-int				Client::get_pid_cgi() const	 	{ return (this->_pid_cgi);}
-bool			Client::is_working() const		{ return (this->_working);}
-bool			Client::is_chunk() const		{ return(this->_chunked);}
-header*			Client::get_header()			{ return (&this->_header);}
-const config*	Client::get_config() const		{ return (&this->_ref_conf);}
-bool			Client::is_cgi() const			{ return (this->_cgi?true:false);}
-bool			Client::is_seeding() const		{ return (this->_sedding?true:false); }
-bool			Client::is_ready() const		{ return (this->_ready?true:false); }
+Client::~Client()
+{
+	this->_ref_conf.nbr_client--;
+}
+
+int				Client::get_sockfd() const 					{ return (this->_sock_fd);}
+time_t			Client::get_time_alive() const				{ return (this->_timeout);}
+std::string 	Client::get_method() const					{ return (this->_header.Method);}
+std::string		Client::get_directory() const				{ return (this->_header.Dir);}
+int				Client::get_pid_cgi() const				 	{ return (this->_pid_cgi);}
+bool			Client::is_working() const					{ return (this->_working);}
+bool			Client::is_chunk() const					{ return(this->_chunked);}
+header*			Client::get_header()						{ return (&this->_header);}
+const config*	Client::get_config() const					{ return (&this->_ref_conf);}
+bool			Client::is_cgi() const						{ return (this->_cgi?true:false);}
+bool			Client::is_seeding() const					{ return (this->_sedding?true:false); }
+bool			Client::is_ready() const					{ return (this->_ready?true:false); }
+unsigned int	Client::get_nbr_connected_client() const	{ return (this->_ref_conf.nbr_client); }
+void			Client::add_nbr_client()					{ this->_ref_conf.nbr_client++; }
 
 std::pair<std::string, std::string>	Client::get_file() const
 {
@@ -116,6 +122,7 @@ bool	Client::new_request()
 {
 	if (!ft::parse_header(this->_sock_fd, this->_header))
 			return (false);
+	this->add_nbr_client();
 	this->_timeout = std::time(nullptr);
 	this->_header.time_out = this->_timeout;
 	this->_ready = true;
@@ -178,8 +185,8 @@ bool	Client::continue_client(fd_set *fdset)
 					close(this->_pipe_cgi_in[0]);
 					this->_sedding = true;
 				}
-				else if (taking == -1)
-					std::cout << RED << "Read error for cgi" << RST << std::endl;
+				//else if (taking == -1)
+				//	std::cout << RED << "Read error -1 for cgi" << RST << std::endl;
 			}
 			else
 			{

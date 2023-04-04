@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 08:20:15 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 18:18:51 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,7 +280,7 @@ void	Webserv::_check_instance(config &conf)
 	}
 	if (!conf.type)
 		conf.type = SOCK_STREAM;
-	if (conf.max_client)
+	if (conf.max_client <= 0)
 		conf.max_client = this->_base.max_client;
 	if (!conf.port)
 		std::cout << conf.name << " is a virtual host (no listen in config file)" << std::endl;
@@ -426,7 +426,7 @@ void	Webserv::check_server()
 		{
 			//std::cout << strerror(errno) << std::endl;
 			goto spring_block;
-			throw std::invalid_argument("Socket error in vhost!");
+			//throw std::invalid_argument("Socket error in vhost!");
 		}
 		fcntl(sock_fd, F_SETFL, O_NONBLOCK);
 		if (!ft::parse_header(sock_fd, head))
@@ -467,8 +467,9 @@ void	Webserv::check_server()
 	}
 	spring_block:
 	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
-		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd))
+		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd) && !it->second.if_max_client())
 		{
+			// Check number of client already in instance....
 			//std::cout << "Ask of new client." << std::endl;
 			try
 			{
@@ -481,6 +482,8 @@ void	Webserv::check_server()
 				std::cout << e.what() << std::endl;
 			}
 		}
+//		else if (it->second.if_max_client())
+//			std::cout << PURPLE << "Maximum client limit! " << RST <<std::endl;
 }
 
 void	Webserv::check_client()
@@ -500,6 +503,7 @@ void	Webserv::check_client()
 			if (it->second.new_request())
 			{
 				//std::cout << GREEN << "Valid Header." << RST << std::endl;
+				it->second.add_nbr_client();
 				FD_CLR(it->second.get_sockfd(), &this->readfd);
 			}
 			else
@@ -525,6 +529,7 @@ void	Webserv::check_client()
 				it->second->kill_cgi();
 			std::cout << GREEN << "Connexion number: " << it->first << " close" << RST << std::endl;
 			::close(it->first);
+			std::cout << YELLOW << it->second->get_nbr_connected_client() << " client are already connected." << RST << std::endl;
 			//delete this->_client(it->first)->second;
 			this->_client.erase(it->first);
 		}
@@ -565,6 +570,7 @@ void	Webserv::exec_client()
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
 		::close(*it);
+		std::cout << YELLOW << this->_client.find(*it)->second.get_nbr_connected_client() << " client are already connected." << RST << std::endl;
 		this->_client.erase(*it);
 		std::cout << BLUE << "Socket " << *it << " closed." << RST << std::endl;
 	}

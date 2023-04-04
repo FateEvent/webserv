@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 09:14:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 15:18:53 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ class Client
 		sockaddr_in					_addr;			// sockaddr_in is a internet socket
 		socklen_t					_socklen;
 //		sockaddr_un					_addr_local;	// sockaddr_un is a local socket
-			config&				_ref_conf;
+		config&						_ref_conf;
 		std::string					_reponse;
 		std::string					_root;
 		std::string					_index;
@@ -99,6 +99,8 @@ class Client
 		bool						send_data(int);
 		int							launch_cgi(std::string);
 		void						kill_cgi();
+		unsigned int				get_nbr_connected_client() const;
+		void						add_nbr_client();
 		
 	protected:
 };

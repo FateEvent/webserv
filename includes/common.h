@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 11:54:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 17:37:59 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct	s_config
 	void	set_zero();
 	void	do_location(std::string);
 	void	get_all_loc(std::string, struct s_location*);
+	bool	if_max_client() const;
 	std::string							name;
 	std::string							root;
 	std::string							index;
@@ -50,7 +51,8 @@ typedef struct	s_config
 	std::map<std::string, std::string>	cgi;
 	std::string							proxy;
 	std::vector<std::string>			allow;
-	unsigned int						max_client;
+	ssize_t								max_client;
+	ssize_t								nbr_client;
 	size_t								max_body;
 	bool								active;
 	bool								prepare;

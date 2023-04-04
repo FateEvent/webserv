@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:48:05 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 18:19:08 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,8 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		}
 		else if (!it->first.compare("max_client"))
 		{
-			int max = std::stol(it->second);
-			if (!(max > 0 && max < static_cast<int>(0x7FFFFFFF)))
+			ssize_t max = std::stol(it->second);
+			if (!(max > 0 && max < static_cast<ssize_t>(0x7FFFFFFF)))
 				throw ("Max client incorrect in instance!");
 			this->max_client = max;
 		}
@@ -119,7 +119,8 @@ void s_config::set_zero()
 	this->error_log.clear();
 	this->cgi.clear();
 	this->allow.clear();
-	this->max_client = 0;
+	this->nbr_client = 0;
+	this->max_client = -1;
 	this->max_body = 0;
 	this->active = false;
 	this->prepare = false;
@@ -181,3 +182,5 @@ void	s_config::get_all_loc(std::string loc, struct s_location *st)
 		st->to.insert(std::make_pair(key, line.substr(line.find_first_not_of(" \v\f\r\n\t"))));
 	}
 }
+
+bool	s_config::if_max_client() const		{ return (this->nbr_client < this->max_client ? false : true); }
