@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 18:26:46 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/04 19:31:22 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -329,9 +329,6 @@ bool	Client::execute_client(bool path)
 					if (!line.find("Content-Disposition"))
 					{
 						ft::split_to_vectors(_header.Content_Disposition, line, ';');
-						ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
-						ft::find_val(_header.Content_Disposition, _header.filename, "filename");
-//						ft::split_to_maposs(_header.other, line);
 						line.erase(0, line.find("\r\n") + 2);
 					}
 					if (!line.find("Content-Type"))
@@ -341,6 +338,23 @@ bool	Client::execute_client(bool path)
 					if (!line.find("\r\n"))
 					{
 						line.erase(0, 2);
+					}
+					if (line.find("\r\n") != line.npos)
+					{
+						std::string	final = "\r\n--" + _header.Boundary + "\r\n";
+						line.erase(line.length() - (final.length()));
+					}
+					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
+					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
+					if (_header.entry_name != "" && _header.filename == "")
+						_header.other.insert(std::make_pair(_header.entry_name, line));
+					else if (_header.filename != "")
+					{
+						FILE	*filename;
+
+						filename = fopen(_header.filename.data(), "w");
+						fwrite(line.data(), sizeof(char), sizeof(line.data()), filename);
+						fclose(filename);
 					}
 					std::cout << "FIRST!=============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
@@ -357,9 +371,6 @@ bool	Client::execute_client(bool path)
 					if (!line.find("Content-Disposition"))
 					{
 						ft::split_to_vectors(_header.Content_Disposition, line, ';');
-						ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
-						ft::find_val(_header.Content_Disposition, _header.filename, "filename");
-//						ft::split_to_maposs(_header.other, line);
 						line.erase(0, line.find("\r\n") + 2);
 					}
 					if (!line.find("Content-Type"))
@@ -369,6 +380,23 @@ bool	Client::execute_client(bool path)
 					if (!line.find("\r\n"))
 					{
 						line.erase(0, 2);
+					}
+					if (line.find("\r\n") != line.npos)
+					{
+						std::string	final = "\r\n--" + _header.Boundary + "--\r\n";
+						line.erase(line.length() - final.length());
+					}
+					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
+					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
+					if (_header.entry_name != "" && _header.filename == "")
+						_header.other.insert(std::make_pair(_header.entry_name, line));
+					else if (_header.filename != "")
+					{
+						FILE	*filename;
+
+						filename = fopen(_header.filename.data(), "w");
+						fwrite(line.data(), sizeof(char), sizeof(line.data()), filename);
+						fclose(filename);
 					}
 					std::cout << "SECOND!============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
