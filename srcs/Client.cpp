@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 18:15:42 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/04 18:26:46 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -344,9 +344,11 @@ bool	Client::execute_client(bool path)
 					}
 					std::cout << "FIRST!=============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
-					std::cout << "filename: " << _header.entry_name << std::endl;
+					std::cout << "filename: " << _header.filename << std::endl;
 					std::cout << line << std::endl;
 					std::cout << "===================================" << std::endl;
+					_header.entry_name.clear();
+					_header.filename.clear();
 				}
 				else if (file_buf.find("--" + _header.Boundary + "--\r\n") != std::string::npos)
 				{
@@ -370,9 +372,11 @@ bool	Client::execute_client(bool path)
 					}
 					std::cout << "SECOND!============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
-					std::cout << "filename: " << _header.entry_name << std::endl;
+					std::cout << "filename: " << _header.filename << std::endl;
 					std::cout << line << std::endl;
 					std::cout << "===================================" << std::endl;
+					_header.entry_name.clear();
+					_header.filename.clear();
 				}
 			}
 			std::cout << "======================================================================" << std::endl;
