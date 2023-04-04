@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 16:13:09 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 08:20:15 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -525,6 +525,7 @@ void	Webserv::check_client()
 				it->second->kill_cgi();
 			std::cout << GREEN << "Connexion number: " << it->first << " close" << RST << std::endl;
 			::close(it->first);
+			//delete this->_client(it->first)->second;
 			this->_client.erase(it->first);
 		}
 	}

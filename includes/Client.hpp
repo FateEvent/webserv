@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 15:11:24 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 09:14:53 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ class Client
 		sockaddr_in					_addr;			// sockaddr_in is a internet socket
 		socklen_t					_socklen;
 //		sockaddr_un					_addr_local;	// sockaddr_un is a local socket
-		const config&				_ref_conf;
+			config&				_ref_conf;
 		std::string					_reponse;
 		std::string					_root;
 		std::string					_index;
@@ -68,8 +68,8 @@ class Client
 		void						_make_struct();
 
 	public:
-		Client(const config&);
-		Client(const config&, sockaddr_in, socklen_t, int, header&);
+		Client(config&);
+		Client(config&, sockaddr_in, socklen_t, int, header&);
 		~Client();
 		int							get_sockfd() const;
 		std::string					get_method() const;

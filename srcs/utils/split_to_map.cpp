@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   split_to_map.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:15:32 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/04 08:16:18 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ bool	ft::split_to_mapss(std::map<std::string, std::string> &mapss, std::string l
 	//std::cout <<  "Key:   " << line.substr(0, line.find_first_of("=")) << std::endl;
 	//std::cout <<  "Value: " << line.substr(line.find_first_of("=") + 1, line.length()) << std::endl;
 	mapss.insert(std::make_pair<std::string, std::string>(
-						line.substr(line.find_first_not_of(" \t\v\n"), line.find_first_of("=")),
+						line.substr(line.find_first_not_of(" \t\v\n"), line.find_first_of("=") - 1),
 						line.substr(line.find_first_of("=") + 1, line.find_last_not_of(" \r\n") - line.find_first_of("="))));
 	return (true);
 }

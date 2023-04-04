@@ -6,13 +6,13 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 17:19:01 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 09:17:55 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Client.hpp"
 
-Client::Client(const config &config) : _ref_conf(config)
+Client::Client(config &config) : _ref_conf(config)
 {
 	this->clear_header();
 	_socklen = sizeof(this->_addr);
@@ -25,7 +25,7 @@ Client::Client(const config &config) : _ref_conf(config)
 	fcntl(this->_sock_fd, F_SETFL, O_NONBLOCK);
 }
 
-Client::Client(const config &config, sockaddr_in sock, socklen_t len, int fd, header& head) : _ref_conf(config), _header(head)
+Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& head) : _ref_conf(config), _header(head)
 {
 	this->_working = false;
 	this->_chunked = false;
@@ -209,10 +209,12 @@ bool	Client::execute_client(bool path)
 		this->_data.file = new std::stringstream();
 		header = ft::make_header(404);
 		send(this->_sock_fd, header.c_str(), header.length(), 0);
-		*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(404, this->_error_page[404].empty() ?
-					(this->_ref_conf.error_page.find(404)->second.empty() ?
-					this->_ref_conf._base->error_page.find(404)->second : this->_ref_conf.error_page.find(404)->second) :
-					this->_error_page[404]);
+		*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(404,
+				this->_error_page[404].empty() ?
+					(this->_ref_conf.error_page[404].empty() ?
+						(this->_ref_conf._base->error_page[404].empty() ? "\n" : this->_ref_conf._base->error_page.find(404)->second) :
+					this->_ref_conf.error_page.find(404)->second) :
+				this->_error_page[404]);
 		this->_data.file->seekg(0, this->_data.file->end);
 		this->_data.data_size = this->_data.file->tellg();
 		this->_data.file->seekg(0, this->_data.file->beg);
