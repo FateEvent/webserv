@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 23:33:22 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 23:44:36 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,16 +260,11 @@ bool	Client::execute_client(bool path)
 			int check = 0;
 			check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
 			if (check == -1)
-			{
-				// ERROR 500
-			}
+				this->make_error(500);
 			if (check == 0)
-			{
-				// ERROR 501
-			}
+				this->make_error(501);
 			std::cout << BLUE << this->_data.header << RST << std::endl;
 			this->_sedding = true;
-			//this->_working = true;
 		}
 	}
 	else if (_header.Method.compare("POST") == 0)

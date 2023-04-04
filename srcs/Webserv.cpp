@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 23:37:18 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 23:54:10 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -486,8 +486,6 @@ void	Webserv::check_server()
 				std::cout << e.what() << std::endl;
 			}
 		}
-//		else if (it->second.if_max_client())
-//			std::cout << PURPLE << "Maximum client limit! " << RST <<std::endl;
 }
 
 void	Webserv::check_client()
@@ -495,12 +493,6 @@ void	Webserv::check_client()
 	std::map<int, Client*>	to_close;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
-/* 		if ((FD_ISSET(it->second.get_sockfd(), &this->readfd) && it->second.is_working()) ||
-			(it->second.get_fd_cgi() > 0 && FD_ISSET(it->second.get_fd_cgi(), &this->readfd)))
-		{
-			it->second.continue_client(&this->readfd);
-			continue;
-		} */
 		if (FD_ISSET(it->second.get_sockfd(), &this->readfd) &&
 				!it->second.is_ready())
 		{
@@ -547,14 +539,8 @@ void	Webserv::exec_client()
 	{
 		if (it->second.get_method().empty())
 			continue;
-		if ((it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
-		{
-			std::cout << "PAS OK" << std::endl;
-			std::cout << "Send: " << send(it->second.get_sockfd(), "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
-			//send(it->second.get_sockfd(), "HTTP/1.1 400 Bad Request\r\nContent-Length: 60\r\n\r\n<html><head></head><body>BAD REQUEST ERROR 400</body></html>\0", 109, MSG_OOB); // , NULL, 0);
-			it->second.clear_header();
-			toclose.push_back(it->second.get_sockfd());
-		}
+		if (!it->second.is_seeding() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
+			it->second.make_error(405);
 		else if (!it->second.is_seeding() && it->second.is_ready() && !it->second.get_fd_cgi() && it->second.get_pid_cgi() == 0) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
 		{
 			if (it->second.execute_client(it->second.check_location()))
