@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 18:35:33 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 23:33:22 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,16 @@ void	Client::clear_header()
 
 Client::~Client()
 {
+	if (this->_pid_cgi > 0)
+		kill(this->_pid_cgi, 2);
+	if (this->_pipe_cgi_out[0] > 0)
+	{
+		close(this->_pipe_cgi_out[0]);
+		close(this->_pipe_cgi_out[1]);
+		close(this->_pipe_cgi_in[0]);
+		close(this->_pipe_cgi_in[1]);
+	}
+	delete this->_data.file;
 	this->_ref_conf.nbr_client--;
 }
 
@@ -163,7 +173,8 @@ bool	Client::continue_client(fd_set *fdset)
 			this->clear_header();
 			this->_index.clear();
 			this->_root.clear();
-			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
+			delete this->_data.file;
+			//std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
 	}
@@ -212,20 +223,7 @@ bool	Client::execute_client(bool path)
 		#ifdef DEBUG
 			std::cout << PURPLE << "File not found or can't open!" << RST << std::endl;
 		#endif
-		std::string header;
-		this->_data.file = new std::stringstream();
-		header = ft::make_header(404);
-		send(this->_sock_fd, header.c_str(), header.length(), 0);
-		*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(404,
-				this->_error_page[404].empty() ?
-					(this->_ref_conf.error_page[404].empty() ?
-						(this->_ref_conf._base->error_page[404].empty() ? "\n" : this->_ref_conf._base->error_page.find(404)->second) :
-					this->_ref_conf.error_page.find(404)->second) :
-				this->_error_page[404]);
-		this->_data.file->seekg(0, this->_data.file->end);
-		this->_data.data_size = this->_data.file->tellg();
-		this->_data.file->seekg(0, this->_data.file->beg);
-		this->_sedding = true;
+		this->make_error(404);
 	}
 	// MAY BE TEST CGI HERE AND NOT IN GET,POST OR DELETE METHODE
 	else if (_header.Method.compare("GET") == 0)
@@ -250,9 +248,7 @@ bool	Client::execute_client(bool path)
 					this->launch_cgi(this->_cgi_call.find(_index.substr(_index.find_last_of(".")))->second);
 				else
 					this->launch_cgi(this->_ref_conf.cgi.find(_index.substr(_index.find_last_of(".")))->second);
-				
 				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
-				
 			}
 		}
 		else
@@ -279,7 +275,11 @@ bool	Client::execute_client(bool path)
 	else if (_header.Method.compare("POST") == 0)
 	{
 		std::cout << "POST METHOD" << std::endl;
-		char buff[2];
+		if (this->_header.Content_Length == 0)
+			this->make_error(411);
+		else if (this->_header.Content_Length > this->_max_body && this->_max_body > 0)
+			this->make_error(413);
+/* 		char buff[2];
 		memset(buff, 0, 2);
 		int recept = 0;
 		recept = recv(this->_sock_fd, &buff, 1, 0);
@@ -295,7 +295,7 @@ bool	Client::execute_client(bool path)
 		this->_index.clear();
 		this->_root.clear();
 		this->_working = true;
-		return (true);
+		return (true); */
 	}
 	else if (_header.Method.compare("DELETE") == 0)
 		std::cout << "DELETE METHOD" << std::endl;
@@ -303,9 +303,6 @@ bool	Client::execute_client(bool path)
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl; // Should not goto inside.
 	return (false);
 }
-
-void	Client::chunk()
-{}
 
 int	Client::take_data() // the data should stay in pipe_in
 {
@@ -361,3 +358,26 @@ void	Client::kill_cgi()
 		close(this->_pipe_cgi_out[1]);
 	}
 }
+
+void	Client::make_error(int i)
+{
+	if (this->_data.file == 0)
+		delete this->_data.file;
+	std::string header;
+	this->_data.file = new std::stringstream();
+	header = ft::make_header(i);
+	send(this->_sock_fd, header.c_str(), header.length(), 0);
+	*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(i,
+			this->_error_page[i].empty() ?
+				(this->_ref_conf.error_page[i].empty() ?
+					(this->_ref_conf._base->error_page[404].empty() ? "\n" : this->_ref_conf._base->error_page.find(i)->second) :
+				this->_ref_conf.error_page.find(i)->second) :
+			this->_error_page[i]);
+	this->_data.file->seekg(0, this->_data.file->end);
+	this->_data.data_size = this->_data.file->tellg();
+	this->_data.file->seekg(0, this->_data.file->beg);
+	this->_sedding = true;
+}
+
+void	Client::chunk()
+{}

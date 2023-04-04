@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 15:18:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 23:25:04 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,7 @@ class Client
 		void						kill_cgi();
 		unsigned int				get_nbr_connected_client() const;
 		void						add_nbr_client();
+		void						make_error(int);
 		
 	protected:
 };

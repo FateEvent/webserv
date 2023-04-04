@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 22:46:56 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 23:19:52 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 bool	Client::check_location()
 {
 	std::string	path;
+	this->_max_body = this->_ref_conf.max_body == 0 ? this->_ref_conf._base->max_body : this->_ref_conf.max_body;
+	
 	for (std::vector<struct s_location>::const_iterator it = this->_ref_conf.location.begin();
 				it != this->_ref_conf.location.end(); it++)
 	{
@@ -69,6 +71,8 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 				std::string err = it->second;
 				ft::put_err_page(err, this->_error_page);
 			}
+			else if (!it->first.find("max_body_size"))
+				this->_max_body = std::stol(it->second);
  			else if (!it->first.find("proxy_pass"))
 				this->_proxy = it->second;
 			else if (!it->first.find("cgi"))

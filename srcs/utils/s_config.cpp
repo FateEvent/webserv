@@ -6,16 +6,13 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 18:19:08 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 23:31:05 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/common.h"
 
-s_config::s_config()
-{
-	set_zero();
-}
+s_config::s_config()	{ set_zero(); }
 
 s_config::s_config(std::multimap<std::string, std::string>& server)
 {
@@ -75,6 +72,13 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 			if (!(max > 0 && max < static_cast<ssize_t>(0x7FFFFFFF)))
 				throw ("Max client incorrect in instance!");
 			this->max_client = max;
+		}
+		else if (!it->first.compare("max_body_size"))
+		{
+			ssize_t max = std::stol(it->second);
+			if (max < 0)
+				throw ("Max body size incorrect in instance!");
+			this->max_body = max;
 		}
 		else if (!it->first.compare("root"))
 		{
@@ -183,4 +187,9 @@ void	s_config::get_all_loc(std::string loc, struct s_location *st)
 	}
 }
 
-bool	s_config::if_max_client() const		{ return (this->nbr_client < this->max_client ? false : true); }
+bool	s_config::if_max_client() const
+{
+	if (this->nbr_client >= this->max_client)
+		std::cout << YELLOW << "Client in qeue." << RST << std::endl;
+	return (this->nbr_client < this->max_client ? false : true);
+}

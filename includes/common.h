@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 17:37:59 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 22:17:04 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ typedef struct	s_config
 	std::vector<std::string>			allow;
 	ssize_t								max_client;
 	ssize_t								nbr_client;
-	size_t								max_body;
+	ssize_t								max_body;
 	bool								active;
 	bool								prepare;
 	std::vector<struct s_location>		location;

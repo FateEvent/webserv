@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 18:18:51 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/04 23:37:18 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,10 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	this->_base.addr.sin_port = htons(this->_base.port);
 	this->_base.domain = AF_INET;
 	this->_base.type = SOCK_STREAM;
-	this->_base.max_client = std::strtoul(it.find("max_client")->second.data(), NULL, 10);
+	if (it.find("max_body_size") != it.end())
+		this->_base.max_body = std::strtoul(it.find("max_body_size")->second.data(), NULL, 10);
+	if (it.find("max_client") != it.end())
+		this->_base.max_client = std::strtoul(it.find("max_client")->second.data(), NULL, 10);
 	if (it.find("error_page") != it.end())
 		ft::parse_err_page(this->_base.error_page, itconfig->second);
 	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
@@ -475,6 +478,7 @@ void	Webserv::check_server()
 			{
 				Client *ret = new Client(it->second);
 				this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
+				delete ret;
 				//std::cout << GREEN << "New client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
 			}
 			catch (std::exception &e)
@@ -529,7 +533,7 @@ void	Webserv::check_client()
 				it->second->kill_cgi();
 			std::cout << GREEN << "Connexion number: " << it->first << " close" << RST << std::endl;
 			::close(it->first);
-			std::cout << YELLOW << it->second->get_nbr_connected_client() << " client are already connected." << RST << std::endl;
+			//std::cout << YELLOW << it->second->get_nbr_connected_client() << " client are already connected." << RST << std::endl;
 			//delete this->_client(it->first)->second;
 			this->_client.erase(it->first);
 		}
@@ -570,7 +574,7 @@ void	Webserv::exec_client()
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
 		::close(*it);
-		std::cout << YELLOW << this->_client.find(*it)->second.get_nbr_connected_client() << " client are already connected." << RST << std::endl;
+		//std::cout << YELLOW << this->_client.find(*it)->second.get_nbr_connected_client() << " client are already connected." << RST << std::endl;
 		this->_client.erase(*it);
 		std::cout << BLUE << "Socket " << *it << " closed." << RST << std::endl;
 	}
