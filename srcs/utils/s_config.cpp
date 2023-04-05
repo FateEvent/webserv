@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 10:00:19 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/05 22:48:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,8 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 			if (!ft::put_err_page(it->second, this->error_page))
 				throw std::invalid_argument("error page in config file not set properly!");
 		}
+		else if (!it->first.compare("return"))
+			this->redirect = it->second;
 		else if (!it->first.find("location"))
 			do_location(it->second);
 		else if (!it->first.find("cgi"))
@@ -135,6 +137,7 @@ void s_config::set_zero()
 	this->nbr_client = 0;
 	this->max_client = -1;
 	this->max_body = 0;
+	this->redirect.clear();
 	this->active = false;
 	this->prepare = false;
 	this->location.clear();

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 14:13:01 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/05 23:29:20 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_proxy.clear();
 	this->_cgi_call.clear();
 	this->_max_body = 0;
+	this->_redirect.clear();
 	this->other.clear();
 	this->_data.data_sended = 1;
 	this->_data.data_size = 0;
@@ -71,6 +72,7 @@ void	Client::clear_header()
 	this->_reponse.clear();
 	this->_root.clear();
 	this->_index.clear();
+	this->_redirect.clear();
 	this->_error_page.clear();
 	this->_proxy.clear();
 	this->_cgi_call.clear();
@@ -219,7 +221,9 @@ bool	Client::continue_client(fd_set *fdset)
 
 bool	Client::execute_client(bool path)
 {
-	if (!path && !this->is_working())
+	if (!this->_redirect.empty())
+		this->make_error(301);
+	else if (!path && !this->is_working())
 	{
 		#ifdef DEBUG
 			std::cout << PURPLE << "File not found or can't open!" << RST << std::endl;
@@ -230,7 +234,7 @@ bool	Client::execute_client(bool path)
 	else if (_header.Method.compare("GET") == 0)
 	{
 		std::cout << "GET METHOD" << std::endl;
-		if (!(this->_allow & 1))
+		if (!(this->_allow & 1) && this->_allow != 0)
 		{
 			this->make_error(405);
 			return (false);
@@ -276,7 +280,7 @@ bool	Client::execute_client(bool path)
 	else if (_header.Method.compare("POST") == 0)
 	{
 		std::cout << "POST METHOD" << std::endl;
-		if (!(this->_allow >> 1 & 1))
+		if (!(this->_allow >> 1 & 1) && this->_allow != 0)
 		{
 			this->make_error(405);
 			return (false);
@@ -303,10 +307,10 @@ bool	Client::execute_client(bool path)
 		this->_working = true;
 		return (true); */
 	}
-	else if (_header.Method.compare("DELETE") == 0)
+	else if (_header.Method.compare("DELETE") != 0)
 	{
 		std::cout << "DELETE METHOD" << std::endl;
-		if (!(this->_allow >> 2 & 1))
+		if (!(this->_allow >> 2 & 1) && this->_allow != 0)
 		{
 			this->make_error(405);
 			return (false);
@@ -382,12 +386,14 @@ void	Client::make_error(int i)
 	header = ft::make_header(i);
 	if (send(this->_sock_fd, header.c_str(), header.length(), 0) == -1)
 		std::cout << "ERROR OF SEND!!" << std::endl;
+	if (!this->_redirect.empty())
+		*static_cast<std::stringstream*>(_data.file) << ("Location: " + this->_redirect + "\r\n\r\n");
 	*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(i,
-			this->_error_page[i].empty() ?
-				(this->_ref_conf.error_page[i].empty() ?
-					(this->_ref_conf._base->error_page[404].empty() ? "\n" : this->_ref_conf._base->error_page.find(i)->second) :
-				this->_ref_conf.error_page.find(i)->second) :
-			this->_error_page[i]);
+		this->_error_page[i].empty() ?
+			(this->_ref_conf.error_page[i].empty() ?
+				(this->_ref_conf._base->error_page[404].empty() ? "\n" : this->_ref_conf._base->error_page.find(i)->second) :
+			this->_ref_conf.error_page.find(i)->second) :
+		this->_error_page[i]);
 	this->_data.file->seekg(0, this->_data.file->end);
 	this->_data.data_size = this->_data.file->tellg();
 	this->_data.file->seekg(0, this->_data.file->beg);
