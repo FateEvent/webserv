@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 22:54:13 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/06 00:42:43 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 
 bool	Client::check_location()
 {
+	static struct stat path_stat;
 	std::string	path;
+
 	this->_max_body = this->_ref_conf.max_body == 0 ? this->_ref_conf._base->max_body : this->_ref_conf.max_body;
 	this->_allow = this->_ref_conf.allow;
 	this->_redirect = this->_ref_conf.redirect;
@@ -27,7 +29,22 @@ bool	Client::check_location()
 			this->condition_location(it);
 	}
 	if (this->_root.empty())
-		this->_root = this->_ref_conf.root + this->_header.Dir;
+	{
+		if (!this->_header.Dir.empty() && this->_header.file.first.empty())
+		{
+			std::string	path_dir(this->_ref_conf.root + this->_header.Dir);
+			stat(path_dir.c_str(), &path_stat);
+			if (S_ISREG(path_stat.st_mode))
+			{
+				this->_root = this->_ref_conf.root + this->_header.Dir.substr(0, this->_header.Dir.find_last_of("/"));
+				this->_index = this->_header.Dir.substr(this->_header.Dir.find_last_of("/") + 1);
+			}
+			else
+				this->_root = this->_ref_conf.root + this->_header.Dir;
+		}
+		else
+			this->_root = this->_ref_conf.root + this->_header.Dir;
+	}
 	if (this->_index.empty())
 	{
 		if (this->_header.file.second.empty())
