@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 10:11:51 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/05 14:13:01 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,8 +311,7 @@ bool	Client::execute_client(bool path)
 			this->make_error(405);
 			return (false);
 		}
-	}
-		
+	}	
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl; // Should not goto inside.
 	return (false);
@@ -375,12 +374,14 @@ void	Client::kill_cgi()
 
 void	Client::make_error(int i)
 {
-	if (this->_data.file == 0)
+	if (this->_data.file != 0)
 		delete this->_data.file;
-	std::string header;
+	this->_data.file = 0;
 	this->_data.file = new std::stringstream();
+	std::string header;
 	header = ft::make_header(i);
-	send(this->_sock_fd, header.c_str(), header.length(), 0);
+	if (send(this->_sock_fd, header.c_str(), header.length(), 0) == -1)
+		std::cout << "ERROR OF SEND!!" << std::endl;
 	*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(i,
 			this->_error_page[i].empty() ?
 				(this->_ref_conf.error_page[i].empty() ?
