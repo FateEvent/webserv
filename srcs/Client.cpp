@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 19:31:22 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/05 10:28:34 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -335,10 +335,9 @@ bool	Client::execute_client(bool path)
 					{
 						line.erase(0, line.find("\r\n") + 2);
 					}
-					if (!line.find("\r\n"))
-					{
-						line.erase(0, 2);
-					}
+					while (line.find("\r\n") != 0)
+						line.erase(0, line.find("\r\n") + 2);
+					line.erase(0, 2);
 					if (line.find("\r\n") != line.npos)
 					{
 						std::string	final = "\r\n--" + _header.Boundary + "\r\n";
@@ -350,11 +349,11 @@ bool	Client::execute_client(bool path)
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
 					{
-						FILE	*filename;
+						std::fstream	filename;
 
-						filename = fopen(_header.filename.data(), "w");
-						fwrite(line.data(), sizeof(char), sizeof(line.data()), filename);
-						fclose(filename);
+						filename.open(_header.filename, std::ios::out);
+						filename << line;
+						filename.close();
 					}
 					std::cout << "FIRST!=============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
@@ -377,10 +376,9 @@ bool	Client::execute_client(bool path)
 					{
 						line.erase(0, line.find("\r\n") + 2);
 					}
-					if (!line.find("\r\n"))
-					{
-						line.erase(0, 2);
-					}
+					while (line.find("\r\n") != 0)
+						line.erase(0, line.find("\r\n") + 2);
+					line.erase(0, 2);
 					if (line.find("\r\n") != line.npos)
 					{
 						std::string	final = "\r\n--" + _header.Boundary + "--\r\n";
@@ -392,11 +390,11 @@ bool	Client::execute_client(bool path)
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
 					{
-						FILE	*filename;
+						std::fstream	filename;
 
-						filename = fopen(_header.filename.data(), "w");
-						fwrite(line.data(), sizeof(char), sizeof(line.data()), filename);
-						fclose(filename);
+						filename.open(_header.filename, std::ios::out);
+						filename << line;
+						filename.close();
 					}
 					std::cout << "SECOND!============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
