@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 10:28:34 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/05 10:40:34 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -351,7 +351,7 @@ bool	Client::execute_client(bool path)
 					{
 						std::fstream	filename;
 
-						filename.open(_header.filename, std::ios::out);
+						filename.open(_header.filename, std::ios::out | std::ios::app);
 						filename << line;
 						filename.close();
 					}
@@ -392,7 +392,7 @@ bool	Client::execute_client(bool path)
 					{
 						std::fstream	filename;
 
-						filename.open(_header.filename, std::ios::out);
+						filename.open(_header.filename, std::ios::out | std::ios::app);
 						filename << line;
 						filename.close();
 					}
