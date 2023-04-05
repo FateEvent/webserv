@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 23:31:05 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/05 10:00:19 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,15 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 				throw ("no index referenced!");
 			this->index = it->second;
 		}
+		else if (!it->first.compare("allow"))
+		{
+			if (it->second.find("GET") != it->second.npos)
+				this->allow |= 0x001;
+			if (it->second.find("POST") != it->second.npos)
+				this->allow |= 0x002;
+			if (it->second.find("DELETE") != it->second.npos)
+				this->allow |= 0x004;
+		}
 		else if (!it->first.compare("error_page"))
 		{
 			if (!ft::put_err_page(it->second, this->error_page))
@@ -122,7 +131,7 @@ void s_config::set_zero()
 	this->port = 0;
 	this->error_log.clear();
 	this->cgi.clear();
-	this->allow.clear();
+	this->allow = 0;
 	this->nbr_client = 0;
 	this->max_client = -1;
 	this->max_body = 0;

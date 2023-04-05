@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 23:44:36 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/05 10:11:51 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ void	Client::clear_header()
 	this->_pipe_cgi_out[0] = 0;
 	this->_pipe_cgi_out[1] = 0;
 	this->_pid_cgi = 0;
+	this->_allow = 0x000;
 	this->_cgi = false;
 	this->_sedding = false;
 	this->_reponse.clear();
@@ -229,6 +230,11 @@ bool	Client::execute_client(bool path)
 	else if (_header.Method.compare("GET") == 0)
 	{
 		std::cout << "GET METHOD" << std::endl;
+		if (!(this->_allow & 1))
+		{
+			this->make_error(405);
+			return (false);
+		}
 		if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
 			(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end()))
 		{
@@ -270,6 +276,11 @@ bool	Client::execute_client(bool path)
 	else if (_header.Method.compare("POST") == 0)
 	{
 		std::cout << "POST METHOD" << std::endl;
+		if (!(this->_allow >> 1 & 1))
+		{
+			this->make_error(405);
+			return (false);
+		}
 		if (this->_header.Content_Length == 0)
 			this->make_error(411);
 		else if (this->_header.Content_Length > this->_max_body && this->_max_body > 0)
@@ -293,7 +304,15 @@ bool	Client::execute_client(bool path)
 		return (true); */
 	}
 	else if (_header.Method.compare("DELETE") == 0)
+	{
 		std::cout << "DELETE METHOD" << std::endl;
+		if (!(this->_allow >> 2 & 1))
+		{
+			this->make_error(405);
+			return (false);
+		}
+	}
+		
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl; // Should not goto inside.
 	return (false);

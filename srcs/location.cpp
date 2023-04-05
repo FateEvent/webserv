@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 23:19:52 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/05 10:06:31 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ bool	Client::check_location()
 {
 	std::string	path;
 	this->_max_body = this->_ref_conf.max_body == 0 ? this->_ref_conf._base->max_body : this->_ref_conf.max_body;
-	
+	this->_allow = this->_ref_conf.allow;
 	for (std::vector<struct s_location>::const_iterator it = this->_ref_conf.location.begin();
 				it != this->_ref_conf.location.end(); it++)
 	{
@@ -75,6 +75,16 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 				this->_max_body = std::stol(it->second);
  			else if (!it->first.find("proxy_pass"))
 				this->_proxy = it->second;
+			else if (!it->first.find("allow"))
+			{
+				this->_allow = 0;
+				if (it->second.find("GET") != it->second.npos)
+					this->_allow |= 0x001;
+				if (it->second.find("POST") != it->second.npos)
+					this->_allow |= 0x002;
+				if (it->second.find("DELETE") != it->second.npos)
+					this->_allow |= 0x004;
+			}
 			else if (!it->first.find("cgi"))
 				this->_cgi_call.insert(std::make_pair(it->second.substr(0, it->second.find_first_of(" \t\v\f")),
 													it->second.substr(it->second.find_last_of(" \t\v\f") + 1)));

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 23:54:10 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/05 09:59:29 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,16 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 		this->_base.max_client = std::strtoul(it.find("max_client")->second.data(), NULL, 10);
 	if (it.find("error_page") != it.end())
 		ft::parse_err_page(this->_base.error_page, itconfig->second);
+	if (it.find("allow") != it.end())
+	{
+		if (it.find("allow")->second.find("GET") != it.find("allow")->second.npos)
+			this->_base.allow |= 0x001;
+		if (it.find("allow")->second.find("POST") != it.find("allow")->second.npos)
+			this->_base.allow |= 0x002;
+		if (it.find("allow")->second.find("DELETE") != it.find("allow")->second.npos)
+			this->_base.allow |= 0x004;
+		this->_base.max_client = std::strtoul(it.find("max_client")->second.data(), NULL, 10);
+	}
 	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
 	fcntl(this->_base.sock_fd, F_SETFL, O_NONBLOCK);

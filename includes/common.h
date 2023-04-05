@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 22:17:04 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/05 09:31:41 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ typedef struct	s_config
 	std::string							error_log;
 	std::map<std::string, std::string>	cgi;
 	std::string							proxy;
-	std::vector<std::string>			allow;
+	int									allow;
 	ssize_t								max_client;
 	ssize_t								nbr_client;
 	ssize_t								max_body;
