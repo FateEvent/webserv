@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 15:53:47 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/06 16:46:57 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,6 +303,7 @@ bool	Client::execute_client(bool path)
 			char		buff[2];
 
 			temporary = tmpfile();
+//			temporary = fopen("temporary_file", "w");
 			std::cout << "POST METHOD" << std::endl;
 			memset(buff, 0, 2);
 			int recept = 0;
@@ -331,11 +332,27 @@ bool	Client::execute_client(bool path)
 					std::string	final = "\r\n--" + _header.Boundary + "\r\n";
 					line = file_buf.substr(0);
 					file_buf.clear();
+					std::cout << "line" << std::endl;
+					std::cout << line << std::endl;
 					if (!line.find("Content-Disposition"))
 					{
 						ft::split_to_vectors(_header.Content_Disposition, line, ';');
 						start_pos += line.substr(0, line.find("\r\n") + 2).length();
 						line.erase(0, line.find("\r\n") + 2);
+						
+						// fsetpos(temporary, &start_pos);
+						// FILE	*filename;
+						
+						// filename = fopen("ciao", "w");
+						// while (!feof(temporary))
+						// {
+						// 	buff[0] = fgetc(temporary);
+						// 	fputc(buff[0], filename);
+						// 	if (buff[0] == EOF)
+						// 		break;
+						// }
+						// fclose(filename);
+						// break ;
 					}
 					if (!line.find("Content-Type"))
 					{
@@ -393,11 +410,27 @@ bool	Client::execute_client(bool path)
 					std::string	final = "\r\n--" + _header.Boundary + "--\r\n";
 					line = file_buf.substr(0);
 					file_buf.clear();
+					// std::cout << "line" << std::endl;
+					// std::cout << line << std::endl;
 					if (!line.find("Content-Disposition"))
 					{
 						ft::split_to_vectors(_header.Content_Disposition, line, ';');
 						start_pos += line.substr(0, line.find("\r\n") + 2).length();
 						line.erase(0, line.find("\r\n") + 2);
+
+						// fsetpos(temporary, &start_pos);
+						// FILE	*filename;
+						
+						// filename = fopen("ciao", "w");
+						// while (!feof(temporary))
+						// {
+						// 	buff[0] = fgetc(temporary);
+						// 	fputc(buff[0], filename);
+						// 	if (buff[0] == EOF)
+						// 		break;
+						// }
+						// fclose(filename);
+						// break ;
 					}
 					if (!line.find("Content-Type"))
 					{
@@ -433,14 +466,17 @@ bool	Client::execute_client(bool path)
 						
 						filename = fopen(_header.filename.c_str(), "w");
 						fsetpos(temporary, &start_pos);
-						while (!feof(temporary) && start_pos < end_pos)
+						fpos_t	tpos = start_pos;	//?
+						while (!feof(temporary) && tpos < end_pos)
 						{
 							buff[0] = fgetc(temporary);
 							fputc(buff[0], filename);
 							if (buff[0] == EOF)
 								break;
+							tpos++;
 						}
 						fclose(filename);
+						break;
 					}
 					std::cout << "SECOND!============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
@@ -451,12 +487,15 @@ bool	Client::execute_client(bool path)
 					_header.filename.clear();
 				}
 			}
+			
 			std::cout << "======================================================================" << std::endl;
 			std::cout << line << std::endl;
 			std::cout << "======================================================================" << std::endl;
 			for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
 				std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
 			std::cout << std::endl;
+			fclose(temporary);
+			
 			std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
 			//close(this->_sock_fd);
 			this->clear_header();
