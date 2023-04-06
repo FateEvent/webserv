@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 00:42:43 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/06 14:15:07 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ bool	Client::check_location()
 	std::string	path;
 
 	this->_max_body = this->_ref_conf.max_body == 0 ? this->_ref_conf._base->max_body : this->_ref_conf.max_body;
+	this->_download = this->_ref_conf.download.empty() ? (this->_ref_conf._base->download.empty() ? this->_ref_conf.root : this->_ref_conf._base->download) : this->_ref_conf.download;
 	this->_allow = this->_ref_conf.allow;
 	this->_redirect = this->_ref_conf.redirect;
 	for (std::vector<struct s_location>::const_iterator it = this->_ref_conf.location.begin();
@@ -28,6 +29,8 @@ bool	Client::check_location()
 		else
 			this->condition_location(it);
 	}
+
+	// CHECK DIR IS A FILE AND CHECK THE ROOT
 	if (this->_root.empty())
 	{
 		if (!this->_header.Dir.empty() && this->_header.file.first.empty())
@@ -52,6 +55,16 @@ bool	Client::check_location()
 		else
 			this->_index = this->_header.file.first + "." + this->_header.file.second; // ????
 	}
+
+	// CHECK IF DOWNLOAD REPERTORY EXIST ELSE CREATE.
+	if (stat(this->_download.c_str(), &path_stat) == -1)
+	{
+		if (mkdir(this->_download.c_str(), S_IRWXU | S_IRGRP | S_IROTH))
+			this->_download = this->_ref_conf.root;
+	}
+	else if (S_ISREG(path_stat.st_mode) || S_ISLNK(path_stat.st_mode))
+			this->_download = this->_ref_conf.root;
+
 	path = this->_root + "/" + this->_index;
 	#ifdef DEBUG
 		std::cout << "Path of file is: \"" + path + "\"" << std::endl;
@@ -105,6 +118,8 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 			}
 			else if (!it->first.find("return"))
 				this->_redirect = it->second;
+			else if (!it->first.find("download"))
+				this->_download = it->second;
 			else if (!it->first.find("cgi"))
 				this->_cgi_call.insert(std::make_pair(it->second.substr(0, it->second.find_first_of(" \t\v\f")),
 													it->second.substr(it->second.find_last_of(" \t\v\f") + 1)));

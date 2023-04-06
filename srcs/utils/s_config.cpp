@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 22:48:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/06 10:57:21 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,8 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 			if (it->second.find("DELETE") != it->second.npos)
 				this->allow |= 0x004;
 		}
+		else if (!it->first.compare("download"))
+			this->download = it->second;
 		else if (!it->first.compare("error_page"))
 		{
 			if (!ft::put_err_page(it->second, this->error_page))
