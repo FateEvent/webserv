@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 10:52:46 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/06 12:08:07 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,54 +322,121 @@ bool	Client::execute_client(bool path)
 				file_buf += buff[0];
 				buf_stream << buff[0];
 				pos++;
-				if (buff[0] == '\n')
+				if (!file_buf.find("--" + _header.Boundary + "\r\n"))
 				{
-					if (!file_buf.find("--" + _header.Boundary + "\r\n")
-						|| !file_buf.find("--" + _header.Boundary + "--\r\n"))
+					std::string	str = "--" + _header.Boundary + "\r\n";
+					end_pos = pos - str.length();
+					std::cout << "end_pos: " << end_pos << std::endl;
+					if (pos == str.length())
 					{
-						std::string	str = "--" + _header.Boundary + "\r\n";
-
-						if (pos == str.length())
-							file_buf.clear();
-						else
+						std::cout << "je rentre ici" << std::endl;
+						std::cout << file_buf << std::endl;
+						std::cout << "--------------" << std::endl;
+						file_buf.clear();
+					}
+					else
+					{
+						if (_header.entry_name != "" && _header.filename == "")
 						{
-							if (_header.entry_name != "" && _header.filename == "")
-							{
-								_header.other.insert(std::make_pair(_header.entry_name, file_buf));
-							}
-							else if (_header.filename != "")
-							{
-								std::fstream	filename;
+							std::cout << "je rentre ici2" << std::endl;
+							std::cout << file_buf << std::endl;
+							std::cout << "--------------" << std::endl;
+							_header.other.insert(std::make_pair(_header.entry_name, file_buf));
+						}
+						else if (_header.filename != "")
+						{
+							std::fstream	filename;
 
-								end_pos = pos;
-								filename.open(_header.filename, std::ios::out | std::ios::app);
-								while (!buf_stream.eof())
-								{
-									filename << file_buf;
-									pos++;
-								}
-								filename.close();
-							}
+							filename.open(_header.filename, std::ios::out | std::ios::app);
+							filename << file_buf;
+							filename.close();
 						}
 					}
-					else if (!file_buf.find("Content-Disposition"))
+				}
+				if (!file_buf.find("--" + _header.Boundary + "--\r\n"))
+				{
+					std::string	str = "--" + _header.Boundary + "--\r\n";
+					end_pos = pos - str.length();
+					std::cout << "end_pos: " << end_pos << std::endl;
+					if (_header.entry_name != "" && _header.filename == "")
 					{
-						ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
-						file_buf.clear();
+						std::cout << "je rentre ici3" << std::endl;
+						std::cout << file_buf << std::endl;
+						std::cout << "--------------" << std::endl;
+						_header.other.insert(std::make_pair(_header.entry_name, file_buf));
 					}
-					else if (!file_buf.find("Content-Type"))
+					else if (_header.filename != "")
 					{
-						file_buf.clear();
+						std::fstream	filename;
+
+						filename.open(_header.filename, std::ios::out | std::ios::app);
+						filename << file_buf;
+						filename.close();
 					}
-					else if (file_buf.find("\r\n") != 0)
-						file_buf.erase(0, file_buf.find("\r\n") + 2);
-					else if (!file_buf.find("\r\n"))
+				}
+				if (!file_buf.find("Content-Disposition"))
+				{
+					std::cout << "Dispo here" << std::endl;
+					while (!feof(temporary) && buff[0] != '\n')
 					{
-						file_buf.erase(0, 2);
-						start_pos = pos;
-						ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
-						ft::find_val(_header.Content_Disposition, _header.filename, "filename");
-						file_buf.clear();
+						buff[0] = fgetc(temporary);
+						if (buff[0] == EOF)
+							break;
+						file_buf += buff[0];
+						buf_stream << buff[0];
+						pos++;
+					}
+					buff[0] = fgetc(temporary);
+					std::cout << file_buf << std::endl;
+					std::cout << "----dispo here----" << std::endl;
+					ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
+					file_buf.clear();
+				}
+				if (!file_buf.find("Content-Type"))
+				{
+					std::cout << "Content type here" << std::endl;
+					while (!feof(temporary) && buff[0] != '\n')
+					{
+						buff[0] = fgetc(temporary);
+						if (buff[0] == EOF)
+							break;
+						file_buf += buff[0];
+						buf_stream << buff[0];
+						pos++;
+					}
+					buff[0] = fgetc(temporary);
+					std::cout << file_buf << std::endl;
+					std::cout << "----content type here----" << std::endl;
+					file_buf.clear();
+				}
+				if (file_buf.find("\r\n") != 0 && file_buf.find("\r\n") != file_buf.npos)
+				{
+					while (!feof(temporary) && buff[0] != '\n')
+					{
+						buff[0] = fgetc(temporary);
+						if (buff[0] == EOF)
+							break;
+						file_buf += buff[0];
+						buf_stream << buff[0];
+						pos++;
+					}
+					file_buf.erase(0, file_buf.find("\r\n") + 2);
+				}
+				if (!file_buf.find("\r\n"))
+				{
+					file_buf.erase(0, 2);
+					start_pos = pos;
+					std::cout << "start_pos: " << start_pos << std::endl;
+					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
+					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
+					while (!feof(temporary) && file_buf.find("\r\n") != file_buf.npos)
+					{
+						buff[0] = fgetc(temporary);
+						if (buff[0] == EOF)
+							break;
+						file_buf += buff[0];
+						buf_stream << buff[0];
+						pos++;
 					}
 				}
 			}
@@ -378,9 +445,13 @@ bool	Client::execute_client(bool path)
 			std::cout << "======================================================================" << std::endl;
 			std::cout << file_buf << std::endl;
 			std::cout << "======================================================================" << std::endl;
-			for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
-				std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
+			for (std::vector<std::string>::iterator it = _header.Content_Disposition.begin(); it != _header.Content_Disposition.end(); ++it)
+				std::cout << "vector it: " << *it << std::endl; 
 			std::cout << std::endl;
+			for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
+				std::cout << "clé: " << it->first << ", value: " << it->second << std::endl;
+			std::cout << std::endl;
+			
 			std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
 			//close(this->_sock_fd);
 			this->clear_header();
