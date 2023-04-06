@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 10:40:34 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/06 10:52:46 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,10 +294,13 @@ bool	Client::execute_client(bool path)
 		}
 		else
 		{
-			FILE		*temporary;
-			std::string	file_buf;
-			std::string	line;
-			char		buff[2];
+			FILE			*temporary;
+			std::string		file_buf;
+			std::fstream	buf_stream;
+			std::size_t		pos(0);
+			std::size_t		start_pos(0);
+			std::size_t		end_pos(0);
+			char			buff[2];
 
 			temporary = tmpfile();
 			std::cout << "POST METHOD" << std::endl;
@@ -317,96 +320,63 @@ bool	Client::execute_client(bool path)
 				if (buff[0] == EOF)
 					break;
 				file_buf += buff[0];
-				if (!file_buf.find("--" + _header.Boundary + "\r\n"))
+				buf_stream << buff[0];
+				pos++;
+				if (buff[0] == '\n')
 				{
-					line = file_buf.substr(0);
-					file_buf.clear();
-				}
-				else if (file_buf.find("--" + _header.Boundary + "\r\n") != std::string::npos)
-				{
-					line = file_buf.substr(0);
-					file_buf.clear();
-					if (!line.find("Content-Disposition"))
+					if (!file_buf.find("--" + _header.Boundary + "\r\n")
+						|| !file_buf.find("--" + _header.Boundary + "--\r\n"))
 					{
-						ft::split_to_vectors(_header.Content_Disposition, line, ';');
-						line.erase(0, line.find("\r\n") + 2);
-					}
-					if (!line.find("Content-Type"))
-					{
-						line.erase(0, line.find("\r\n") + 2);
-					}
-					while (line.find("\r\n") != 0)
-						line.erase(0, line.find("\r\n") + 2);
-					line.erase(0, 2);
-					if (line.find("\r\n") != line.npos)
-					{
-						std::string	final = "\r\n--" + _header.Boundary + "\r\n";
-						line.erase(line.length() - (final.length()));
-					}
-					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
-					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
-					if (_header.entry_name != "" && _header.filename == "")
-						_header.other.insert(std::make_pair(_header.entry_name, line));
-					else if (_header.filename != "")
-					{
-						std::fstream	filename;
+						std::string	str = "--" + _header.Boundary + "\r\n";
 
-						filename.open(_header.filename, std::ios::out | std::ios::app);
-						filename << line;
-						filename.close();
-					}
-					std::cout << "FIRST!=============================" << std::endl;
-					std::cout << "name: " << _header.entry_name << std::endl;
-					std::cout << "filename: " << _header.filename << std::endl;
-					std::cout << line << std::endl;
-					std::cout << "===================================" << std::endl;
-					_header.entry_name.clear();
-					_header.filename.clear();
-				}
-				else if (file_buf.find("--" + _header.Boundary + "--\r\n") != std::string::npos)
-				{
-					line = file_buf.substr(0);
-					file_buf.clear();
-					if (!line.find("Content-Disposition"))
-					{
-						ft::split_to_vectors(_header.Content_Disposition, line, ';');
-						line.erase(0, line.find("\r\n") + 2);
-					}
-					if (!line.find("Content-Type"))
-					{
-						line.erase(0, line.find("\r\n") + 2);
-					}
-					while (line.find("\r\n") != 0)
-						line.erase(0, line.find("\r\n") + 2);
-					line.erase(0, 2);
-					if (line.find("\r\n") != line.npos)
-					{
-						std::string	final = "\r\n--" + _header.Boundary + "--\r\n";
-						line.erase(line.length() - final.length());
-					}
-					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
-					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
-					if (_header.entry_name != "" && _header.filename == "")
-						_header.other.insert(std::make_pair(_header.entry_name, line));
-					else if (_header.filename != "")
-					{
-						std::fstream	filename;
+						if (pos == str.length())
+							file_buf.clear();
+						else
+						{
+							if (_header.entry_name != "" && _header.filename == "")
+							{
+								_header.other.insert(std::make_pair(_header.entry_name, file_buf));
+							}
+							else if (_header.filename != "")
+							{
+								std::fstream	filename;
 
-						filename.open(_header.filename, std::ios::out | std::ios::app);
-						filename << line;
-						filename.close();
+								end_pos = pos;
+								filename.open(_header.filename, std::ios::out | std::ios::app);
+								while (!buf_stream.eof())
+								{
+									filename << file_buf;
+									pos++;
+								}
+								filename.close();
+							}
+						}
 					}
-					std::cout << "SECOND!============================" << std::endl;
-					std::cout << "name: " << _header.entry_name << std::endl;
-					std::cout << "filename: " << _header.filename << std::endl;
-					std::cout << line << std::endl;
-					std::cout << "===================================" << std::endl;
-					_header.entry_name.clear();
-					_header.filename.clear();
+					else if (!file_buf.find("Content-Disposition"))
+					{
+						ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
+						file_buf.clear();
+					}
+					else if (!file_buf.find("Content-Type"))
+					{
+						file_buf.clear();
+					}
+					else if (file_buf.find("\r\n") != 0)
+						file_buf.erase(0, file_buf.find("\r\n") + 2);
+					else if (!file_buf.find("\r\n"))
+					{
+						file_buf.erase(0, 2);
+						start_pos = pos;
+						ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
+						ft::find_val(_header.Content_Disposition, _header.filename, "filename");
+						file_buf.clear();
+					}
 				}
 			}
+			_header.entry_name.clear();
+			_header.filename.clear();
 			std::cout << "======================================================================" << std::endl;
-			std::cout << line << std::endl;
+			std::cout << file_buf << std::endl;
 			std::cout << "======================================================================" << std::endl;
 			for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
 				std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
