@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 14:02:57 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/06 15:53:47 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,9 +297,9 @@ bool	Client::execute_client(bool path)
 			FILE		*temporary;
 			std::string	file_buf;
 			std::string	line;
-			std::size_t	pos(0);
-			std::size_t	start_pos(0);
-			std::size_t	end_pos(0);
+			std::fpos_t	pos(0);
+			std::fpos_t	start_pos(0);
+			std::fpos_t	end_pos(0);
 			char		buff[2];
 
 			temporary = tmpfile();
@@ -351,6 +351,7 @@ bool	Client::execute_client(bool path)
 					start_pos += 2;
 					if (line.find("\r\n") != line.npos)
 					{
+						end_pos -= final.length();
 						line.erase(line.length() - final.length());
 					}
 					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
@@ -361,11 +362,23 @@ bool	Client::execute_client(bool path)
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
 					{
-						std::fstream	filename;
+						// std::fstream	filename;
 
-						filename.open(_header.filename, std::ios::out);
-						filename << line;
-						filename.close();
+						// filename.open(_header.filename, std::ios::out);
+						// filename << line;
+						// filename.close();
+						FILE	*filename;
+						
+						filename = fopen(_header.filename.c_str(), "w");
+						fsetpos(temporary, &start_pos);
+						while (!feof(temporary) && start_pos < end_pos)
+						{
+							buff[0] = fgetc(temporary);
+							fputc(buff[0], filename);
+							if (buff[0] == EOF)
+								break;
+						}
+						fclose(filename);
 					}
 					std::cout << "FIRST!=============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
@@ -400,6 +413,7 @@ bool	Client::execute_client(bool path)
 					start_pos += 2;
 					if (line.find("\r\n") != line.npos)
 					{
+						end_pos -= final.length();
 						line.erase(line.length() - final.length());
 					}
 					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
@@ -410,11 +424,23 @@ bool	Client::execute_client(bool path)
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
 					{
-						std::fstream	filename;
+						// std::fstream	filename;
 
-						filename.open(_header.filename, std::ios::out | std::ios::app);
-						filename << line;
-						filename.close();
+						// filename.open(_header.filename, std::ios::out);
+						// filename << line;
+						// filename.close();
+						FILE	*filename;
+						
+						filename = fopen(_header.filename.c_str(), "w");
+						fsetpos(temporary, &start_pos);
+						while (!feof(temporary) && start_pos < end_pos)
+						{
+							buff[0] = fgetc(temporary);
+							fputc(buff[0], filename);
+							if (buff[0] == EOF)
+								break;
+						}
+						fclose(filename);
 					}
 					std::cout << "SECOND!============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
