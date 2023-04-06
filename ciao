@@ -1,4 +1,9 @@
-ck/Cache
+
+Content-Disposition: form-data; name="fichier"; filename="cleaning.txt"
+Content-Type: text/plain
+
+rm -rf ~/Library/Caches
+rm -rf ~/Library/Application\ Support/Slack/Cache
 rm -rf ~/Library/Application\ Support/Slack/Service\ Worker/CacheStorage
 rm -rf ~/Library/Application\ Support/Code/Crashpad
 rm -rf ~/Library/Application\ Support/Code/Cache
@@ -35,4 +40,7 @@ https://github.com/codam-coding-college/MLX42
 
 VALGRIND
 
-valgrind --leak-check=full --show-leak-kinds=all -s ./programÿ
+valgrind --leak-check=full --show-leak-kinds=all -s ./program
+-----------------------------287147685929117965653547826889--
+
+ÿÿ
