@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 19:48:20 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/06 20:08:57 by faventur         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -426,7 +426,7 @@ bool	Client::execute_client(bool path)
 						fputc(EOF, filename);
 						fclose(filename);
 						fsetpos(temporary, &pos);
-						start_pos = end_pos;
+						start_pos = end_pos + final.length();
 					}
 					std::cout << "FIRST!=============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
@@ -528,7 +528,7 @@ bool	Client::execute_client(bool path)
 						fputc(EOF, filename);
 						fclose(filename);
 						fsetpos(temporary, &pos);
-						start_pos = end_pos;
+						start_pos = end_pos + final.length();
 					}
 					std::cout << "SECOND!============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
