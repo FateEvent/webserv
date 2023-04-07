@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/07 02:21:18 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/07 11:40:55 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,7 @@ bool	Client::continue_client(fd_set *fdset)
 			this->_index.clear();
 			this->_root.clear();
 			delete this->_data.file;
-			//std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
+			// std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
 	}
@@ -301,7 +301,7 @@ void	Client::cgi_prepare_to_send()
 		return;
 	this->_data.minus_header = header_test.find("\r\n\r\n");
 	this->_data.header = ft::make_header(200);
-	if (header_test.find("Content-Length:") == header_test.npos)
+	if (header_test.find("Content-Length:") == header_test.npos || header_test.find("content-length:") == header_test.npos)
 		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size - (this->_data.minus_header != header_test.npos ? this->_data.minus_header + 4 : 0)) + "\r\n");
 	if (header_test.find("Content-Type:") == header_test.npos)
 		this->_data.header.append("Content-Type: text/html\r\n");

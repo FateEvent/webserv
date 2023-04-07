@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 23:08:38 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/07 11:40:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -569,9 +569,10 @@ void	Webserv::exec_client()
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
-		::close(*it);
+usleep(50000); // If not 0,5sec error when post have body??!!!!
 		//std::cout << YELLOW << this->_client.find(*it)->second.get_nbr_connected_client() << " client are already connected." << RST << std::endl;
 		this->_client.erase(*it);
+		::close(*it);
 		std::cout << BLUE << "Socket " << *it << " closed." << RST << std::endl;
 	}
 }

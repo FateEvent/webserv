@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/07 02:19:52 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/07 11:32:31 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ int	Client::launch_cgi(std::string path)
 
 	if (pipe(this->_pipe_cgi_out) == -1 || pipe(this->_pipe_cgi_in) == -1)
 		return (503);
-
 	this->_pid_cgi = fork();
 	if (this->_pid_cgi > 0)
 	{
