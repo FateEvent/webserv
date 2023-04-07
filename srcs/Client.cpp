@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 23:29:20 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/07 02:21:18 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,9 +183,37 @@ bool	Client::continue_client(fd_set *fdset)
 	}
 	else if (this->is_cgi())
 	{
-		if (this->_chunked)
+		if (this->is_chunk())
 		{
-			// chunk by paquet
+			int			recept = 1;
+			char 		buff[2];
+			std::string tmp;
+			int			size = 0;
+			std::memset(buff, 0, 2);
+			while (tmp.find("/r/n") == tmp.npos)
+			{
+				// ATTENTION BLOQUANT EN CAS DE SOCKET NON PRET OU LONGUE RECUPERATION! PASSER PAR UN STREAMSTRING??
+				// NORMALEMENT NON CAR LES CHUNK DEVRAIENT ETRE DE PETITE TAILLE.
+				recept = recv(this->_sock_fd, &buff, 1, 0);
+ 				if (recept == -1)
+					continue;
+				if (recept == 0 || buff[0] == 0) // Usualy client close connection...
+					break;
+				tmp.push_back(buff[0]);
+			}
+			size = std::strtoul(tmp.c_str(), NULL, 16);
+			char tosend[size + 1];
+			std::memset(tosend, 0 ,size + 1);
+			if (size > 0)
+			{
+				if (recv(this->_sock_fd, &tosend, size, 0) > 0)
+					write(this->_pipe_cgi_out[1], tosend, size);
+			}
+			else
+			{
+				::close(this->_pipe_cgi_out[1]);
+				this->_chunked = false;
+			}
 		}
 		else
 		{
@@ -209,7 +237,7 @@ bool	Client::continue_client(fd_set *fdset)
 			}
 		}
 	}
-	else if (this->_chunked)
+	else if (this->is_chunk())
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
 	else
 	{
@@ -232,90 +260,11 @@ bool	Client::execute_client(bool path)
 	}
 	// MAY BE TEST CGI HERE AND NOT IN GET,POST OR DELETE METHODE
 	else if (_header.Method.compare("GET") == 0)
-	{
-		std::cout << "GET METHOD" << std::endl;
-		if (!(this->_allow & 1) && this->_allow != 0)
-		{
-			this->make_error(405);
-			return (false);
-		}
-		if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
-			(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end()))
-		{
-			(*static_cast<std::ifstream*>(this->_data.file)).close();
-			this->_data.file = 0;
-			this->_data.file = new std::stringstream();
-			if (_ref_conf.cgi.find(this->_header.file.second) != this->_ref_conf.cgi.end()) // Tester en premier les gci dans location... switch if and else..
-			{
-				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
-				//this->launch_cgi(this->_ref_conf.cgi.find(_index.substr(_index.find_last_of(".")))->second);
-				std::cout << "CGI on base" << std::endl;
-			}
-			else
-			{
-				std::cout << "CGI on location" << std::endl;
-				if (!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end())
-					this->launch_cgi(this->_cgi_call.find(_index.substr(_index.find_last_of(".")))->second);
-				else
-					this->launch_cgi(this->_ref_conf.cgi.find(_index.substr(_index.find_last_of(".")))->second);
-				// WARNING IF CGI VAR AS ONLY A KEY THAT MEANS THE KEY IS A PATH! TODO THAT!
-			}
-		}
-		else
-		{
-			std::string	header;
-			this->_data.header = ft::make_header(200);
-			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
-			this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
-			int check = 0;
-			check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
-			if (check == -1)
-				this->make_error(500);
-			if (check == 0)
-				this->make_error(501);
-			std::cout << BLUE << this->_data.header << RST << std::endl;
-			this->_sedding = true;
-		}
-	}
+		return (this->execute_get());
 	else if (_header.Method.compare("POST") == 0)
-	{
-		std::cout << "POST METHOD" << std::endl;
-		if (!(this->_allow >> 1 & 1) && this->_allow != 0)
-		{
-			this->make_error(405);
-			return (false);
-		}
-		if (this->_header.Content_Length == 0)
-			this->make_error(411);
-		else if (this->_header.Content_Length > this->_max_body && this->_max_body > 0)
-			this->make_error(413);
-/* 		char buff[2];
-		memset(buff, 0, 2);
-		int recept = 0;
-		recept = recv(this->_sock_fd, &buff, 1, 0);
-		while (recept > 0)
-		{
-			std::cout << buff;
-			recept = recv(this->_sock_fd, &buff, 1, 0);
-		}
-		std::cout << std::endl;
-		std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
-		//close(this->_sock_fd);
-		this->clear_header();
-		this->_index.clear();
-		this->_root.clear();
-		this->_working = true;
-		return (true); */
-	}
+		return (this->execute_post());
 	else if (_header.Method.compare("DELETE") != 0)
-	{
-		std::cout << "DELETE METHOD" << std::endl;
-		if (!(this->_allow >> 2 & 1) && this->_allow != 0)
-		{
-			this->make_error(405);
-			return (false);
-		}
-	}	
+		return (this->execute_delete());	
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl; // Should not goto inside.
 	return (false);

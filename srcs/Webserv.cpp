@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 22:45:01 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/06 23:08:38 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -520,7 +520,7 @@ void	Webserv::check_client()
 			continue;
 		}
 		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd) &&
-					it->second.is_ready())// && it->second.is_ready())// ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
+					it->second.is_ready() && !it->second.is_cgi())// && it->second.is_ready())// ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
 		{
 			to_close.insert(std::make_pair(it->second.get_sockfd(), &it->second));
 			std::cout << YELLOW << "CLOSE CONNEXION" << RST << std::endl;

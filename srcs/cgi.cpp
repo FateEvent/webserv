@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 00:27:28 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/07 02:19:52 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,18 +79,20 @@ int	Client::launch_cgi(std::string path)
 	this->_pid_cgi = fork();
 	if (this->_pid_cgi > 0)
 	{
-		// EXECVE
+		// MAIN
 		close(this->_pipe_cgi_out[0]);
-		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
-		close(this->_pipe_cgi_in[1]);
 		//dup2(this->_pipe_cgi_out[1], STDOUT_FILENO);
+		close(this->_pipe_cgi_in[1]);
+		//dup2(this->_pipe_cgi_in[0], STDIN_FILENO);
 		fcntl(this->_pipe_cgi_in[0], F_SETFL, O_NONBLOCK);
-// Try cgi_tester without follow line.. if don't work uncomment...
  		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
 			this->_header.Content_Length == 0)
-		{
 			close(this->_pipe_cgi_out[1]);
-		} 
+		else if (this->_header.Method.find("POST") != this->_header.Method.npos)
+		{
+			if (!this->is_chunk())
+				dup2(this->_sock_fd, this->_pipe_cgi_out[1]);
+		}
 		this->_cgi = true;
 	}
 	else if (this->_pid_cgi == -1)
@@ -102,6 +104,7 @@ int	Client::launch_cgi(std::string path)
 	}
 	else
 	{
+		// CHILD
 		close(this->_pipe_cgi_out[1]);
 		close(this->_pipe_cgi_in[0]);
 		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);

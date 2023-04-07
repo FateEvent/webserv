@@ -3,12 +3,9 @@
 
 int	main()
 {
-	std::string locate = "/test";
-	std::string dir = "/test/du/repertoire";
-	std::cout << locate.length() << std::endl;
-
-	std::cout << std::strncmp((locate + "/").c_str(), dir.c_str(), locate.length() + 1) << std::endl;
-	std::cout << std::strncmp(locate.c_str(), dir.c_str(), locate.length()) << std::endl;
-
+	int size = 0;
+	std::string tmp("10\r\n");
+	size = std::strtoul(tmp.c_str(), NULL, 16);
+	std::cout << size << std::endl;
 	return 0;
 }
