@@ -326,6 +326,7 @@ bool	Client::execute_client(bool path)
 				{
 					file_buf.clear();
 					start_pos = pos;
+					std::cout << "start position (0): " << start_pos << std::endl;
 				}
 				else if (file_buf.find("--" + _header.Boundary + "\r\n") != std::string::npos)
 				{
@@ -389,18 +390,17 @@ bool	Client::execute_client(bool path)
 					line.erase(0, 2);
 					start_pos += 2;
 					std::cout << "line dans le futur d'après" << std::endl;
-					std::cout << "start position (5): " << start_pos << std::endl;
+					std::cout << "start position (5) OK!: " << start_pos << std::endl;
 					std::cout << line << std::endl;
 					std::cout << "----------------" << std::endl;
-					if (line.find("\r\n") != line.npos)
-					{
-						end_pos -= final.length();
-						line.erase(line.length() - final.length());
-					}
+					// if (line.find("\r\n") != line.npos)
+					// {
+					// 	//end_pos -= final.length();
+					// 	line.erase(line.length() - final.length());
+					// }
 					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
 					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 					end_pos = pos - final.length();
-					std::cout << "positions: " << start_pos << "\\" << end_pos << std::endl;
 					if (_header.entry_name != "" && _header.filename == "")
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
@@ -423,14 +423,20 @@ bool	Client::execute_client(bool path)
 								break;
 							tpos++;
 						}
-						fputc(EOF, filename);
 						fclose(filename);
 						fsetpos(temporary, &pos);
-						start_pos = end_pos + final.length();
 					}
+					if (line.find("\r\n") != line.npos)
+					{
+						start_pos += line.substr(0, line.find("\r\n") + 2).length();
+						line.erase(0, line.find("\r\n") + 2);
+//						line.erase(line.length() - final.length());
+					}
+					start_pos = end_pos + final.length();
 					std::cout << "FIRST!=============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
 					std::cout << "filename: " << _header.filename << std::endl;
+					std::cout << "positions: " << start_pos << "\\" << end_pos << std::endl;
 					std::cout << line << std::endl;
 					std::cout << "===================================" << std::endl;
 					_header.entry_name.clear();
@@ -494,15 +500,14 @@ bool	Client::execute_client(bool path)
 					std::cout << "start position (10): " << start_pos << std::endl;
 					std::cout << line << std::endl;
 					std::cout << "----------------" << std::endl;
-					if (line.find("\r\n") != line.npos)
-					{
-						end_pos -= final.length();
-						line.erase(line.length() - final.length());
-					}
+					// if (line.find("\r\n") != line.npos)
+					// {
+					// 	//end_pos -= final.length();
+					// 	line.erase(line.length() - final.length());
+					// }
 					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
 					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 					end_pos = pos - final.length();
-					std::cout << "positions: " << start_pos << "\\" << end_pos << std::endl;
 					if (_header.entry_name != "" && _header.filename == "")
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
@@ -525,14 +530,20 @@ bool	Client::execute_client(bool path)
 								break;
 							tpos++;
 						}
-						fputc(EOF, filename);
 						fclose(filename);
 						fsetpos(temporary, &pos);
-						start_pos = end_pos + final.length();
 					}
+					if (line.find("\r\n") != line.npos)
+					{
+						start_pos += line.substr(0, line.find("\r\n") + 2).length();
+						line.erase(0, line.find("\r\n") + 2);
+//						line.erase(line.length() - final.length());
+					}
+					start_pos = end_pos + final.length();
 					std::cout << "SECOND!============================" << std::endl;
 					std::cout << "name: " << _header.entry_name << std::endl;
 					std::cout << "filename: " << _header.filename << std::endl;
+					std::cout << "positions: " << start_pos << "\\" << end_pos << std::endl;
 					std::cout << line << std::endl;
 					std::cout << "===================================" << std::endl;
 					_header.entry_name.clear();
