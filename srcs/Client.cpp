@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/07 11:40:55 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/10 00:26:45 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,8 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 {
 	this->_working = false;
 	this->_chunked = false;
-	this->_pipe_cgi_in[0] = 0;
-	this->_pipe_cgi_in[1] = 0;
-	this->_pipe_cgi_out[0] = 0;
-	this->_pipe_cgi_out[1] = 0;
+	this->_pipe_cgi[0] = 0;
+	this->_pipe_cgi[1] = 0;
 	this->_cgi = false;
 	this->_sedding = false;
 	this->_reponse.clear();
@@ -54,6 +52,7 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_timeout = std::time(nullptr);
 	this->_header.time_out = this->_timeout;
 	this->_ready = true;
+	this->_close = false;
 }
 
 void	Client::clear_header()
@@ -61,10 +60,8 @@ void	Client::clear_header()
 	this->_header.clear();
 	this->_working = false;
 	this->_chunked = false;
-	this->_pipe_cgi_in[0] = 0;
-	this->_pipe_cgi_in[1] = 0;
-	this->_pipe_cgi_out[0] = 0;
-	this->_pipe_cgi_out[1] = 0;
+	this->_pipe_cgi[0] = 0;
+	this->_pipe_cgi[1] = 0;
 	this->_pid_cgi = 0;
 	this->_allow = 0x000;
 	this->_cgi = false;
@@ -85,18 +82,17 @@ void	Client::clear_header()
 		delete this->_data.file;
 	this->_data.file = NULL;
 	this->_ready = false;
+	this->_close = false;
 }
 
 Client::~Client()
 {
 	if (this->_pid_cgi > 0)
-		kill(this->_pid_cgi, 2);
-	if (this->_pipe_cgi_out[0] > 0)
+		::kill(this->_pid_cgi, 2);
+	if (this->_pipe_cgi[0] > 0)
 	{
-		close(this->_pipe_cgi_out[0]);
-		close(this->_pipe_cgi_out[1]);
-		close(this->_pipe_cgi_in[0]);
-		close(this->_pipe_cgi_in[1]);
+		::close(this->_pipe_cgi[0]);
+		::close(this->_pipe_cgi[1]);
 	}
 	delete this->_data.file;
 	this->_ref_conf.nbr_client--;
@@ -116,6 +112,7 @@ bool			Client::is_seeding() const					{ return (this->_sedding?true:false); }
 bool			Client::is_ready() const					{ return (this->_ready?true:false); }
 unsigned int	Client::get_nbr_connected_client() const	{ return (this->_ref_conf.nbr_client); }
 void			Client::add_nbr_client()					{ this->_ref_conf.nbr_client++; }
+bool			Client::get_close() const					{ return (this->_close); }
 
 std::pair<std::string, std::string>	Client::get_file() const
 {
@@ -127,7 +124,7 @@ std::pair<std::string, std::string>	Client::get_file() const
 int	Client::get_fd_cgi() const
 {
 	if (this->is_cgi())
-		return (this->_pipe_cgi_in[1]);
+		return (this->_pipe_cgi[1]);
 	return (0);
 }
 
@@ -139,6 +136,7 @@ bool	Client::new_request()
 	this->_timeout = std::time(nullptr);
 	this->_header.time_out = this->_timeout;
 	this->_ready = true;
+	std::cout << GREEN << "Connexion accepted to socket " << this->_sock_fd << RST << std::endl;
 	return (true);
 }
 
@@ -151,11 +149,11 @@ bool	Client::send_data(int fd)
 		std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		return (false);
 	}
+	this->_data.file->clear();
 	this->_data.file->seekg(this->_data.data_sended - 1, this->_data.file->beg);
 	char buff[size + 1];
 	std::memset(buff, 0, size + 1);
 	this->_data.file->read(buff, size);
-	this->_data.file->clear();
 	ssize_t s = send(fd, buff, this->_data.file->gcount(), 0);
 	if (s > 0)
 		this->_data.data_sended += s;
@@ -176,8 +174,11 @@ bool	Client::continue_client(fd_set *fdset)
 			this->clear_header();
 			this->_index.clear();
 			this->_root.clear();
+			this->_close = true;
+			this->_sedding = false;
 			delete this->_data.file;
-			// std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
+			::shutdown(this->_sock_fd, SHUT_RDWR);
+			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
 	}
@@ -204,37 +205,22 @@ bool	Client::continue_client(fd_set *fdset)
 			size = std::strtoul(tmp.c_str(), NULL, 16);
 			char tosend[size + 1];
 			std::memset(tosend, 0 ,size + 1);
-			if (size > 0)
-			{
-				if (recv(this->_sock_fd, &tosend, size, 0) > 0)
-					write(this->_pipe_cgi_out[1], tosend, size);
-			}
-			else
-			{
-				::close(this->_pipe_cgi_out[1]);
-				this->_chunked = false;
-			}
 		}
 		else
 		{
+			int taking = this->take_data();
 			if (this->_data.wpid == this->_pid_cgi)
 			{
-				int taking = this->take_data();
 				if (taking == 0)
 				{
 					cgi_prepare_to_send();
-					close(this->_pipe_cgi_out[1]);
-					close(this->_pipe_cgi_in[0]);
+					close(this->_pipe_cgi[0]);
 					this->_sedding = true;
 				}
 				//else if (taking == -1)
 				//	std::cout << RED << "Read error -1 for cgi" << RST << std::endl;
 			}
-			else
-			{
-				this->take_data();
-				this->_data.wpid = waitpid(this->_pid_cgi, &this->_data.wsatus, WNOHANG);
-			}
+			this->_data.wpid = waitpid(this->_pid_cgi, &this->_data.wsatus, WNOHANG);
 		}
 	}
 	else if (this->is_chunk())
@@ -273,10 +259,10 @@ bool	Client::execute_client(bool path)
 int	Client::take_data() // the data should stay in pipe_in
 {
 	int size = BUFFER_SIZE_MB * 4;
-	char buff[size + 1];
-	std::memset(buff, 0, size + 1);
+	char buff[size];
+	std::memset(buff, 0, size);
 
-	int reading = read(this->_pipe_cgi_in[0], &buff, size);
+	int reading = read(this->_pipe_cgi[0], &buff, size);
 	if (reading > 0)
 	{
 		*static_cast<std::stringstream*>(_data.file) << buff;
@@ -292,36 +278,36 @@ int	Client::take_data() // the data should stay in pipe_in
 
 void	Client::cgi_prepare_to_send()
 {
+	int		err_header = 200;
 	char	buff[BUFFER_SIZE_KB * 8 + 1];
+	
 	std::memset(buff, 0, BUFFER_SIZE_KB * 8 + 1);
 	this->_data.file->seekg(0, this->_data.file->beg);
 	this->_data.file->read(buff, BUFFER_SIZE_KB * 8);
 	std::string header_test = buff;
 	if (header_test.find("HTTP/1.1") == 0) // Means complete header stay stringstream
 		return;
-	this->_data.minus_header = header_test.find("\r\n\r\n");
-	this->_data.header = ft::make_header(200);
-	if (header_test.find("Content-Length:") == header_test.npos || header_test.find("content-length:") == header_test.npos)
+	this->_data.minus_header = header_test.find("\r\n\r\n") == header_test.npos ? 0 : header_test.find("\r\n\r\n");
+	if (header_test.find("Status: ") < this->_data.minus_header)
+		err_header = std::strtoul(header_test.substr(header_test.find("Status: ") + 8, 3).c_str(), NULL, 10);
+	this->_data.header = ft::make_header(err_header);
+	if (header_test.find("Content-Length:") > this->_data.minus_header && header_test.find("content-length:") > this->_data.minus_header)
 		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size - (this->_data.minus_header != header_test.npos ? this->_data.minus_header + 4 : 0)) + "\r\n");
-	if (header_test.find("Content-Type:") == header_test.npos)
+	if (header_test.find("Content-Type:") > this->_data.minus_header && header_test.find("content-type:") > this->_data.minus_header)
 		this->_data.header.append("Content-Type: text/html\r\n");
-	if (this->_data.minus_header == header_test.npos)
+	if (header_test.find("\r\n\r\n") == header_test.npos)
 		this->_data.header.append("\r\n");
-
 	send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
-	this->_sedding = true;
 	return ;
 }
 
 void	Client::kill_cgi()
 {
-	if (this->_pipe_cgi_in[0] > 0)
+	if (this->_pipe_cgi[0] > 0)
 	{
 		kill(this->_pid_cgi, 2);
-		close(this->_pipe_cgi_in[0]);
-		close(this->_pipe_cgi_in[1]);
-		close(this->_pipe_cgi_out[0]);
-		close(this->_pipe_cgi_out[1]);
+		close(this->_pipe_cgi[0]);
+		close(this->_pipe_cgi[1]);
 	}
 }
 
@@ -345,7 +331,8 @@ void	Client::make_error(int i)
 		this->_error_page[i]);
 	this->_data.file->seekg(0, this->_data.file->end);
 	this->_data.data_size = this->_data.file->tellg();
-	this->_data.file->seekg(0, this->_data.file->beg);
+	//this->_data.file->seekg(0, this->_data.file->beg);
+	this->_data.file->clear();
 	this->_sedding = true;
 }
 

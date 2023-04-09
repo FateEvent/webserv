@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/07 11:32:31 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/09 12:00:44 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,24 +73,24 @@ int	Client::launch_cgi(std::string path)
 	char **ENVP = ft::vector_to_tab(env);
 	char *ARGV[] = {const_cast<char*>(path.c_str()), const_cast<char*>(file.c_str()), NULL};
 
-	if (pipe(this->_pipe_cgi_out) == -1 || pipe(this->_pipe_cgi_in) == -1)
+	if (pipe(this->_pipe_cgi) == -1)
 		return (503);
 	this->_pid_cgi = fork();
 	if (this->_pid_cgi > 0)
 	{
 		// MAIN
-		close(this->_pipe_cgi_out[0]);
-		//dup2(this->_pipe_cgi_out[1], STDOUT_FILENO);
-		close(this->_pipe_cgi_in[1]);
-		//dup2(this->_pipe_cgi_in[0], STDIN_FILENO);
-		fcntl(this->_pipe_cgi_in[0], F_SETFL, O_NONBLOCK);
+		close(this->_pipe_cgi[1]);
+		//fcntl(this->_pipe_cgi[0], F_SETFL, O_NONBLOCK);
+		usleep(20000);
+		// a fermer ou rediriger dans le cgi....
  		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
 			this->_header.Content_Length == 0)
-			close(this->_pipe_cgi_out[1]);
+			close(this->_pipe_cgi[1]);
 		else if (this->_header.Method.find("POST") != this->_header.Method.npos)
 		{
 			if (!this->is_chunk())
-				dup2(this->_sock_fd, this->_pipe_cgi_out[1]);
+			{
+			}
 		}
 		this->_cgi = true;
 	}
@@ -104,13 +104,17 @@ int	Client::launch_cgi(std::string path)
 	else
 	{
 		// CHILD
-		close(this->_pipe_cgi_out[1]);
-		close(this->_pipe_cgi_in[0]);
-		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
-		dup2(this->_pipe_cgi_in[1], STDOUT_FILENO);
+		close(this->_pipe_cgi[0]);
+//		fcntl(this->_pipe_cgi_out[0], F_SETFL, ~O_NONBLOCK);
+		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
+			this->_header.Content_Length == 0)
+			close(STDIN_FILENO);
+		else
+			dup2(this->_sock_fd, STDIN_FILENO);
+		//dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
+		dup2(this->_pipe_cgi[1], STDOUT_FILENO);
 		if (execve(path.c_str(), ARGV, ENVP) < 0) //FOR TEST CAN PUT ENVP WITH PHP //if (execve(path.c_str(), ARGV, NULL) < 0)
 		{
-			close(this->_pipe_cgi_out[0]);
 			std::string header(ft::make_header(500));
 			header.append(ft::get_page_error(500, this->_error_page[500].empty() ?
 					(this->_ref_conf.error_page.find(500)->second.empty() ?

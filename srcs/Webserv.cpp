@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/07 11:40:17 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/10 00:35:32 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	if (it.find("allow") != it.end())
 	{
 		if (it.find("allow")->second.find("GET") != it.find("allow")->second.npos)
-			this->_base.allow |= 0x001;
+			this->_base.allow |= 0b1;// 0x001;
 		if (it.find("allow")->second.find("POST") != it.find("allow")->second.npos)
-			this->_base.allow |= 0x002;
+			this->_base.allow |= 0b10; //0x002;
 		if (it.find("allow")->second.find("DELETE") != it.find("allow")->second.npos)
-			this->_base.allow |= 0x004;
+			this->_base.allow |= 0b100; //0x004;
 		this->_base.max_client = std::strtoul(it.find("max_client")->second.data(), NULL, 10);
 	}
 	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
@@ -389,7 +389,10 @@ void	Webserv::fd_rst()
 	for (std::map<int, Client>::iterator it = this->_client.begin();
 			it != this->_client.end(); it++)
 	{
-		FD_SET(it->first, &this->readfd);
+		if (it->second.get_close())
+			FD_SET(it->first, &this->writefd);
+		//if (!it->second.is_cgi())
+			FD_SET(it->first, &this->readfd);
 		//if (it->second.is_cgi()) // without in test in moment
 		//	FD_SET(it->second.get_fd_cgi(), &this->readfd);
 	}
@@ -508,7 +511,7 @@ void	Webserv::check_client()
 		{
 			if (it->second.new_request())
 			{
-				//std::cout << GREEN << "Valid Header." << RST << std::endl;
+				std::cout << GREEN << "Valid Header." << RST << std::endl;
 				it->second.add_nbr_client();
 				FD_CLR(it->second.get_sockfd(), &this->readfd);
 			}
@@ -520,7 +523,7 @@ void	Webserv::check_client()
 			continue;
 		}
 		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd) &&
-					it->second.is_ready() && !it->second.is_cgi())// && it->second.is_ready())// ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
+					it->second.is_ready() && it->second.get_close())// && it->second.is_cgi() == false) // ELSE ONLY FOR TEST// AFTER WHEN NEW REQUETE IS OK is_working SHOULD RETURN TRUE! 
 		{
 			to_close.insert(std::make_pair(it->second.get_sockfd(), &it->second));
 			std::cout << YELLOW << "CLOSE CONNEXION" << RST << std::endl;
@@ -547,29 +550,33 @@ void	Webserv::exec_client()
 	std::list<int> toclose;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
+		
 		if (it->second.get_method().empty())
 			continue;
-		if (!it->second.is_seeding() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
-			it->second.make_error(405);
-		else if (!it->second.is_seeding() && it->second.is_ready() && !it->second.get_fd_cgi() && it->second.get_pid_cgi() == 0) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
+		if (it->second.get_close())
 		{
-			if (it->second.execute_client(it->second.check_location()))
+			if (FD_ISSET(it->second.get_sockfd(), &writefd) && it->second.get_close())
 			{
-				it->second.clear_header();
+				std::cout << YELLOW << "PUT TO CLOSE" << RST << std::endl;
 				toclose.push_back(it->second.get_sockfd());
 			}
 		}
+		else if (!it->second.is_seeding() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
+			it->second.make_error(405);
+		else if (!it->second.is_seeding() && it->second.is_ready() && it->second.get_pid_cgi() == 0) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
+		{
+			if (it->second.execute_client(it->second.check_location()))
+				it->second.clear_header();
+		}
 		else if ((it->second.is_seeding() && it->second.is_ready()) || it->second.is_cgi())
 		{
-			if (it->second.continue_client(&this->readfd))
-				toclose.push_back(it->first);	//check keep alive...
-			else
+			if (!it->second.continue_client(&this->readfd))
 				this->timeout(0);
 		}
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
-usleep(50000); // If not 0,5sec error when post have body??!!!!
+		//usleep(50000); // If not 0,5sec error when post have body??!!!!
 		//std::cout << YELLOW << this->_client.find(*it)->second.get_nbr_connected_client() << " client are already connected." << RST << std::endl;
 		this->_client.erase(*it);
 		::close(*it);

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 19:58:57 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/09 11:42:23 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,7 @@ class Client
 		std::string					_proxy;
 		std::string					_download;
 		std::map<std::string, std::string>	_cgi_call;
-		int							_pipe_cgi_out[2];
-		int							_pipe_cgi_in[2];
+		int							_pipe_cgi[2];
 		pid_t						_pid_cgi;
 		bool						_working;
 		bool						_chunked;
@@ -66,6 +65,7 @@ class Client
 		bool						_sedding;
 		struct s_clt_data			_data;
 		bool						_ready;
+		bool						_close;
 		std::map<std::string, std::string>	other;
 //		fd_set						_writefd;		
 		void						_make_struct();
@@ -83,6 +83,7 @@ class Client
 		const config*				get_config() const;
 		int							get_fd_cgi() const;
 		int							get_pid_cgi() const;
+		bool						get_close() const;
 		bool						continue_client(fd_set*);
 		bool						execute_client(bool);
 		bool						is_working() const;

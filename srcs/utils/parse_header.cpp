@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 22:45:15 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/08 22:08:24 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,7 @@ bool	ft::parse_header(int fd, s_header &head)
 	}
 std::cout << PURPLE << tmp << RST << std::endl;
 	if (recept == 0 || (tmp.find("\r\n\r\n") == tmp.npos)) // close client
-	{
-		std::cout << YELLOW << "Connexion closed by client" << RST << std::endl;
 		return (false);
-	}
 	else if (recept == -1)	// empty
 	{
 		std::cout << strerror(errno) << std::endl;
