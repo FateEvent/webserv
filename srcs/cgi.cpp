@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/09 12:00:44 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/10 02:18:47 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,11 @@ int	Client::launch_cgi(std::string path)
 		env.push_back("PATH_INFO=" + this->_header.Dir + "/" + this->_index); // NOT REALY GOOD... SHOULD BE AFTER THIS CALLING FILE
 		env.push_back("REQUEST_URI=" + this->_header.Dir + "/" + this->_index + (!this->_header.get_var.empty()?("?" + this->_header.get_var):"")); // SHOULD BY cgi_tester
 	}
-	env.push_back("SCRIPT_NAME=" + this->_root + this->_index); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
+	env.push_back("SCRIPT_NAME=" + this->_root + "/" + this->_index); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
 	env.push_back("SERVER_NAME=Webserv"); // Le nom du serveur web.
 	env.push_back("SERVER_PORT=" + std::to_string(this->_ref_conf.port)); // Le port sur lequel le serveur web écoute les requêtes.
 	env.push_back("SERVER_SOFTWARE=0.2"); // Le nom et la version du serveur web utilisé.
-	env.push_back("SCRIPT_FILENAME=" + this->_root + "." + this->_index); // Le chemin d'accès absolu du script CGI sur le serveur.
+	env.push_back("SCRIPT_FILENAME=" + this->_root + "/" + this->_index); // Le chemin d'accès absolu du script CGI sur le serveur.
 	env.push_back("DOCUMENT_ROOT=" + this->_root); // Le chemin d'accès absolu du répertoire racine du site web.
 	env.push_back("QUERY_STRING=" + this->_header.get_var); // La chaîne de requête (paramètres de la requête) envoyée avec la requête HTTP.
 	env.push_back("CONTENT_LENGTH=" + std::to_string(this->_header.Content_Length)); // La longueur (en octets) du corps de la requête HTTP.
@@ -113,6 +113,7 @@ int	Client::launch_cgi(std::string path)
 			dup2(this->_sock_fd, STDIN_FILENO);
 		//dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
 		dup2(this->_pipe_cgi[1], STDOUT_FILENO);
+		dup2(this->_pipe_cgi[1], STDERR_FILENO);
 		if (execve(path.c_str(), ARGV, ENVP) < 0) //FOR TEST CAN PUT ENVP WITH PHP //if (execve(path.c_str(), ARGV, NULL) < 0)
 		{
 			std::string header(ft::make_header(500));
