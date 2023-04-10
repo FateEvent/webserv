@@ -294,16 +294,15 @@ bool	Client::execute_client(bool path)
 		}
 		else
 		{
-			FILE		*temporary;
-			std::string	file_buf;
-			std::string	line;
-			std::fpos_t	pos(0);
-			std::fpos_t	start_pos(0);
-			std::fpos_t	end_pos(0);
-			char		buff[2];
+			std::fstream	temporary;
+			std::string		file_buf;
+			std::string		line;
+			std::fpos_t		pos(0);
+			std::fpos_t		start_pos(0);
+			std::fpos_t		end_pos(0);
+			char			buff[2];
 
-			temporary = tmpfile();
-//			temporary = fopen(".temporary_file", "w");
+			temporary = open(".temporary_file", std::ios::in);
 			std::cout << "POST METHOD" << std::endl;
 			memset(buff, 0, 2);
 			int recept = 0;
