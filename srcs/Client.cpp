@@ -294,26 +294,29 @@ bool	Client::execute_client(bool path)
 		}
 		else
 		{
-			char	*tmpfile = strdup("temporaryXXXXXX");
+			char	*tmpfile = strdup(".tmpXXXXXX");
 			mkstemp(tmpfile);
-			std::fstream	temporary(tmpfile);
+			std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
 
 			std::string		file_buf;
 			std::string		line;
 			std::fpos_t		pos(0);
 			std::fpos_t		start_pos(0);
 			std::fpos_t		end_pos(0);
-			char			buff[2];
+			char			buff[1024];
 
 			std::cout << "POST METHOD" << std::endl;
-			memset(buff, 0, 2);
+			memset(buff, 0, 1024);
 			int recept = 0;
-			recept = recv(this->_sock_fd, &buff, 1, 0);
-			temporary << buff[0];
+			recept = recv(this->_sock_fd, &buff, 1023, 0);
+			for (int i = 0; i < recept; i++)
+				temporary << buff[i];
 			while (recept > 0)
 			{
-				recept = recv(this->_sock_fd, &buff, 1, 0);
-				temporary << buff[0];
+				memset(buff, 0, 1024);
+				recept = recv(this->_sock_fd, &buff, 1023, 0);
+				for (int i = 0; i < recept; i++)
+					temporary << buff[i];
 			}
 			temporary.seekg(0, std::ios::end);
 			long	file_end = temporary.tellg();
@@ -349,8 +352,6 @@ bool	Client::execute_client(bool path)
 						std::cout << "start position (2): " << start_pos << std::endl;
 						// std::cout << line << std::endl;
 						std::cout << "----------------" << std::endl;
-
-
 					}
 					if (!line.find("Content-Type"))
 					{
@@ -407,7 +408,7 @@ bool	Client::execute_client(bool path)
 					// std::cout << "FIRST!=============================" << std::endl;
 					// std::cout << "name: " << _header.entry_name << std::endl;
 					// std::cout << "filename: " << _header.filename << std::endl;
-					std::cout << line << std::endl;
+					// std::cout << line << std::endl;
 					// std::cout << "===================================" << std::endl;
 					_header.entry_name.clear();
 					_header.filename.clear();
@@ -489,7 +490,7 @@ bool	Client::execute_client(bool path)
 					// std::cout << "SECOND!============================" << std::endl;
 					// std::cout << "name: " << _header.entry_name << std::endl;
 					// std::cout << "filename: " << _header.filename << std::endl;
-					std::cout << line << std::endl;
+					// std::cout << line << std::endl;
 					// std::cout << "===================================" << std::endl;
 					_header.entry_name.clear();
 					_header.filename.clear();
