@@ -1,0 +1,16 @@
+voici un fichier txt...
+
+AAAA
+BBBB
+CCCC
+DDDD
+EEEE
+FFFF
+
+GGGG
+
+HHHH
+
+IIII
+
+Keep end....

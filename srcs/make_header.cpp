@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 17:11:28 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:48:01 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/11 16:52:01 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ std::string ft::make_header(int http_err)
 
 	if (head_err.empty())
 	{
-		std::fstream	file("error_http.ini");
+		std::fstream	file("./etc/error_http.ini");
 		std::string		line;
 		if (!file.is_open())
-			throw std::invalid_argument("Can't found error_http.ini!");
+			throw std::invalid_argument("Can't found etc/error_http.ini!");
 		while(std::getline(file, line))
 		{
 			std::string key = line.substr(line.find_first_not_of(" \t"), line.find_first_of("\t"));
@@ -47,10 +47,10 @@ std::string ft::make_content_type(std::string type_file)
 
 	if (content_type.empty())
 	{
-		std::fstream	file("content_type.ini");
+		std::fstream	file("./etc/content_type.ini");
 		std::string		line;
 		if (!file.is_open())
-			throw std::invalid_argument("Can't found content_type.ini!");
+			throw std::invalid_argument("Can't found etc/content_type.ini!");
 		while(std::getline(file, line))
 		{
 			std::string key = line.substr(line.find_first_not_of(" \t."), line.find_first_of("\t") - line.find_first_not_of(" \t."));

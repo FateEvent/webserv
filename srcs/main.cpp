@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/05 09:35:37 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/11 16:50:41 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int main(int ac, char **av) //, char** ev)
 
 	// FIRST PARSE IN MAP STRING STRING
 	std::ifstream file;
-	av[1] ? file.open(av[1]) : file.open("./config.conf");
+	av[1] ? file.open(av[1]) : file.open("./config/config.conf");
 	if (!file.is_open())
 	{
 		std::cout << "Can't open config file." << std::endl;
