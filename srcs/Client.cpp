@@ -294,7 +294,7 @@ bool	Client::execute_client(bool path)
 		}
 		else
 		{
-			FILE		*temporary;
+			std::FILE		*temporary;
 			std::string	file_buf;
 			std::string	line;
 			std::fpos_t	pos(0);
@@ -303,7 +303,7 @@ bool	Client::execute_client(bool path)
 			char		buff[2];
 
 			temporary = tmpfile();
-//			temporary = fopen(".temporary_file", "w");
+
 			std::cout << "POST METHOD" << std::endl;
 			memset(buff, 0, 2);
 			int recept = 0;
@@ -312,16 +312,18 @@ bool	Client::execute_client(bool path)
 			while (recept > 0)
 			{
 				recept = recv(this->_sock_fd, &buff, 1, 0);
-				fputs(&buff[0], temporary);
+				//temporary << buff;
+				fputc(buff[0] + 0, temporary);
 			}
+
+			fseek(temporary, 0, SEEK_END);
+			long	file_end = ftell(temporary);
+
 			rewind(temporary);
-			while (!feof(temporary))
+			while (pos < file_end)
 			{
 				buff[0] = fgetc(temporary);
-				if (buff[0] == EOF)
-					break;
-				if (buff[0] >= 0 && buff[0] <= 127)
-					file_buf += buff[0];
+				file_buf += buff[0];
 				pos++;
 				if (!file_buf.find("--" + _header.Boundary + "\r\n"))
 				{
@@ -337,7 +339,7 @@ bool	Client::execute_client(bool path)
 
 					std::cout << "line" << std::endl;
 					std::cout << "start position (1): " << start_pos << std::endl;
-					std::cout << line << std::endl;
+					// std::cout << line << std::endl;
 					std::cout << "----------------" << std::endl;
 					if (!line.find("Content-Disposition"))
 					{
@@ -347,26 +349,8 @@ bool	Client::execute_client(bool path)
 
 						std::cout << "line après" << std::endl;
 						std::cout << "start position (2): " << start_pos << std::endl;
-						std::cout << line << std::endl;
+						// std::cout << line << std::endl;
 						std::cout << "----------------" << std::endl;
-
-
-
-						// FILE	*filename;
-						
-						// filename = fopen("ciao", "w");
-						// fsetpos(temporary, &start_pos);
-						// while (!feof(temporary))
-						// {
-						// 	buff[0] = fgetc(temporary);
-						// 	fputc(buff[0], filename);
-						// 	if (buff[0] == EOF)
-						// 		break;
-						// }
-						// fputc(EOF, filename);
-						// fclose(filename);
-						// fsetpos(temporary, &pos);
-
 
 
 					}
@@ -376,7 +360,7 @@ bool	Client::execute_client(bool path)
 						line.erase(0, line.find("\r\n") + 2);
 						std::cout << "line dans le futur" << std::endl;
 						std::cout << "start position (3): " << start_pos << std::endl;
-						std::cout << line << std::endl;
+						// std::cout << line << std::endl;
 						std::cout << "----------------" << std::endl;
 					}
 					while (line.find("\r\n") != 0)
@@ -385,20 +369,16 @@ bool	Client::execute_client(bool path)
 						line.erase(0, line.find("\r\n") + 2);
 						std::cout << "line dans le futur" << std::endl;
 						std::cout << "start position (4): " << start_pos << std::endl;
-						std::cout << line << std::endl;
+						// std::cout << line << std::endl;
 						std::cout << "----------------" << std::endl;
 					}
 					line.erase(0, 2);
 					start_pos += 2;
 					std::cout << "line dans le futur d'après" << std::endl;
 					std::cout << "start position (5) OK!: " << start_pos << std::endl;
-					std::cout << line << std::endl;
+					// std::cout << line << std::endl;
 					std::cout << "----------------" << std::endl;
-					// if (line.find("\r\n") != line.npos)
-					// {
-					// 	//end_pos -= final.length();
-					// 	line.erase(line.length() - final.length());
-					// }
+
 					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
 					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 					end_pos = pos - final.length();
@@ -406,11 +386,6 @@ bool	Client::execute_client(bool path)
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
 					{
-						// std::fstream	filename;
-
-						// filename.open(_header.filename, std::ios::out);
-						// filename << line;
-						// filename.close();
 						FILE	*filename;
 						fpos_t	tpos = start_pos;
 						
@@ -434,12 +409,11 @@ bool	Client::execute_client(bool path)
 //						line.erase(line.length() - final.length());
 					}
 					start_pos = end_pos + final.length();
-					std::cout << "FIRST!=============================" << std::endl;
-					std::cout << "name: " << _header.entry_name << std::endl;
-					std::cout << "filename: " << _header.filename << std::endl;
-					std::cout << "positions: " << start_pos << "\\" << end_pos << std::endl;
+					// std::cout << "FIRST!=============================" << std::endl;
+					// std::cout << "name: " << _header.entry_name << std::endl;
+					// std::cout << "filename: " << _header.filename << std::endl;
 					std::cout << line << std::endl;
-					std::cout << "===================================" << std::endl;
+					// std::cout << "===================================" << std::endl;
 					_header.entry_name.clear();
 					_header.filename.clear();
 				}
@@ -451,7 +425,7 @@ bool	Client::execute_client(bool path)
 					
 					std::cout << "line" << std::endl;
 					std::cout << "start position (6): " << start_pos << std::endl;
-					std::cout << line << std::endl;
+					// std::cout << line << std::endl;
 					if (!line.find("Content-Disposition"))
 					{
 						ft::split_to_vectors(_header.Content_Disposition, line, ';');
@@ -460,22 +434,10 @@ bool	Client::execute_client(bool path)
 
 						std::cout << "line après" << std::endl;
 						std::cout << "start position (7): " << start_pos << std::endl;
-						std::cout << line << std::endl;
+						// std::cout << line << std::endl;
 						std::cout << "----------------" << std::endl;
 
-						// fsetpos(temporary, &start_pos);
-						// FILE	*filename;
-						
-						// filename = fopen("ciao", "w");
-						// while (!feof(temporary))
-						// {
-						// 	buff[0] = fgetc(temporary);
-						// 	fputc(buff[0], filename);
-						// 	if (buff[0] == EOF)
-						// 		break;
-						// }
-						// fclose(filename);
-						// break ;
+
 					}
 					if (!line.find("Content-Type"))
 					{
@@ -483,7 +445,7 @@ bool	Client::execute_client(bool path)
 						line.erase(0, line.find("\r\n") + 2);
 						std::cout << "line dans le futur" << std::endl;
 						std::cout << "start position (8): " << start_pos << std::endl;
-						std::cout << line << std::endl;
+						// std::cout << line << std::endl;
 						std::cout << "----------------" << std::endl;
 					}
 					while (line.find("\r\n") != 0)
@@ -492,20 +454,16 @@ bool	Client::execute_client(bool path)
 						line.erase(0, line.find("\r\n") + 2);
 						std::cout << "line dans le futur" << std::endl;
 						std::cout << "start position (9): " << start_pos << std::endl;
-						std::cout << line << std::endl;
+						// std::cout << line << std::endl;
 						std::cout << "----------------" << std::endl;
 					}
 					line.erase(0, 2);
 					start_pos += 2;
 					std::cout << "line dans le futur d'après" << std::endl;
 					std::cout << "start position (10): " << start_pos << std::endl;
-					std::cout << line << std::endl;
+					// std::cout << line << std::endl;
 					std::cout << "----------------" << std::endl;
-					// if (line.find("\r\n") != line.npos)
-					// {
-					// 	//end_pos -= final.length();
-					// 	line.erase(line.length() - final.length());
-					// }
+
 					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
 					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 					end_pos = pos - final.length();
@@ -513,22 +471,16 @@ bool	Client::execute_client(bool path)
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
 					{
-						// std::fstream	filename;
 
-						// filename.open(_header.filename, std::ios::out);
-						// filename << line;
-						// filename.close();
 						FILE	*filename;
 						fpos_t	tpos = start_pos;
 						
 						filename = fopen(_header.filename.c_str(), "w");
 						fsetpos(temporary, &start_pos);
-						while (!feof(temporary) && tpos < end_pos)
+						while (tpos < end_pos)
 						{
 							buff[0] = fgetc(temporary);
 							fputc(buff[0], filename);
-							if (buff[0] == EOF)
-								break;
 							tpos++;
 						}
 						fclose(filename);
@@ -541,25 +493,20 @@ bool	Client::execute_client(bool path)
 //						line.erase(line.length() - final.length());
 					}
 					start_pos = end_pos + final.length();
-					std::cout << "SECOND!============================" << std::endl;
-					std::cout << "name: " << _header.entry_name << std::endl;
-					std::cout << "filename: " << _header.filename << std::endl;
-					std::cout << "positions: " << start_pos << "\\" << end_pos << std::endl;
+					// std::cout << "SECOND!============================" << std::endl;
+					// std::cout << "name: " << _header.entry_name << std::endl;
+					// std::cout << "filename: " << _header.filename << std::endl;
 					std::cout << line << std::endl;
-					std::cout << "===================================" << std::endl;
+					// std::cout << "===================================" << std::endl;
 					_header.entry_name.clear();
 					_header.filename.clear();
 				}
 			}
 			
-			std::cout << "======================================================================" << std::endl;
-			std::cout << line << std::endl;
-			std::cout << "======================================================================" << std::endl;
-			for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
-				std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
-			std::cout << std::endl;
 
-			fclose(temporary);
+			// for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
+			// 	std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
+			// std::cout << std::endl;
 
 			std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
 			//close(this->_sock_fd);
