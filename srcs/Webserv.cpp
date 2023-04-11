@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/10 00:35:32 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 00:53:55 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -391,7 +391,7 @@ void	Webserv::fd_rst()
 	{
 		if (it->second.get_close())
 			FD_SET(it->first, &this->writefd);
-		//if (!it->second.is_cgi())
+		if (!it->second.is_cgi())
 			FD_SET(it->first, &this->readfd);
 		//if (it->second.is_cgi()) // without in test in moment
 		//	FD_SET(it->second.get_fd_cgi(), &this->readfd);

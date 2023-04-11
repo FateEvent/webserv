@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/11 01:56:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 01:17:20 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ int	Client::launch_cgi(std::string path)
 	std::string STR;
 	std::vector<std::string> env;
 	char hostName[NI_MAXHOST];
-	this->_cgi = true;
 
 	env.push_back("REQUEST_METHOD=" + this->get_method()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
@@ -80,12 +79,12 @@ int	Client::launch_cgi(std::string path)
 	{
 		// MAIN
 		close(this->_pipe_cgi[1]);
-		//fcntl(this->_pipe_cgi[0], F_SETFL, O_NONBLOCK);
-		usleep(20000);
+		fcntl(this->_pipe_cgi[0], F_SETFL, O_NONBLOCK);
+		usleep(50000);
 		// a fermer ou rediriger dans le cgi....
- 		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
-			this->_header.Content_Length == 0)
-			close(this->_pipe_cgi[1]);
+ 	//	if (this->_header.Method.find("GET") != this->_header.Method.npos ||
+	//		this->_header.Content_Length == 0)
+		//	close(this->_pipe_cgi[1]);
 		this->_cgi = true;
 	}
 	else if (this->_pid_cgi == -1)

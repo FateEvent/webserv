@@ -12,7 +12,7 @@
 
 NAME		=	webserv
 CC			=	c++
-FLAGS		=	-Wall -Werror -Wextra -std=c++98 -Og -g -fsanitize=address
+FLAGS		=	-Wall -Werror -Wextra -std=c++11 -Og -g -fsanitize=address
 INCLUDES	=	./includes/utils.h
 FILES		=	utils/file_to_map.cpp \
 				utils/multi_to_config.cpp \
