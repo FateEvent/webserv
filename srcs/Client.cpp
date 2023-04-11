@@ -320,7 +320,8 @@ bool	Client::execute_client(bool path)
 				buff[0] = fgetc(temporary);
 				if (buff[0] == EOF)
 					break;
-				file_buf += buff[0];
+				if (buff[0] >= 0 && buff[0] <= 127)
+					file_buf += buff[0];
 				pos++;
 				if (!file_buf.find("--" + _header.Boundary + "\r\n"))
 				{
