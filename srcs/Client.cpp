@@ -294,35 +294,33 @@ bool	Client::execute_client(bool path)
 		}
 		else
 		{
-			std::FILE		*temporary;
-			std::string	file_buf;
-			std::string	line;
-			std::fpos_t	pos(0);
-			std::fpos_t	start_pos(0);
-			std::fpos_t	end_pos(0);
-			char		buff[2];
+			char	*tmpfile = strdup("temporaryXXXXXX");
+			mkstemp(tmpfile);
+			std::fstream	temporary(tmpfile);
 
-			temporary = tmpfile();
+			std::string		file_buf;
+			std::string		line;
+			std::fpos_t		pos(0);
+			std::fpos_t		start_pos(0);
+			std::fpos_t		end_pos(0);
+			char			buff[2];
 
 			std::cout << "POST METHOD" << std::endl;
 			memset(buff, 0, 2);
 			int recept = 0;
 			recept = recv(this->_sock_fd, &buff, 1, 0);
-			fputs(&buff[0], temporary);
+			temporary << buff[0];
 			while (recept > 0)
 			{
 				recept = recv(this->_sock_fd, &buff, 1, 0);
-				//temporary << buff;
-				fputc(buff[0] + 0, temporary);
+				temporary << buff[0];
 			}
-
-			fseek(temporary, 0, SEEK_END);
-			long	file_end = ftell(temporary);
-
-			rewind(temporary);
+			temporary.seekg(0, std::ios::end);
+			long	file_end = temporary.tellg();
+			temporary.seekg(0, std::ios::beg);
 			while (pos < file_end)
 			{
-				buff[0] = fgetc(temporary);
+				buff[0] = temporary.get();
 				file_buf += buff[0];
 				pos++;
 				if (!file_buf.find("--" + _header.Boundary + "\r\n"))
@@ -386,27 +384,24 @@ bool	Client::execute_client(bool path)
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
 					{
-						FILE	*filename;
-						fpos_t	tpos = start_pos;
-						
-						filename = fopen(_header.filename.c_str(), "w");
-						fsetpos(temporary, &start_pos);
-						while (!feof(temporary) && tpos < end_pos)
+						fpos_t			tpos = start_pos;
+						std::fstream	filename;
+
+						filename.open(_header.filename, std::ios::out);
+						temporary.seekg(start_pos);
+						while (tpos < end_pos)
 						{
-							buff[0] = fgetc(temporary);
-							fputc(buff[0], filename);
-							if (buff[0] == EOF)
-								break;
+							buff[0] = temporary.get();
+							filename << buff[0];
 							tpos++;
 						}
-						fclose(filename);
-						fsetpos(temporary, &pos);
+						filename.close();
+						temporary.seekg(pos);
 					}
 					if (line.find("\r\n") != line.npos)
 					{
 						start_pos += line.substr(0, line.find("\r\n") + 2).length();
 						line.erase(0, line.find("\r\n") + 2);
-//						line.erase(line.length() - final.length());
 					}
 					start_pos = end_pos + final.length();
 					// std::cout << "FIRST!=============================" << std::endl;
@@ -471,26 +466,24 @@ bool	Client::execute_client(bool path)
 						_header.other.insert(std::make_pair(_header.entry_name, line));
 					else if (_header.filename != "")
 					{
+						fpos_t			tpos = start_pos;
+						std::fstream	filename;
 
-						FILE	*filename;
-						fpos_t	tpos = start_pos;
-						
-						filename = fopen(_header.filename.c_str(), "w");
-						fsetpos(temporary, &start_pos);
+						filename.open(_header.filename, std::ios::out);
+						temporary.seekg(start_pos);
 						while (tpos < end_pos)
 						{
-							buff[0] = fgetc(temporary);
-							fputc(buff[0], filename);
+							buff[0] = temporary.get();
+							filename << buff[0];
 							tpos++;
 						}
-						fclose(filename);
-						fsetpos(temporary, &pos);
+						filename.close();
+						temporary.seekg(pos);
 					}
 					if (line.find("\r\n") != line.npos)
 					{
 						start_pos += line.substr(0, line.find("\r\n") + 2).length();
 						line.erase(0, line.find("\r\n") + 2);
-//						line.erase(line.length() - final.length());
 					}
 					start_pos = end_pos + final.length();
 					// std::cout << "SECOND!============================" << std::endl;
