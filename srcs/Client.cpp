@@ -495,8 +495,7 @@ bool	Client::execute_client(bool path)
 					_header.filename.clear();
 				}
 			}
-			
-
+			remove(tmpfile);
 			// for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
 			// 	std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
 			// std::cout << std::endl;
