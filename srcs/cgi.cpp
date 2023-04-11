@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/10 02:18:47 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/11 01:56:53 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,12 +86,6 @@ int	Client::launch_cgi(std::string path)
  		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
 			this->_header.Content_Length == 0)
 			close(this->_pipe_cgi[1]);
-		else if (this->_header.Method.find("POST") != this->_header.Method.npos)
-		{
-			if (!this->is_chunk())
-			{
-			}
-		}
 		this->_cgi = true;
 	}
 	else if (this->_pid_cgi == -1)
@@ -109,12 +103,18 @@ int	Client::launch_cgi(std::string path)
 		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
 			this->_header.Content_Length == 0)
 			close(STDIN_FILENO);
-		else
-			dup2(this->_sock_fd, STDIN_FILENO);
-		//dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
+		else if (this->_header.Method.find("POST") != this->_header.Method.npos)
+		{
+			if (!this->is_chunk())
+				dup2(this->_sock_fd, STDIN_FILENO);
+			else
+			{
+				//DO CHUNK MODE -- WE ARE IN CHILD WE CAN TAKE ALL THE DATA IN SOCKET AND WORK AFTER. CAN'T BLOCK IN MAIN PROGRAM ///
+			}
+		}
 		dup2(this->_pipe_cgi[1], STDOUT_FILENO);
-		dup2(this->_pipe_cgi[1], STDERR_FILENO);
-		if (execve(path.c_str(), ARGV, ENVP) < 0) //FOR TEST CAN PUT ENVP WITH PHP //if (execve(path.c_str(), ARGV, NULL) < 0)
+		dup2(this->_pipe_cgi[1], STDERR_FILENO); // RECEIPT ERROR IN PIPE, TO SEE WHAT THE PROBLEM IF EXIST.
+		if (execve(path.c_str(), ARGV, ENVP) < 0)
 		{
 			std::string header(ft::make_header(500));
 			header.append(ft::get_page_error(500, this->_error_page[500].empty() ?

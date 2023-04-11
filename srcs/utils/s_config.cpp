@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 10:57:21 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/10 16:18:08 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,11 +95,11 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		else if (!it->first.compare("allow"))
 		{
 			if (it->second.find("GET") != it->second.npos)
-				this->allow |= 0x001;
+				this->allow |= 0b1; // 0x001;
 			if (it->second.find("POST") != it->second.npos)
-				this->allow |= 0x002;
+				this->allow |= 0b10; //0x002;
 			if (it->second.find("DELETE") != it->second.npos)
-				this->allow |= 0x004;
+				this->allow |= 0b100; //0x004;
 		}
 		else if (!it->first.compare("download"))
 			this->download = it->second;
