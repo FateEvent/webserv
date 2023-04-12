@@ -331,9 +331,7 @@ bool	Client::execute_client(bool path)
 							ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
 							ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 							if (_header.entry_name != "" && _header.filename == "")
-							{
 								_header.other.insert(std::make_pair(_header.entry_name, file_buf));
-							}
 							else if (_header.filename != "")
 							{
 								std::fstream	filename;
