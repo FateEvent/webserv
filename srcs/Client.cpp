@@ -226,6 +226,12 @@ bool	Client::continue_client(fd_set *fdset)
 	}
 	else if (this->is_chunk())
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
+	/*
+	else if (boundary)
+	{
+
+	}
+	*/
 	else
 	{
 		std::cout << "PROBLEME EXIST IF ON SCREEN!!!!!continue_client" << std::endl;

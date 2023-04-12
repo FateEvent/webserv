@@ -57,6 +57,7 @@ bool	Client::execute_post()
 	{
 		std::cout << YELLOW << "Multipart POST" << RST << std::endl;
 		char			*tmpfile = strdup(".tmpXXXXXX");
+//		boundary = true;
 
 		mkstemp(tmpfile);
 		std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
