@@ -306,17 +306,15 @@ bool	Client::execute_client(bool path)
 			char			buff[1024];
 
 			std::cout << "POST METHOD" << std::endl;
-			memset(buff, 0, 1024);
-			int recept = 0;
-			recept = recv(this->_sock_fd, &buff, 1023, 0);
-			for (int i = 0; i < recept; i++)
-				temporary << buff[i];
+			int recept = 1;
 			while (recept > 0)
 			{
 				memset(buff, 0, 1024);
 				recept = recv(this->_sock_fd, &buff, 1023, 0);
 				for (int i = 0; i < recept; i++)
+				{
 					temporary << buff[i];
+				}
 			}
 			temporary.seekg(0, std::ios::end);
 			long	file_end = temporary.tellg();
