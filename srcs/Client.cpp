@@ -298,9 +298,8 @@ bool	Client::execute_client(bool path)
 			mkstemp(tmpfile);
 			std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
 
-			std::string		file_buf;
-			std::string		line;
-			char			buff[1024];
+			std::string	file_buf;
+			char		buff[1024];
 
 			std::cout << "POST METHOD" << std::endl;
 			int recept = 1;
@@ -317,40 +316,23 @@ bool	Client::execute_client(bool path)
 						if ((!file_buf.find("--" + _header.Boundary + "\r\n"))
 							|| (!file_buf.find("--" + _header.Boundary + "--\r\n")))
 						{
-							// std::string b_str = "--" + _header.Boundary + "\r\n";
-							std::cout << "QUANTE VOLTE" << std::endl;
 							file_buf.clear();
 						}
 						if (!file_buf.find("Content-Disposition"))
 						{
-							std::cout << "file_buf avant" << std::endl;
-							std::cout << file_buf << std::endl;
-							std::cout << "----------------" << std::endl;
-							ft::split_to_vectors(_header.Content_Disposition, line, ';');
+							ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
 							file_buf.clear();
-
-							std::cout << "file_buf après" << std::endl;
-							std::cout << file_buf << std::endl;
-							std::cout << "----------------" << std::endl;
 						}
 						if (!file_buf.find("Content-Type"))
 						{
-							std::cout << "file_buf avant" << std::endl;
-							std::cout << file_buf << std::endl;
-							std::cout << "----------------" << std::endl;
 							file_buf.clear();
-
-							std::cout << "file_buf après" << std::endl;
-							std::cout << file_buf << std::endl;
-							std::cout << "----------------" << std::endl;
 						}
 						if (!file_buf.find("\r\n"))
 						{
 							file_buf.clear();
 						}
-						if (file_buf.find("\r\n") != 0 && file_buf.find("\r\n") != file_buf.npos)
+						if (file_buf.find("\r\n--" + _header.Boundary) != file_buf.npos)
 						{
-//							file_buf.erase(file_buf.length() - 2);
 							ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
 							ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 							if (_header.entry_name != "" && _header.filename == "")
@@ -370,10 +352,10 @@ bool	Client::execute_client(bool path)
 					}
 				}
 			}
-//			remove(tmpfile);
-			// for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
-			// 	std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
-			// std::cout << std::endl;
+			remove(tmpfile);
+			for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
+				std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
+			std::cout << std::endl;
 
 			std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
 			//close(this->_sock_fd);
