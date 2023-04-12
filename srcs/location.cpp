@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 14:15:07 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 12:39:04 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ bool	Client::check_location()
 	std::string	path;
 
 	this->_max_body = this->_ref_conf.max_body == 0 ? this->_ref_conf._base->max_body : this->_ref_conf.max_body;
-	this->_download = this->_ref_conf.download.empty() ? (this->_ref_conf._base->download.empty() ? this->_ref_conf.root : this->_ref_conf._base->download) : this->_ref_conf.download;
+	if (!this->_download.empty())
+		this->_download = this->_ref_conf.download.empty() ? (this->_ref_conf._base->download.empty() ? this->_ref_conf.root : this->_ref_conf._base->download) : this->_ref_conf.download;
 	this->_allow = this->_ref_conf.allow;
 	this->_redirect = this->_ref_conf.redirect;
 	for (std::vector<struct s_location>::const_iterator it = this->_ref_conf.location.begin();
@@ -66,9 +67,9 @@ bool	Client::check_location()
 			this->_download = this->_ref_conf.root;
 
 	path = this->_root + "/" + this->_index;
-	#ifdef DEBUG
-		std::cout << "Path of file is: \"" + path + "\"" << std::endl;
-	#endif
+//	#ifdef DEBUG
+//		std::cout << "Path of file is: \"" + path + "\"" << std::endl;
+//	#endif
 	this->_data.file = new std::ifstream(path, std::ios::binary);
 	if (!this->_data.file->good())
 		return (false);

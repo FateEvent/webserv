@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 01:12:49 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 12:38:04 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ bool	Client::execute_post()
 	std::cout << "POST METHOD" << std::endl;
 	if (!(this->_allow >> 1 & 1) && this->_allow != 0)
 	{
+		std::cout << RED << "False methode POST?" << RST << std::endl;
 		this->make_error(405);
 		return (false);
 	}
@@ -28,11 +29,13 @@ bool	Client::execute_post()
 		}
 	if (this->_header.Content_Length == 0 && !this->is_chunk()) // Maybe change Content_Length to ssize_t and initialize it to -1. Compare with -1 instead of 0  
 	{
+		std::cout << RED << "False content-length POST?" << RST << std::endl;
 		this->make_error(411);
 		return (false);
 	}
 	else if (this->_header.Content_Length > this->_max_body && this->_max_body > 0)
 	{
+		std::cout << RED << "False content-length 2 POST?" << RST << std::endl;
 		this->make_error(413);
 		return (false);
 	}
@@ -73,7 +76,7 @@ bool	Client::execute_post()
 			this->make_error(500);
 		if (check == 0)
 			this->make_error(501);
-		std::cout << BLUE << this->_data.header << RST << std::endl;
+		//std::cout << BLUE << "\"" << this->_data.header << "\"" << RST << std::endl;
 		this->_sedding = true;
 	}
 	return (false);

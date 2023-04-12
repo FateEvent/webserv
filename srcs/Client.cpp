@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 00:29:25 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 12:37:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_chunked = false;
 	this->_pipe_cgi[0] = 0;
 	this->_pipe_cgi[1] = 0;
+	this->_pid_cgi = 0;
 	this->_cgi = false;
 	this->_sedding = false;
 	this->_reponse.clear();
@@ -50,7 +51,7 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_addr = sock;
 	this->_socklen = len;
 	this->_timeout = std::time(nullptr);
-	this->_header.time_out = this->_timeout;
+	this->_header.time_out = std::time(nullptr);
 	this->_ready = true;
 	this->_close = false;
 }
@@ -94,7 +95,7 @@ Client::~Client()
 		::close(this->_pipe_cgi[0]);
 		::close(this->_pipe_cgi[1]);
 	}
-	delete this->_data.file;
+	//delete this->_data.file;
 	this->_ref_conf.nbr_client--;
 }
 
@@ -134,7 +135,7 @@ bool	Client::new_request()
 			return (false);
 	this->add_nbr_client();
 	this->_timeout = std::time(nullptr);
-	this->_header.time_out = this->_timeout;
+	this->_header.time_out = std::time(nullptr);
 	this->_ready = true;
 	std::cout << GREEN << "Connexion accepted to socket " << this->_sock_fd << RST << std::endl;
 	return (true);
@@ -171,13 +172,13 @@ bool	Client::continue_client(fd_set *fdset)
 	{
 		if (this->send_data(this->_sock_fd))
 		{
-			this->clear_header();
+			//this->clear_header();
 			this->_index.clear();
 			this->_root.clear();
 			this->_close = true;
 			this->_sedding = false;
 			delete this->_data.file;
-			::shutdown(this->_sock_fd, SHUT_RDWR);
+			//::shutdown(this->_sock_fd, SHUT_RD);
 			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
@@ -331,8 +332,8 @@ void	Client::make_error(int i)
 		this->_error_page[i]);
 	this->_data.file->seekg(0, this->_data.file->end);
 	this->_data.data_size = this->_data.file->tellg();
-	//this->_data.file->seekg(0, this->_data.file->beg);
 	this->_data.file->clear();
+	this->_data.file->seekg(0, this->_data.file->beg);
 	this->_sedding = true;
 }
 

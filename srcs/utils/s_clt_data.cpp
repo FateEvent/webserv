@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 00:41:52 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/02 11:52:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 10:09:22 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,5 +20,5 @@ s_clt_data::s_clt_data()
 	data_size = 0;
 	data_sended = 1;
 	wsatus = 0;
-	wpid = 0;
+	wpid = -1;
 }

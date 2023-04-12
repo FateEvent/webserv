@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 01:17:20 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 11:33:21 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ int	Client::launch_cgi(std::string path)
 		// MAIN
 		close(this->_pipe_cgi[1]);
 		fcntl(this->_pipe_cgi[0], F_SETFL, O_NONBLOCK);
-		usleep(50000);
+		//usleep(50000);
 		// a fermer ou rediriger dans le cgi....
  	//	if (this->_header.Method.find("GET") != this->_header.Method.npos ||
 	//		this->_header.Content_Length == 0)
@@ -105,7 +105,10 @@ int	Client::launch_cgi(std::string path)
 		else if (this->_header.Method.find("POST") != this->_header.Method.npos)
 		{
 			if (!this->is_chunk())
+			{
+				//fcntl(this->_sock_fd, F_SETFL, ~O_NONBLOCK);
 				dup2(this->_sock_fd, STDIN_FILENO);
+			}
 			else
 			{
 				//DO CHUNK MODE -- WE ARE IN CHILD WE CAN TAKE ALL THE DATA IN SOCKET AND WORK AFTER. CAN'T BLOCK IN MAIN PROGRAM ///

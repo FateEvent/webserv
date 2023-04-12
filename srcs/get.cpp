@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/06 20:06:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 12:38:12 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ bool	Client::execute_get()
 	std::cout << "GET METHOD" << std::endl;
 	if (!(this->_allow & 1) && this->_allow != 0)
 	{
+		std::cout << RED << "False methode GET?" << RST << std::endl;
 		this->make_error(405);
 		return (false);
 	}
@@ -45,7 +46,7 @@ bool	Client::execute_get()
 			this->make_error(500);
 		if (check == 0)
 			this->make_error(501);
-		std::cout << BLUE << this->_data.header << RST << std::endl;
+		//std::cout << BLUE << "\"" << this->_data.header << "\"" << RST << std::endl;
 		this->_sedding = true;
 	}
 	return (false);

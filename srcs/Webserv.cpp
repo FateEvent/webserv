@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 00:53:55 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 12:38:30 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -391,7 +391,7 @@ void	Webserv::fd_rst()
 	{
 		if (it->second.get_close())
 			FD_SET(it->first, &this->writefd);
-		if (!it->second.is_cgi())
+		if (!it->second.get_close())
 			FD_SET(it->first, &this->readfd);
 		//if (it->second.is_cgi()) // without in test in moment
 		//	FD_SET(it->second.get_fd_cgi(), &this->readfd);
@@ -550,14 +550,15 @@ void	Webserv::exec_client()
 	std::list<int> toclose;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
-		
 		if (it->second.get_method().empty())
+		{
 			continue;
+		}
 		if (it->second.get_close())
 		{
 			if (FD_ISSET(it->second.get_sockfd(), &writefd) && it->second.get_close())
 			{
-				std::cout << YELLOW << "PUT TO CLOSE" << RST << std::endl;
+				//std::cout << YELLOW << "PUT TO CLOSE" << RST << std::endl;
 				toclose.push_back(it->second.get_sockfd());
 			}
 		}
