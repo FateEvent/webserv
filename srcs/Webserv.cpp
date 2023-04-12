@@ -564,12 +564,12 @@ void	Webserv::exec_client()
 		}
 		else if (!it->second.is_seeding() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
 			it->second.make_error(405);
-		else if (!it->second.is_seeding() && it->second.is_ready() && it->second.get_pid_cgi() == 0) // && boundary == false) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
+		else if (!it->second.is_seeding() && it->second.is_ready() && it->second.get_pid_cgi() == 0) // && !this->_multipart) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
 		{
 			if (it->second.execute_client(it->second.check_location()))
 				it->second.clear_header();
 		}
-		else if ((it->second.is_seeding() && it->second.is_ready()) || it->second.is_cgi()) // || boundary == true)
+		else if ((it->second.is_seeding() && it->second.is_ready()) || it->second.is_cgi()) // || this->_multipart)
 		{
 			if (!it->second.continue_client(&this->readfd))
 				this->timeout(0);

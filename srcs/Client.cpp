@@ -29,6 +29,7 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 {
 	this->_working = false;
 	this->_chunked = false;
+	this->_multipart = false;
 	this->_pipe_cgi[0] = 0;
 	this->_pipe_cgi[1] = 0;
 	this->_pid_cgi = 0;
@@ -61,6 +62,7 @@ void	Client::clear_header()
 	this->_header.clear();
 	this->_working = false;
 	this->_chunked = false;
+	this->_multipart = false;
 	this->_pipe_cgi[0] = 0;
 	this->_pipe_cgi[1] = 0;
 	this->_pid_cgi = 0;
@@ -227,7 +229,7 @@ bool	Client::continue_client(fd_set *fdset)
 	else if (this->is_chunk())
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
 	/*
-	else if (boundary)
+	else if (this->_multipart)
 	{
 
 	}

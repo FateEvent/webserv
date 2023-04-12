@@ -66,6 +66,8 @@ class Client
 		struct s_clt_data			_data;
 		bool						_ready;
 		bool						_close;
+		bool						_multipart;
+
 		std::map<std::string, std::string>	other;
 //		fd_set						_writefd;		
 		void						_make_struct();
