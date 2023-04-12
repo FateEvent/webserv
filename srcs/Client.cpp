@@ -315,24 +315,19 @@ bool	Client::execute_client(bool path)
 					{
 						if ((!file_buf.find("--" + _header.Boundary + "\r\n"))
 							|| (!file_buf.find("--" + _header.Boundary + "--\r\n")))
-						{
 							file_buf.clear();
-						}
 						if (!file_buf.find("Content-Disposition"))
 						{
 							ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
 							file_buf.clear();
 						}
 						if (!file_buf.find("Content-Type"))
-						{
 							file_buf.clear();
-						}
 						if (!file_buf.find("\r\n"))
-						{
 							file_buf.clear();
-						}
 						if (file_buf.find("\r\n--" + _header.Boundary) != file_buf.npos)
 						{
+							file_buf.erase(file_buf.find("\r\n--" + _header.Boundary));
 							ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
 							ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 							if (_header.entry_name != "" && _header.filename == "")
