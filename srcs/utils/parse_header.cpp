@@ -31,7 +31,7 @@ bool	ft::parse_header(int fd, s_header &head)
 			break;
 		tmp.push_back(buffer[0]);
 	}
-std::cout << PURPLE << tmp << RST << std::endl;
+	std::cout << PURPLE << tmp << RST << std::endl;
 	if (recept == 0 || (tmp.find("\r\n\r\n") == tmp.npos)) // close client
 		return (false);
 	else if (recept == -1)	// empty

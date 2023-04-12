@@ -55,16 +55,14 @@ bool	Client::execute_post()
 	}
 	else if (!this->_header.Boundary.empty())
 	{
-		// FABIO DOING THAT.
-		std::cout << YELLOW << "Boundary POST" << RST << std::endl;
-		char	*tmpfile = strdup(".tmpXXXXXX");
+		std::cout << YELLOW << "Multipart POST" << RST << std::endl;
+		char			*tmpfile = strdup(".tmpXXXXXX");
+
 		mkstemp(tmpfile);
 		std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
+		std::string		file_buf;
+		char			buff[1024];
 
-		std::string	file_buf;
-		char		buff[1024];
-
-		std::cout << "POST METHOD" << std::endl;
 		int recept = 1;
 		while (recept > 0)
 		{
@@ -109,17 +107,6 @@ bool	Client::execute_post()
 			}
 		}
 		remove(tmpfile);
-		for (std::map<std::string, std::string>::iterator it = _header.other.begin(); it != _header.other.end(); ++it)
-			std::cout << "clé: " << it->first << ", value: " << it->second << std::endl; 
-		std::cout << std::endl;
-
-		std::cout << "Send: " << send(this->_sock_fd, "HTTP/1.1 405 Method Not Allowed\r\n\r\n\0", 36, MSG_OOB) << std::endl; // , NULL, 0);
-		//close(this->_sock_fd);
-		this->clear_header();
-		this->_index.clear();
-		this->_root.clear();
-		this->_working = true;
-		return (true);
 	}
 	else if (!this->is_chunk())
 	{
