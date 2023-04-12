@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 00:27:45 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/11 16:50:41 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ void	false_while(int type)
 
 int main(int ac, char **av) //, char** ev)
 {
-	if (ac != 2)
+	if (ac > 2)
 	{
-		std::cout << "Argument error.\nNeed " << av[0] << " [CONFIG FILE]" << std::endl;
+		std::cout << RED << "Argument error.\nNeed " << av[0] << " [CONFIG FILE] or nothing." << RST << std::endl;
 		return (1);
 	}
 
@@ -39,7 +39,7 @@ int main(int ac, char **av) //, char** ev)
 
 	// FIRST PARSE IN MAP STRING STRING
 	std::ifstream file;
-	file.open(av[1]);
+	av[1] ? file.open(av[1]) : file.open("./config/config.conf");
 	if (!file.is_open())
 	{
 		std::cout << "Can't open config file." << std::endl;

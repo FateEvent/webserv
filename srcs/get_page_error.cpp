@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/21 14:06:17 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 08:58:43 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 00:19:47 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,9 @@ std::string	ft::get_page_error(int nbr_error, std::string dir)
 		std::ifstream	file(dir);
 		if (file.is_open())
 		{
-			std::string	data;
-			file >> data;
+			std::stringstream streamfile;
+	    	streamfile << file.rdbuf(); //read the file
+    		std::string data = streamfile.str();
 			return ("Content-Length: " + std::to_string(data.length()) + "\r\n\r\n" + data);
 		}
 	}

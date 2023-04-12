@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 00:27:28 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 11:33:21 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ int	Client::launch_cgi(std::string path)
 	std::string STR;
 	std::vector<std::string> env;
 	char hostName[NI_MAXHOST];
-	this->_cgi = true;
 
 	env.push_back("REQUEST_METHOD=" + this->get_method()); // : La méthode HTTP utilisée dans la requête (GET, POST, PUT, DELETE, etc.).
 	env.push_back("SERVER_PROTOCOL=HTTP/1.1");
@@ -31,11 +30,11 @@ int	Client::launch_cgi(std::string path)
 		env.push_back("PATH_INFO=" + this->_header.Dir + "/" + this->_index); // NOT REALY GOOD... SHOULD BE AFTER THIS CALLING FILE
 		env.push_back("REQUEST_URI=" + this->_header.Dir + "/" + this->_index + (!this->_header.get_var.empty()?("?" + this->_header.get_var):"")); // SHOULD BY cgi_tester
 	}
-	env.push_back("SCRIPT_NAME=" + this->_root + this->_index); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
+	env.push_back("SCRIPT_NAME=" + this->_root + "/" + this->_index); // Le chemin d'accès relatif du script CGI à partir de la racine du serveur web.
 	env.push_back("SERVER_NAME=Webserv"); // Le nom du serveur web.
 	env.push_back("SERVER_PORT=" + std::to_string(this->_ref_conf.port)); // Le port sur lequel le serveur web écoute les requêtes.
 	env.push_back("SERVER_SOFTWARE=0.2"); // Le nom et la version du serveur web utilisé.
-	env.push_back("SCRIPT_FILENAME=" + this->_root + "." + this->_index); // Le chemin d'accès absolu du script CGI sur le serveur.
+	env.push_back("SCRIPT_FILENAME=" + this->_root + "/" + this->_index); // Le chemin d'accès absolu du script CGI sur le serveur.
 	env.push_back("DOCUMENT_ROOT=" + this->_root); // Le chemin d'accès absolu du répertoire racine du site web.
 	env.push_back("QUERY_STRING=" + this->_header.get_var); // La chaîne de requête (paramètres de la requête) envoyée avec la requête HTTP.
 	env.push_back("CONTENT_LENGTH=" + std::to_string(this->_header.Content_Length)); // La longueur (en octets) du corps de la requête HTTP.
@@ -73,24 +72,19 @@ int	Client::launch_cgi(std::string path)
 	char **ENVP = ft::vector_to_tab(env);
 	char *ARGV[] = {const_cast<char*>(path.c_str()), const_cast<char*>(file.c_str()), NULL};
 
-	if (pipe(this->_pipe_cgi_out) == -1 || pipe(this->_pipe_cgi_in) == -1)
+	if (pipe(this->_pipe_cgi) == -1)
 		return (503);
-
 	this->_pid_cgi = fork();
 	if (this->_pid_cgi > 0)
 	{
-		// EXECVE
-		close(this->_pipe_cgi_out[0]);
-		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
-		close(this->_pipe_cgi_in[1]);
-		//dup2(this->_pipe_cgi_out[1], STDOUT_FILENO);
-		fcntl(this->_pipe_cgi_in[0], F_SETFL, O_NONBLOCK);
-// Try cgi_tester without follow line.. if don't work uncomment...
- 		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
-			this->_header.Content_Length == 0)
-		{
-			close(this->_pipe_cgi_out[1]);
-		} 
+		// MAIN
+		close(this->_pipe_cgi[1]);
+		fcntl(this->_pipe_cgi[0], F_SETFL, O_NONBLOCK);
+		//usleep(50000);
+		// a fermer ou rediriger dans le cgi....
+ 	//	if (this->_header.Method.find("GET") != this->_header.Method.npos ||
+	//		this->_header.Content_Length == 0)
+		//	close(this->_pipe_cgi[1]);
 		this->_cgi = true;
 	}
 	else if (this->_pid_cgi == -1)
@@ -102,13 +96,28 @@ int	Client::launch_cgi(std::string path)
 	}
 	else
 	{
-		close(this->_pipe_cgi_out[1]);
-		close(this->_pipe_cgi_in[0]);
-		dup2(this->_pipe_cgi_out[0], STDIN_FILENO);
-		dup2(this->_pipe_cgi_in[1], STDOUT_FILENO);
-		if (execve(path.c_str(), ARGV, ENVP) < 0) //FOR TEST CAN PUT ENVP WITH PHP //if (execve(path.c_str(), ARGV, NULL) < 0)
+		// CHILD
+		close(this->_pipe_cgi[0]);
+//		fcntl(this->_pipe_cgi_out[0], F_SETFL, ~O_NONBLOCK);
+		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
+			this->_header.Content_Length == 0)
+			close(STDIN_FILENO);
+		else if (this->_header.Method.find("POST") != this->_header.Method.npos)
 		{
-			close(this->_pipe_cgi_out[0]);
+			if (!this->is_chunk())
+			{
+				//fcntl(this->_sock_fd, F_SETFL, ~O_NONBLOCK);
+				dup2(this->_sock_fd, STDIN_FILENO);
+			}
+			else
+			{
+				//DO CHUNK MODE -- WE ARE IN CHILD WE CAN TAKE ALL THE DATA IN SOCKET AND WORK AFTER. CAN'T BLOCK IN MAIN PROGRAM ///
+			}
+		}
+		dup2(this->_pipe_cgi[1], STDOUT_FILENO);
+		dup2(this->_pipe_cgi[1], STDERR_FILENO); // RECEIPT ERROR IN PIPE, TO SEE WHAT THE PROBLEM IF EXIST.
+		if (execve(path.c_str(), ARGV, ENVP) < 0)
+		{
 			std::string header(ft::make_header(500));
 			header.append(ft::get_page_error(500, this->_error_page[500].empty() ?
 					(this->_ref_conf.error_page.find(500)->second.empty() ?

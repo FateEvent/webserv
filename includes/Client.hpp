@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 09:14:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/12 12:33:35 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,18 +43,20 @@ class Client
 		sockaddr_in					_addr;			// sockaddr_in is a internet socket
 		socklen_t					_socklen;
 //		sockaddr_un					_addr_local;	// sockaddr_un is a local socket
-			config&				_ref_conf;
+		config&						_ref_conf;
 		std::string					_reponse;
 		std::string					_root;
 		std::string					_index;
 		std::time_t					_timeout;
 		header						_header;
 		size_t						_max_body;
+		int							_allow;
+		std::string					_redirect;
 		std::map<int, std::string>	_error_page;
 		std::string					_proxy;
+		std::string					_download;
 		std::map<std::string, std::string>	_cgi_call;
-		int							_pipe_cgi_out[2];
-		int							_pipe_cgi_in[2];
+		int							_pipe_cgi[2];
 		pid_t						_pid_cgi;
 		bool						_working;
 		bool						_chunked;
@@ -63,6 +65,7 @@ class Client
 		bool						_sedding;
 		struct s_clt_data			_data;
 		bool						_ready;
+		bool						_close;
 		std::map<std::string, std::string>	other;
 //		fd_set						_writefd;		
 		void						_make_struct();
@@ -80,6 +83,7 @@ class Client
 		const config*				get_config() const;
 		int							get_fd_cgi() const;
 		int							get_pid_cgi() const;
+		bool						get_close() const;
 		bool						continue_client(fd_set*);
 		bool						execute_client(bool);
 		bool						is_working() const;
@@ -99,7 +103,13 @@ class Client
 		bool						send_data(int);
 		int							launch_cgi(std::string);
 		void						kill_cgi();
-		
+		unsigned int				get_nbr_connected_client() const;
+		void						add_nbr_client();
+		void						make_error(int);
+		bool						execute_get();
+		bool						execute_post();
+		bool						execute_delete();
+
 	protected:
 };
 

@@ -6,16 +6,13 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/03/31 13:48:05 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/10 16:18:08 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/common.h"
 
-s_config::s_config()
-{
-	set_zero();
-}
+s_config::s_config()	{ set_zero(); }
 
 s_config::s_config(std::multimap<std::string, std::string>& server)
 {
@@ -71,10 +68,17 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		}
 		else if (!it->first.compare("max_client"))
 		{
-			int max = std::stol(it->second);
-			if (!(max > 0 && max < static_cast<int>(0x7FFFFFFF)))
+			ssize_t max = std::stol(it->second);
+			if (!(max > 0 && max < static_cast<ssize_t>(0x7FFFFFFF)))
 				throw ("Max client incorrect in instance!");
 			this->max_client = max;
+		}
+		else if (!it->first.compare("max_body_size"))
+		{
+			ssize_t max = std::stol(it->second);
+			if (max < 0)
+				throw ("Max body size incorrect in instance!");
+			this->max_body = max;
 		}
 		else if (!it->first.compare("root"))
 		{
@@ -88,11 +92,24 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 				throw ("no index referenced!");
 			this->index = it->second;
 		}
+		else if (!it->first.compare("allow"))
+		{
+			if (it->second.find("GET") != it->second.npos)
+				this->allow |= 0b1; // 0x001;
+			if (it->second.find("POST") != it->second.npos)
+				this->allow |= 0b10; //0x002;
+			if (it->second.find("DELETE") != it->second.npos)
+				this->allow |= 0b100; //0x004;
+		}
+		else if (!it->first.compare("download"))
+			this->download = it->second;
 		else if (!it->first.compare("error_page"))
 		{
 			if (!ft::put_err_page(it->second, this->error_page))
 				throw std::invalid_argument("error page in config file not set properly!");
 		}
+		else if (!it->first.compare("return"))
+			this->redirect = it->second;
 		else if (!it->first.find("location"))
 			do_location(it->second);
 		else if (!it->first.find("cgi"))
@@ -118,9 +135,11 @@ void s_config::set_zero()
 	this->port = 0;
 	this->error_log.clear();
 	this->cgi.clear();
-	this->allow.clear();
-	this->max_client = 0;
+	this->allow = 0;
+	this->nbr_client = 0;
+	this->max_client = -1;
 	this->max_body = 0;
+	this->redirect.clear();
 	this->active = false;
 	this->prepare = false;
 	this->location.clear();
@@ -180,4 +199,11 @@ void	s_config::get_all_loc(std::string loc, struct s_location *st)
 		loc.erase(0, pos + 1);
 		st->to.insert(std::make_pair(key, line.substr(line.find_first_not_of(" \v\f\r\n\t"))));
 	}
+}
+
+bool	s_config::if_max_client() const
+{
+	if (this->nbr_client >= this->max_client)
+		std::cout << YELLOW << "Client in qeue." << RST << std::endl;
+	return (this->nbr_client < this->max_client ? false : true);
 }

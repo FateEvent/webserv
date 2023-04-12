@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_header.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 17:16:45 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/12 09:50:01 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,7 @@ bool	ft::parse_header(int fd, s_header &head)
 	}
 std::cout << PURPLE << tmp << RST << std::endl;
 	if (recept == 0 || (tmp.find("\r\n\r\n") == tmp.npos)) // close client
-	{
-		std::cout << YELLOW << "Connexion closed by client" << RST << std::endl;
 		return (false);
-	}
 	else if (recept == -1)	// empty
 	{
 		std::cout << strerror(errno) << std::endl;

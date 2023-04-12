@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 18:14:06 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/12 09:50:04 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct	s_config
 	void	set_zero();
 	void	do_location(std::string);
 	void	get_all_loc(std::string, struct s_location*);
+	bool	if_max_client() const;
 	std::string							name;
 	std::string							root;
 	std::string							index;
@@ -49,9 +50,12 @@ typedef struct	s_config
 	std::string							error_log;
 	std::map<std::string, std::string>	cgi;
 	std::string							proxy;
-	std::vector<std::string>			allow;
-	unsigned int						max_client;
-	size_t								max_body;
+	int									allow;
+	std::string							redirect;
+	ssize_t								max_client;
+	ssize_t								nbr_client;
+	ssize_t								max_body;
+	std::string							download;
 	bool								active;
 	bool								prepare;
 	std::vector<struct s_location>		location;
@@ -87,7 +91,7 @@ typedef struct s_header
 	std::vector<std::string>			Accept;
 	std::map<std::string, std::string>	Cookie; // change to a ref of cookie in instance
 	ssize_t								Keep_Alive;
-	long int							time_out;
+	std::time_t							time_out;
 	std::string							Connexion;
 	std::string							get_var;
 	std::map<std::string, std::string>	body_var;
