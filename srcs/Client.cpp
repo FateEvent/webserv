@@ -413,11 +413,11 @@ void	Client::chunk()
 		file_buf += buff[0];
 		if (buff[0] == '\n')
 		{
-			if (!file_buf.find("\r\n"))
-				file_buf.clear();
+//			if (!file_buf.find("\r\n"))	// je pense que c'est dans le header, pas besoin ici donc
+//				file_buf.clear();
 			if (is_hex_line(file_buf))
 			{
-//				char_num = hextol(file_buf);
+				char_num = hextol(file_buf);
 				file_buf.clear();
 				while (char_num >= 0)
 				{
