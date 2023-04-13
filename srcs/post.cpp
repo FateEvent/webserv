@@ -56,58 +56,7 @@ bool	Client::execute_post()
 	else if (!this->_header.Boundary.empty())
 	{
 		std::cout << YELLOW << "Multipart POST" << RST << std::endl;
-		char			*tmpfile = strdup(".tmpXXXXXX");
-//		this->_multipart = true;
-
-		mkstemp(tmpfile);
-		std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
-		std::string		file_buf;
-		char			buff[1024];
-
-		int recept = 1;
-		while (recept > 0)
-		{
-			memset(buff, 0, 1024);
-			recept = recv(this->_sock_fd, &buff, 1023, 0);
-			for (int i = 0; i < recept; i++)
-			{
-				temporary << buff[i];
-				file_buf += buff[i];
-				if (buff[i] == '\n')
-				{
-					if ((!file_buf.find("--" + _header.Boundary + "\r\n"))
-						|| (!file_buf.find("--" + _header.Boundary + "--\r\n")))
-						file_buf.clear();
-					if (!file_buf.find("Content-Disposition"))
-					{
-						ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
-						file_buf.clear();
-					}
-					if (!file_buf.find("Content-Type"))
-						file_buf.clear();
-					if (!file_buf.find("\r\n"))
-						file_buf.clear();
-					if (file_buf.find("\r\n--" + _header.Boundary) != file_buf.npos)
-					{
-						file_buf.erase(file_buf.find("\r\n--" + _header.Boundary));
-						ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
-						ft::find_val(_header.Content_Disposition, _header.filename, "filename");
-						if (_header.entry_name != "" && _header.filename == "")
-							_header.other.insert(std::make_pair(_header.entry_name, file_buf));
-						else if (_header.filename != "")
-						{
-							std::fstream	filename;
-
-							filename.open(_header.filename, std::ios::out);
-							filename << file_buf;
-							filename.close();
-						}
-						file_buf.clear();
-					}
-				}
-			}
-		}
-		remove(tmpfile);
+		this->_multipart = true;
 	}
 	else if (!this->is_chunk())
 	{

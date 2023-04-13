@@ -101,16 +101,17 @@ Client::~Client()
 	this->_ref_conf.nbr_client--;
 }
 
-int				Client::get_sockfd() const 					{ return (this->_sock_fd);}
-time_t			Client::get_time_alive() const				{ return (this->_timeout);}
-std::string 	Client::get_method() const					{ return (this->_header.Method);}
-std::string		Client::get_directory() const				{ return (this->_header.Dir);}
-int				Client::get_pid_cgi() const				 	{ return (this->_pid_cgi);}
-bool			Client::is_working() const					{ return (this->_working);}
-bool			Client::is_chunk() const					{ return(this->_chunked);}
-header*			Client::get_header()						{ return (&this->_header);}
-const config*	Client::get_config() const					{ return (&this->_ref_conf);}
-bool			Client::is_cgi() const						{ return (this->_cgi?true:false);}
+int				Client::get_sockfd() const 					{ return (this->_sock_fd); }
+time_t			Client::get_time_alive() const				{ return (this->_timeout); }
+std::string 	Client::get_method() const					{ return (this->_header.Method); }
+std::string		Client::get_directory() const				{ return (this->_header.Dir); }
+int				Client::get_pid_cgi() const				 	{ return (this->_pid_cgi); }
+bool			Client::is_working() const					{ return (this->_working); }
+bool			Client::is_chunk() const					{ return(this->_chunked); }
+header*			Client::get_header()						{ return (&this->_header); }
+const config*	Client::get_config() const					{ return (&this->_ref_conf); }
+bool			Client::is_cgi() const						{ return (this->_cgi?true:false); }
+bool			Client::is_multipart() const				{ return (this->_multipart); }
 bool			Client::is_seeding() const					{ return (this->_sedding?true:false); }
 bool			Client::is_ready() const					{ return (this->_ready?true:false); }
 unsigned int	Client::get_nbr_connected_client() const	{ return (this->_ref_conf.nbr_client); }
@@ -228,12 +229,58 @@ bool	Client::continue_client(fd_set *fdset)
 	}
 	else if (this->is_chunk())
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
-	/*
 	else if (this->_multipart)
 	{
+//		char	*tmpfile = strdup(".tmpXXXXXX");
 
+//		mkstemp(tmpfile);
+//		std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
+		std::string		file_buf;
+		int				recept = 1;
+		char			buff[2];
+
+		std::memset(buff, 0, 2);
+		while (recept > 0)
+		{
+			recept = recv(this->_sock_fd, &buff, 1, 0);
+//			temporary << buff[0];
+			file_buf += buff[0];
+			if (buff[0] == '\n')
+			{
+				if ((!file_buf.find("--" + _header.Boundary + "\r\n"))
+					|| (!file_buf.find("--" + _header.Boundary + "--\r\n")))
+					file_buf.clear();
+				if (!file_buf.find("Content-Disposition"))
+				{
+					ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
+					file_buf.clear();
+				}
+				if (!file_buf.find("Content-Type"))
+					file_buf.clear();
+				if (!file_buf.find("\r\n"))
+					file_buf.clear();
+				if (file_buf.find("\r\n--" + _header.Boundary) != file_buf.npos)
+				{
+					file_buf.erase(file_buf.find("\r\n--" + _header.Boundary));
+					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
+					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
+					if (_header.entry_name != "" && _header.filename == "")
+						_header.other.insert(std::make_pair(_header.entry_name, file_buf));
+					else if (_header.filename != "")
+					{
+						std::fstream	filename;
+
+						filename.open(_header.filename, std::ios::out);
+						filename << file_buf;
+						filename.close();
+					}
+					file_buf.clear();
+				}
+			}
+		}
+//		remove(tmpfile);
+//		this->_multipart = false;
 	}
-	*/
 	else
 	{
 		std::cout << "PROBLEME EXIST IF ON SCREEN!!!!!continue_client" << std::endl;
