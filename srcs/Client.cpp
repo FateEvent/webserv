@@ -395,48 +395,69 @@ void	Client::make_error(int i)
 
 void	Client::chunk()
 {
+//	char	*tmpfile = strdup(".tmpXXXXXX");
+
+//	mkstemp(tmpfile);
+//	std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
 	std::string		file_buf;
+	std::string		temporary_stock;
 	int				recept = 1;
 	char			buff[2];
+	ssize_t			char_num(0);
 
 	std::memset(buff, 0, 2);
 	while (recept > 0)
 	{
 		recept = recv(this->_sock_fd, &buff, 1, 0);
+//		temporary << buff[0];
 		file_buf += buff[0];
 		if (buff[0] == '\n')
 		{
-			if ((!file_buf.find("--" + _header.Boundary + "\r\n"))
-				|| (!file_buf.find("--" + _header.Boundary + "--\r\n")))
-				file_buf.clear();
-			if (!file_buf.find("Content-Disposition"))
-			{
-				ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
-				file_buf.clear();
-			}
-			if (!file_buf.find("Content-Type"))
-				file_buf.clear();
 			if (!file_buf.find("\r\n"))
 				file_buf.clear();
-			if (file_buf.find("\r\n--" + _header.Boundary) != file_buf.npos)
+			if (is_hex_line(file_buf))
 			{
-				file_buf.erase(file_buf.find("\r\n--" + _header.Boundary));
-				ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
-				ft::find_val(_header.Content_Disposition, _header.filename, "filename");
-				if (_header.entry_name != "" && _header.filename == "")
-					_header.other.insert(std::make_pair(_header.entry_name, file_buf));
-				else if (_header.filename != "")
-				{
-					std::fstream	filename;
-
-					filename.open(_header.filename, std::ios::out);
-					filename << file_buf;
-					filename.close();
-				}
+				char_num = hextol(file_buf);
 				file_buf.clear();
+				while (char_num >= 0)
+				{
+					recept = recv(this->_sock_fd, &buff, 1, 0);
+//					temporary << buff[0];
+					temporary_stock += buff[0];
+					--char_num;
+				}
 			}
+			if (!file_buf.find("0\r\n"))
+				break ;
 		}
 	}
+//		remove(tmpfile);
+}
+
+int	Client::is_hex_line(std::string str)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (is_str_digit(str[i]))
+			i++;
+		else
+			break ;
+	}
+	if (str[i] == '\r' && str[i + 1] == '\n')
+		return (1);
+	return (0);
+}
+
+int	Client::is_hex_digit(char c)
+{
+	if ((c >= 48 && c <= 57)
+		|| (c >= 65 && c <= 70)
+		|| (c >= 97 && c <= 102))
+		return (1);
+	return (0);
 }
 
 static size_t	getMaxPower(std::string hex)
@@ -446,9 +467,7 @@ static size_t	getMaxPower(std::string hex)
 	i = 0;
 	while (hex[i])
 	{
-		if ((hex[i] >= 48 && hex[i] <= 57)
-			|| (hex[i] >= 65 && hex[i] <= 70)
-			|| (hex[i] >= 97 && hex[i] <= 102))
+		if (is_hex_digit(hex[i]))
 			i++;
 		else
 			break ;
@@ -457,7 +476,7 @@ static size_t	getMaxPower(std::string hex)
 	return (i);
 }
 
-ssize_t	Client::hexAndHappy(std::string hex)
+ssize_t	Client::hextol(std::string hex)
 {
 	size_t  i;
 	size_t  power;

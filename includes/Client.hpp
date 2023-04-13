@@ -113,7 +113,9 @@ class Client
 		bool						execute_get();
 		bool						execute_post();
 		bool						execute_delete();
-		ssize_t						hexAndHappy(std::string hex);
+		ssize_t						hextol(std::string hex);
+		int							is_hex_digit(char c);
+		int							is_hex_line(std::string str);
 
 	protected:
 };
