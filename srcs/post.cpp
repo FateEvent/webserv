@@ -81,4 +81,3 @@ bool	Client::execute_post()
 	}
 	return (false);
 }
-

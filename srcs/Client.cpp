@@ -280,6 +280,7 @@ bool	Client::continue_client(fd_set *fdset)
 		}
 //		remove(tmpfile);
 //		this->_multipart = false;
+		this->_sedding = true;
 	}
 	else
 	{
