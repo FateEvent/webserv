@@ -417,7 +417,7 @@ void	Client::chunk()
 				file_buf.clear();
 			if (is_hex_line(file_buf))
 			{
-				char_num = hextol(file_buf);
+//				char_num = hextol(file_buf);
 				file_buf.clear();
 				while (char_num >= 0)
 				{
@@ -441,7 +441,7 @@ int	Client::is_hex_line(std::string str)
 	i = 0;
 	while (str[i])
 	{
-		if (is_str_digit(str[i]))
+		if (Client::is_hex_digit(str[i]))
 			i++;
 		else
 			break ;
@@ -460,14 +460,14 @@ int	Client::is_hex_digit(char c)
 	return (0);
 }
 
-static size_t	getMaxPower(std::string hex)
+size_t	Client::getMaxPower(std::string hex)
 {
 	size_t	i;
 
 	i = 0;
 	while (hex[i])
 	{
-		if (is_hex_digit(hex[i]))
+		if (Client::is_hex_digit(hex[i]))
 			i++;
 		else
 			break ;
