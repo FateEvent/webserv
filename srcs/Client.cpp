@@ -394,4 +394,90 @@ void	Client::make_error(int i)
 }
 
 void	Client::chunk()
-{}
+{
+	std::string		file_buf;
+	int				recept = 1;
+	char			buff[2];
+
+	std::memset(buff, 0, 2);
+	while (recept > 0)
+	{
+		recept = recv(this->_sock_fd, &buff, 1, 0);
+		file_buf += buff[0];
+		if (buff[0] == '\n')
+		{
+			if ((!file_buf.find("--" + _header.Boundary + "\r\n"))
+				|| (!file_buf.find("--" + _header.Boundary + "--\r\n")))
+				file_buf.clear();
+			if (!file_buf.find("Content-Disposition"))
+			{
+				ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
+				file_buf.clear();
+			}
+			if (!file_buf.find("Content-Type"))
+				file_buf.clear();
+			if (!file_buf.find("\r\n"))
+				file_buf.clear();
+			if (file_buf.find("\r\n--" + _header.Boundary) != file_buf.npos)
+			{
+				file_buf.erase(file_buf.find("\r\n--" + _header.Boundary));
+				ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
+				ft::find_val(_header.Content_Disposition, _header.filename, "filename");
+				if (_header.entry_name != "" && _header.filename == "")
+					_header.other.insert(std::make_pair(_header.entry_name, file_buf));
+				else if (_header.filename != "")
+				{
+					std::fstream	filename;
+
+					filename.open(_header.filename, std::ios::out);
+					filename << file_buf;
+					filename.close();
+				}
+				file_buf.clear();
+			}
+		}
+	}
+}
+
+static size_t	getMaxPower(std::string hex)
+{
+	size_t	i;
+
+	i = 0;
+	while (hex[i])
+	{
+		if ((hex[i] >= 48 && hex[i] <= 57)
+			|| (hex[i] >= 65 && hex[i] <= 70)
+			|| (hex[i] >= 97 && hex[i] <= 102))
+			i++;
+		else
+			break ;
+	}
+	--i;
+	return (i);
+}
+
+ssize_t	Client::hexAndHappy(std::string hex)
+{
+	size_t  i;
+	size_t  power;
+	ssize_t count;
+
+	i = 0;
+	count = 0;
+	power = getMaxPower(hex);
+	while (power >= 0)
+	{
+		if (hex[i] >= 97 && hex[i] <= 102)
+			hex[i] -= 32;
+		if (hex[i] >= 48 && hex[i] <= 57)
+			count += (hex[i] - '0') * pow(16, power);
+		else if (hex[i] >= 65 && hex[i] <= 70)
+			count += (10 + hex[i] - 'A') * pow(16, power);
+		else
+			break ;
+		power--;
+		i++;
+	}
+	return (count);
+}

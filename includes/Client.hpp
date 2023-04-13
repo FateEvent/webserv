@@ -11,30 +11,31 @@
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
-#define CLIENT_HPP
-#define DEBUG
-#include <iostream>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <cstring>
-#include <string>
-#include <ctime>
-#include <sys/types.h>
-#include <map>
-#include <vector>
-#include <list>
-#include "../includes/common.h"
-#include <sys/un.h> // FOR LOCAL SOCKET
-#include <sys/wait.h>
-#include <signal.h>
-// #include "../includes/Reponse.hpp"
-#include <fstream>
-#include <sstream>
-#include <fcntl.h>
+# define CLIENT_HPP
+# define DEBUG
+# include <iostream>
+# include <unistd.h>
+# include <sys/socket.h>
+# include <sys/stat.h>
+# include <netdb.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <cstring>
+# include <string>
+# include <ctime>
+# include <sys/types.h>
+# include <map>
+# include <vector>
+# include <list>
+# include "../includes/common.h"
+# include <sys/un.h> // FOR LOCAL SOCKET
+# include <sys/wait.h>
+# include <signal.h>
+// # include "../includes/Reponse.hpp"
+# include <fstream>
+# include <sstream>
+# include <fcntl.h>
+# include <cmath>
 
 class Client
 {
@@ -112,6 +113,7 @@ class Client
 		bool						execute_get();
 		bool						execute_post();
 		bool						execute_delete();
+		ssize_t						hexAndHappy(std::string hex);
 
 	protected:
 };
