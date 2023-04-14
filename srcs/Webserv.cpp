@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/14 20:15:51 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/14 20:46:43 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -560,7 +560,7 @@ void	Webserv::exec_client()
 		//std::cout << YELLOW << "PASSAGE CLIENT" << RST << std::endl;
 		if (it->second.get_method().empty())
 		{
-			//std::cout << YELLOW << "METHODE VIDE: " << it->first << " : " << it->second.get_sockfd() << RST << std::endl;
+			std::cout << YELLOW << "METHODE VIDE: " << it->first << " : " << it->second.get_sockfd() << RST << std::endl;
 			continue;
 		}
 		if (it->second.get_close())
