@@ -38,7 +38,6 @@ namespace ft {
 
 	std::ifstream	*test_path(std::string &);
 	std::string		make_header(int = 0);
-	void			send_success_status();
 	std::string 	make_content_type(std::string);
 	std::string		get_page_error(int nbr_error, std::string dir);
 	void			do_cgi();

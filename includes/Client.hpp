@@ -118,6 +118,7 @@ class Client
 		int							is_hex_digit(char c);
 		int							is_hex_line(std::string str);
 		bool						multipart();
+		void						send_success_status();
 
 	protected:
 };

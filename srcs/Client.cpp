@@ -292,7 +292,7 @@ bool	Client::continue_client(fd_set *fdset)
 	else if (this->is_multipart())
 	{
 		if (this->multipart())
-			ft::send_success_status();
+			send_success_status();
 	}
 	else
 	{
@@ -414,29 +414,32 @@ void	Client::chunk()
 	// READ SOCKET JJUSQUA \R\N
 	//COVERTI EN INT
 	//
-	while (this->_data._in.size == 0 && recept > 0 && file_buf.find("\r\n") != file_buf.npos)
+	std::cout << "len: " << this->_data._in.size << std::endl;
+	while (this->_data._in.size == 0 && this->_data._in.receipt > 0 && file_buf.find("\r\n") == file_buf.npos)
 	{
 		this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
 		file_buf += buff[0];
+		std::cout << "boucle:" << std::endl;
 		if (buff[0] == '\n')
 			break ;
 	}
+	std::cout << "chunk!!" << std::endl;
 	int	len = strtoul(file_buf.c_str(), NULL, 16);
 	if (len > 0)
 	{
 		char	buffer[len];
 
-		std::memset(buff, 0, len);
-		recept = recv(this->_sock_fd, &buffer, len, 0);
-		temporary.write(buffer, recept);
+		std::memset(buffer, 0, len);
+		this->_data._in.receipt = recv(this->_sock_fd, &buffer, len, 0);
+		this->_data._in.temporary->write(buffer, this->_data._in.receipt);
 		file_buf.clear();
-		if (recept == len)
+		if (this->_data._in.receipt == len)
 			return ;
 		else
-			this->_data._in.size = recept - len;
+			this->_data._in.size = this->_data._in.receipt - len;
 	}
 	else if (!len)
-		ft::send_success_status();
+		send_success_status();
 }
 
 int	Client::is_hex_line(std::string str)
@@ -504,4 +507,18 @@ ssize_t	Client::hextol(std::string hex)
 		i++;
 	}
 	return (count);
+}
+
+void	Client::send_success_status()
+{
+	this->_data.header = ft::make_header(200);
+	this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
+	this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+	int check = 0;
+	check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
+	if (check == -1)
+		this->make_error(500);
+	if (check == 0)
+		this->make_error(501);
+	this->_sedding = true;
 }

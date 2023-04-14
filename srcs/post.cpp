@@ -21,9 +21,11 @@ bool	Client::execute_post()
 		this->make_error(405);
 		return (false);
 	}
+	std::cout << "1" << std::endl;
 	for (std::vector<std::string>::iterator it = this->_header.Transfer_Encoding.begin(); it != this->_header.Transfer_Encoding.end(); it++)
 		if (!it->compare("chunked"))
 		{
+			std::cout << "10" << std::endl;
 			this->_chunked = true;
 			char	tmpfile[12];
 
@@ -32,24 +34,28 @@ bool	Client::execute_post()
 			this->_data._in.temporary = new std::fstream(tmpfile, std::ios::out | std::ios::in | std::ios::binary | std::ios::app);
 			this->_data._in.size = 0;
 			this->_data._in.receipt = 1;
-			break;
+			return (false);
 		}
+		std::cout << "2" << std::endl;
 	if (this->_header.Content_Length == 0 && !this->is_chunk()) // Maybe change Content_Length to ssize_t and initialize it to -1. Compare with -1 instead of 0  
 	{
+		std::cout << "3" << std::endl;
 		std::cout << RED << "False content-length POST?" << RST << std::endl;
 		this->make_error(411);
 		return (false);
 	}
 	else if (this->_header.Content_Length > this->_max_body && this->_max_body > 0)
 	{
+		std::cout << "4" << std::endl;
 		std::cout << RED << "False content-length 2 POST?" << RST << std::endl;
 		this->make_error(413);
 		return (false);
 	}
-
+	std::cout << "5" << std::endl;
 	if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
 		(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end()))
 	{
+		std::cout << "6" << std::endl;
 		std::cout << YELLOW << "Execute POST by a CGI" << RST << std::endl;
 		static_cast<std::fstream*>(this->_data.file)->close();
 		this->_data.file = 0;
@@ -62,6 +68,7 @@ bool	Client::execute_post()
 	}
 	else if (!this->_header.Boundary.empty())
 	{
+		std::cout << "7" << std::endl;
 		std::cout << YELLOW << "Multipart POST" << RST << std::endl;
 		this->_multipart = true;
 		//this->_data._in.tmpfile = TMP_FILE_NAMED;
@@ -80,13 +87,14 @@ bool	Client::execute_post()
 	}
 	else if (!this->is_chunk())
 	{
+
 		// TO THAT AND THINK ABOUT CHUNKED CGI
 		std::cout << YELLOW << "Chunked POST" << RST << std::endl;
 	}
 	else
 	{
 		// SAME AS POST METHODE! CAN DO ONE FUNCTION USUALY
-		ft::send_success_status();
+		send_success_status();
 		//std::cout << BLUE << "\"" << this->_data.header << "\"" << RST << std::endl;
 	}
 	return (false);
