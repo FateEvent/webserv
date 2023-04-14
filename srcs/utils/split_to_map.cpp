@@ -6,7 +6,7 @@
 /*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 18:11:12 by faventur         ###   ########.fr       */
+/*   Updated: 2023/04/13 15:10:02 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ bool	ft::find_val(std::vector<std::string> &vector, std::string &var, std::strin
 
 	for (first = vector.begin(); first != last; ++first)
 	{
+		std::cout << RED << "NAMED: " << first->data() << RST << std::endl;
 		while (std::isspace((*first)[0]))
 			first->erase(0, 1);
 		if (first->find(key + "=") != std::string::npos)

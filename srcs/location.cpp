@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 12:39:04 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/13 11:33:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,12 @@ bool	Client::check_location()
 			this->_download = this->_ref_conf.root;
 
 	path = this->_root + "/" + this->_index;
-//	#ifdef DEBUG
-//		std::cout << "Path of file is: \"" + path + "\"" << std::endl;
-//	#endif
-	this->_data.file = new std::ifstream(path, std::ios::binary);
+
+/*  	#ifdef DEBUG
+		std::cout << "Path of file is: \"" + path + "\"" << std::endl;
+	#endif */
+
+	this->_data.file = new std::fstream(path, std::ios::in | std::ios::binary);
 	if (!this->_data.file->good())
 		return (false);
 	this->_data.file->seekg(0, this->_data.file->end);
