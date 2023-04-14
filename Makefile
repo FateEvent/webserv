@@ -6,7 +6,7 @@
 #    By: stissera <stissera@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/04/11 13:40:07 by stissera         ###   ########.fr        #
+#    Updated: 2023/04/13 17:03:05 by stissera         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,6 +25,7 @@ FILES		=	utils/file_to_map.cpp \
 				utils/test_path.cpp \
 				utils/vector_to_tab.cpp \
 				cgi.cpp \
+				multipart.cpp \
 				Client.cpp \
 				get.cpp \
 				post.cpp \

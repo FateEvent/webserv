@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/09 20:26:03 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/03 15:55:15 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/13 14:24:38 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ namespace ft {
 	void			do_cgi();
 	std::string		return_content_type(char *);
 	char			**vector_to_tab(std::vector<std::string>&);
-	
+	bool			find_val(std::vector<std::string> &, std::string &, std::string);
 	//void			free_tab(char **);
 };
 #endif

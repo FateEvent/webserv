@@ -6,11 +6,30 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 13:43:46 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/04 08:16:18 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/13 15:10:02 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/utils.hpp"
+
+bool	ft::find_val(std::vector<std::string> &vector, std::string &var, std::string key)
+{
+	std::vector<std::string>::iterator first = vector.begin(), last = vector.end();
+
+	for (first = vector.begin(); first != last; ++first)
+	{
+		std::cout << RED << "NAMED: " << first->data() << RST << std::endl;
+		while (std::isspace((*first)[0]))
+			first->erase(0, 1);
+		if (first->find(key + "=") != std::string::npos)
+		{
+			var = first->substr(first->find_first_not_of(key + "="));
+			vector.erase(first);
+			return (true);
+		}
+	}
+	return (false);
+}
 
 bool	ft::split_to_vectors(std::vector<std::string> &svector, std::string &Boundary, std::string line)
 {

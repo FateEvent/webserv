@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 12:37:17 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/14 09:40:16 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_header.time_out = std::time(nullptr);
 	this->_ready = true;
 	this->_close = false;
+	this->_multipart = false;
 }
 
 void	Client::clear_header()
@@ -84,6 +85,7 @@ void	Client::clear_header()
 	this->_data.file = NULL;
 	this->_ready = false;
 	this->_close = false;
+	this->_multipart = false;
 }
 
 Client::~Client()
@@ -114,6 +116,7 @@ bool			Client::is_ready() const					{ return (this->_ready?true:false); }
 unsigned int	Client::get_nbr_connected_client() const	{ return (this->_ref_conf.nbr_client); }
 void			Client::add_nbr_client()					{ this->_ref_conf.nbr_client++; }
 bool			Client::get_close() const					{ return (this->_close); }
+bool			Client::is_multipart() const				{ return (this->_multipart?true:false);}
 
 std::pair<std::string, std::string>	Client::get_file() const
 {
@@ -178,7 +181,7 @@ bool	Client::continue_client(fd_set *fdset)
 			this->_close = true;
 			this->_sedding = false;
 			delete this->_data.file;
-			//::shutdown(this->_sock_fd, SHUT_RD);
+			::shutdown(this->_sock_fd, SHUT_RDWR);
 			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
@@ -212,6 +215,7 @@ bool	Client::continue_client(fd_set *fdset)
 			int taking = this->take_data();
 			if (this->_data.wpid == this->_pid_cgi)
 			{
+				// check return value wsatus, if != 0 do free already receipt and send a error 500
 				if (taking == 0)
 				{
 					cgi_prepare_to_send();
@@ -226,6 +230,23 @@ bool	Client::continue_client(fd_set *fdset)
 	}
 	else if (this->is_chunk())
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
+	else if (this->is_multipart())
+	{
+		if (this->multipart())
+		{
+			std::string	header;
+			this->_data.header = ft::make_header(200);
+			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
+			this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+			int check = 0;
+			check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
+			if (check == -1)
+				this->make_error(500);
+			if (check == 0)
+				this->make_error(501);
+			this->_sedding = true;
+		}
+	}
 	else
 	{
 		std::cout << "PROBLEME EXIST IF ON SCREEN!!!!!continue_client" << std::endl;
@@ -266,7 +287,7 @@ int	Client::take_data() // the data should stay in pipe_in
 	int reading = read(this->_pipe_cgi[0], &buff, size);
 	if (reading > 0)
 	{
-		*static_cast<std::stringstream*>(_data.file) << buff;
+		static_cast<std::stringstream*>(_data.file)->write(buff, reading); //<< buff;
 		this->_data.file->seekg(0, this->_data.file->end);
 		this->_data.data_size = this->_data.file->tellg();
 		this->_data.file->seekg(0, this->_data.file->beg);

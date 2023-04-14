@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 12:33:35 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/13 19:19:33 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ class Client
 		std::string					_index;
 		std::time_t					_timeout;
 		header						_header;
-		size_t						_max_body;
+		ssize_t						_max_body;
 		int							_allow;
 		std::string					_redirect;
 		std::map<int, std::string>	_error_page;
@@ -61,6 +61,7 @@ class Client
 		bool						_working;
 		bool						_chunked;
 		bool						_cgi;
+		bool						_multipart;
 		fd_set						_readfd;
 		bool						_sedding;
 		struct s_clt_data			_data;
@@ -91,6 +92,7 @@ class Client
 		bool						is_chunk() const;
 		bool						is_seeding() const;
 		bool						is_ready() const;
+		bool						is_multipart() const;
 		bool						new_request();
 		void						clear_header();
 		void						clear();
@@ -109,6 +111,7 @@ class Client
 		bool						execute_get();
 		bool						execute_post();
 		bool						execute_delete();
+		bool						multipart();
 
 	protected:
 };

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 17:51:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/13 19:20:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ bool	Client::execute_post()
 		(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end()))
 	{
 		std::cout << YELLOW << "Execute POST by a CGI" << RST << std::endl;
-		(*static_cast<std::ifstream*>(this->_data.file)).close();
+		static_cast<std::fstream*>(this->_data.file)->close();
 		this->_data.file = 0;
 		this->_data.file = new std::stringstream();
 		if (!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end())
@@ -55,8 +55,20 @@ bool	Client::execute_post()
 	}
 	else if (!this->_header.Boundary.empty())
 	{
-		// FABIO DOING THAT.
-		std::cout << YELLOW << "Boundary POST" << RST << std::endl;
+		//this->_data._in.tmpfile = TMP_FILE_NAMED;
+		std::cout << YELLOW << "Multipart POST" << RST << std::endl;
+		strcpy(this->_data._in.tmpfile, ".tmpXXXXXX");
+		if (mkstemp(this->_data._in.tmpfile) == -1)
+		{
+			this->make_error(500);
+			return (false);
+		}
+		this->_data._in.temporary = new std::fstream(this->_data._in.tmpfile, std::ios::out | std::ios::in | std::ios::binary);
+		this->_data._in.receipt = 1;
+		this->_data._in.file_buf.clear();
+		this->_data._in.filename = NULL;
+		this->_multipart = true;
+		this->_data._in.size = 0;
 	}
 	else if (!this->is_chunk())
 	{

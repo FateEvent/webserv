@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 09:50:04 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/14 00:09:58 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@
 
 #define BUFFER_SIZE_KB 1024
 #define BUFFER_SIZE_MB 1024 * 1024
-
 
 typedef struct	s_config
 {
@@ -80,7 +79,7 @@ typedef struct s_header
 	std::string							Dir;
 	std::string							Host;
 	std::string							User_Agent;
-	size_t								Content_Length;
+	ssize_t								Content_Length;
 	std::vector<std::string>			Content_Type;
 	std::string							Boundary;
 	std::vector<std::string>			Content_Encoding;
@@ -95,6 +94,10 @@ typedef struct s_header
 	// A voir MISS some directives...
 	std::pair<std::string, std::string>	file;
 	std::map<std::string, std::string>	other; // Need change to a map<string, string>
+	// FABIO BOUNDARY
+	std::vector<std::string>			Content_Disposition;
+	std::string							entry_name;
+	std::string							filename;
 }	header;
 
 typedef struct s_location
@@ -104,18 +107,31 @@ typedef struct s_location
 	std::multimap<std::string, std::string>	to; 	// what we do (name, directive).
 }	t_location;
 
+typedef struct s_clt_data_in
+{
+	std::fstream	*temporary;
+	int				receipt; // Only for take socket to file don't change the value; 
+	ssize_t			size;
+	std::string		file_buf;
+	char			tmpfile[11];
+	std::fstream	*filename;
+}	clt_data_in;
+
 typedef struct s_clt_data
 {
 	s_clt_data();
-	std::istream		*file;
-	size_t				minus_header; // substract this number on data_size before make header (for content-length)
-	std::string			header;
-	ssize_t				data_size;
-	ssize_t				data_sended;
-	int					wsatus; // status du fork
-	int					wpid; // status de la reception
-	//std::FILE			*cgi_return;
+	std::iostream			*file;
+	size_t					minus_header; // substract this number on data_size before make header (for content-length)
+	std::string				header;
+	ssize_t					data_size;
+	ssize_t					data_sended;
+	int						wsatus; // status du fork
+	int						wpid; // status de la reception
+	//std::FILE				*cgi_return;
+	struct s_clt_data_in	_in;
 }	clt_data;
+
+
 
 namespace ft {
 	bool			parse_header(int, s_header&);
