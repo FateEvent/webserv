@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/13 19:14:30 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/14 20:15:51 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,9 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	}
 	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
+	int optval = 1;
+	if (setsockopt(this->_base.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(socklen_t)) == - 1)
+		throw std::invalid_argument("Cannot REUSE the port! Usualy already used."); // ("Server bind error.");
 	fcntl(this->_base.sock_fd, F_SETFL, O_NONBLOCK);
 	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
 		throw std::invalid_argument("Cannot bind port! Usualy already used."); // ("Server bind error.");
@@ -98,6 +101,9 @@ void	Webserv::prepare(config &instance)
 		if ((instance.sock_fd = socket(instance.addr.sin_family, instance.type, 0)) != -1)
 		{
 			//socket(instance.addr.sin_family, instance.type, instance.addr.sin_addr.s_addr)))
+			int optval = 1;
+			if (setsockopt(instance.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(int)) == - 1)
+				throw std::invalid_argument("Cannot REUSE the port in instance! Usualy already used."); // ("Server bind error.");
 			instance.prepare = true;
 			fcntl(instance.sock_fd, F_SETFL, O_NONBLOCK);
 		}
@@ -485,7 +491,6 @@ void	Webserv::check_server()
 	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
 		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd) && !it->second.if_max_client())
 		{
-			// Check number of client already in instance....
 			//std::cout << "Ask of new client." << std::endl;
 			try
 			{
@@ -493,10 +498,12 @@ void	Webserv::check_server()
 				this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
 				delete ret;
 				//std::cout << GREEN << "New client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+				FD_CLR(it->second.sock_fd, &this->readfd);
 			}
 			catch (std::exception &e)
 			{
 				std::cout << e.what() << std::endl;
+				FD_CLR(it->second.sock_fd, &this->readfd);
 			}
 		}
 }
@@ -550,35 +557,41 @@ void	Webserv::exec_client()
 	std::list<int> toclose;
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
+		//std::cout << YELLOW << "PASSAGE CLIENT" << RST << std::endl;
 		if (it->second.get_method().empty())
 		{
+			//std::cout << YELLOW << "METHODE VIDE: " << it->first << " : " << it->second.get_sockfd() << RST << std::endl;
 			continue;
 		}
 		if (it->second.get_close())
 		{
+			//std::cout << YELLOW << "DEMANDE CLOSE NUMBER: " << it->first << RST << std::endl;
 			if (FD_ISSET(it->second.get_sockfd(), &writefd) && it->second.get_close())
 			{
 				//std::cout << YELLOW << "PUT TO CLOSE" << RST << std::endl;
 				toclose.push_back(it->second.get_sockfd());
+				it->second.kill_cgi();
 			}
 		}
 		else if (!it->second.is_seeding() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
 			it->second.make_error(405);
 		else if (!it->second.is_seeding() && it->second.is_ready() && it->second.get_pid_cgi() == 0 && !it->second.is_multipart()) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
 		{
+			//std::cout << YELLOW << "EXECUTION CLIENT NUMBER: " << it->first << RST << std::endl;
 			if (it->second.execute_client(it->second.check_location()))
 				it->second.clear_header();
 		}
 		else if ((it->second.is_seeding() && it->second.is_ready()) || it->second.is_cgi() || it->second.is_multipart())
 		{
+			//std::cout << YELLOW << "Seeding client number: " << it->first << RST << std::endl;
 			if (!it->second.continue_client(&this->readfd))
 				this->timeout(0);
 		}
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
+		//std::cout << YELLOW << "Close client number: " << *it << RST << std::endl;
 		//usleep(50000); // If not 0,5sec error when post have body??!!!!
-		//std::cout << YELLOW << this->_client.find(*it)->second.get_nbr_connected_client() << " client are already connected." << RST << std::endl;
 		this->_client.erase(*it);
 		::close(*it);
 		std::cout << BLUE << "Socket " << *it << " closed." << RST << std::endl;

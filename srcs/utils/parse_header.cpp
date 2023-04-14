@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/12 09:50:01 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/14 19:44:58 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,14 @@ bool	ft::parse_header(int fd, s_header &head)
 	{
 		recept = recv(fd, &buffer, 1, 0);
  		if (recept == -1)
+		{
+			return (false);
 			continue;
+		}
 		if (recept == 0 || buffer[0] == 0) // Usualy client close connection...
 			break;
 		tmp.push_back(buffer[0]);
+
 	}
 	std::cout << PURPLE << tmp << RST << std::endl;
 	if (recept == 0 || (tmp.find("\r\n\r\n") == tmp.npos)) // close client
