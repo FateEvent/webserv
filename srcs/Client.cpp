@@ -119,7 +119,6 @@ bool			Client::is_ready() const					{ return (this->_ready?true:false); }
 unsigned int	Client::get_nbr_connected_client() const	{ return (this->_ref_conf.nbr_client); }
 void			Client::add_nbr_client()					{ this->_ref_conf.nbr_client++; }
 bool			Client::get_close() const					{ return (this->_close); }
-bool			Client::is_multipart() const				{ return (this->_multipart?true:false);}
 
 std::pair<std::string, std::string>	Client::get_file() const
 {
@@ -283,9 +282,9 @@ bool	Client::continue_client(fd_set *fdset)
 			}
 		}
 //		remove(tmpfile);
-//		free(tmpfile);
 //		this->_multipart = false;
 		this->_sedding = true;
+	}
 	else if (this->is_multipart())
 	{
 		if (this->multipart())

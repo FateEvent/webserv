@@ -68,7 +68,6 @@ class Client
 		struct s_clt_data			_data;
 		bool						_ready;
 		bool						_close;
-		bool						_multipart;
 
 		std::map<std::string, std::string>	other;
 //		fd_set						_writefd;		
@@ -93,7 +92,6 @@ class Client
 		bool						is_working() const;
 		bool						is_cgi() const;
 		bool						is_chunk() const;
-		bool						is_multipart() const;
 		bool						is_seeding() const;
 		bool						is_ready() const;
 		bool						is_multipart() const;

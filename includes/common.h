@@ -81,10 +81,6 @@ typedef struct s_header
 	std::string							User_Agent;
 	ssize_t								Content_Length;
 	std::vector<std::string>			Content_Type;
-	std::string							Boundary;
-	std::vector<std::string>			Content_Disposition;
-	std::string							entry_name;
-	std::string							filename;
 	std::vector<std::string>			Content_Encoding;
 	std::vector<std::string>			Transfer_Encoding;
 	std::vector<std::string>			Accept;
@@ -99,6 +95,7 @@ typedef struct s_header
 	std::pair<std::string, std::string>	file;
 	std::map<std::string, std::string>	other; // Need change to a map<string, string>
 	// FABIO BOUNDARY
+	std::string							Boundary;
 	std::vector<std::string>			Content_Disposition;
 	std::string							entry_name;
 	std::string							filename;
