@@ -25,6 +25,13 @@ bool	Client::execute_post()
 		if (!it->compare("chunked"))
 		{
 			this->_chunked = true;
+			char	tmpfile[12];
+
+			strcpy(tmpfile, "chunkXXXXXX");
+			mkstemp(tmpfile);
+			this->_data._in.temporary = new std::fstream(tmpfile, std::ios::out | std::ios::in | std::ios::binary | std::ios::app);
+			this->_data._in.size = 0;
+			this->_data._in.receipt = 1;
 			break;
 		}
 	if (this->_header.Content_Length == 0 && !this->is_chunk()) // Maybe change Content_Length to ssize_t and initialize it to -1. Compare with -1 instead of 0  
@@ -79,18 +86,8 @@ bool	Client::execute_post()
 	else
 	{
 		// SAME AS POST METHODE! CAN DO ONE FUNCTION USUALY
-		std::string	header;
-		this->_data.header = ft::make_header(200);
-		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
-		this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
-		int check = 0;
-		check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
-		if (check == -1)
-			this->make_error(500);
-		if (check == 0)
-			this->make_error(501);
+		ft::send_success_status();
 		//std::cout << BLUE << "\"" << this->_data.header << "\"" << RST << std::endl;
-		this->_sedding = true;
 	}
 	return (false);
 }

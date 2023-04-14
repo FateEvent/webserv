@@ -292,19 +292,7 @@ bool	Client::continue_client(fd_set *fdset)
 	else if (this->is_multipart())
 	{
 		if (this->multipart())
-		{
-			std::string	header;
-			this->_data.header = ft::make_header(200);
-			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
-			this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
-			int check = 0;
-			check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
-			if (check == -1)
-				this->make_error(500);
-			if (check == 0)
-				this->make_error(501);
-			this->_sedding = true;
-		}
+			ft::send_success_status();
 	}
 	else
 	{
@@ -419,47 +407,36 @@ void	Client::make_error(int i)
 
 void	Client::chunk()
 {
-	char	*tmpfile;
-
-	tmpfile = new char[11];
-	strcpy(tmpfile, ".tmpXXXXXX");
-
-	mkstemp(tmpfile);
-	std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
 	std::string		file_buf;
-	std::string		temporary_stock;
-	int				recept = 1;
 	char			buff[2];
-	ssize_t			char_num(0);
 
 	std::memset(buff, 0, 2);
-	while (recept > 0)
+	// READ SOCKET JJUSQUA \R\N
+	//COVERTI EN INT
+	//
+	while (this->_data._in.size == 0 && recept > 0 && file_buf.find("\r\n") != file_buf.npos)
 	{
-		recept = recv(this->_sock_fd, &buff, 1, 0);
-		temporary << buff[0];
+		this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
 		file_buf += buff[0];
 		if (buff[0] == '\n')
-		{
-//			if (!file_buf.find("\r\n"))	// je pense que c'est dans le header, pas besoin ici donc
-//				file_buf.clear();
-			if (is_hex_line(file_buf))
-			{
-				char_num = hextol(file_buf);
-				file_buf.clear();
-				while (char_num >= 0)
-				{
-					recept = recv(this->_sock_fd, &buff, 1, 0);
-					temporary << buff[0];
-					temporary_stock += buff[0];
-					--char_num;
-				}
-			}
-			if (!file_buf.find("0\r\n"))
-				break ;
-		}
+			break ;
 	}
-		remove(tmpfile);
-		delete[] tmpfile;
+	int	len = strtoul(file_buf.c_str(), NULL, 16);
+	if (len > 0)
+	{
+		char	buffer[len];
+
+		std::memset(buff, 0, len);
+		recept = recv(this->_sock_fd, &buffer, len, 0);
+		temporary.write(buffer, recept);
+		file_buf.clear();
+		if (recept == len)
+			return ;
+		else
+			this->_data._in.size = recept - len;
+	}
+	else if (!len)
+		ft::send_success_status();
 }
 
 int	Client::is_hex_line(std::string str)
