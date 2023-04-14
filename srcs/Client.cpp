@@ -234,10 +234,13 @@ bool	Client::continue_client(fd_set *fdset)
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
 	else if (this->_multipart)
 	{
-//		char	*tmpfile = strdup(".tmpXXXXXX");
+		char	*tmpfile;
 
-//		mkstemp(tmpfile);
-//		std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
+		tmpfile = new char[11];
+		strcpy(tmpfile, ".tmpXXXXXX");
+
+		mkstemp(tmpfile);
+		std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
 		std::string		file_buf;
 		int				recept = 1;
 		char			buff[2];
@@ -246,7 +249,7 @@ bool	Client::continue_client(fd_set *fdset)
 		while (recept > 0)
 		{
 			recept = recv(this->_sock_fd, &buff, 1, 0);
-//			temporary << buff[0];
+			temporary << buff[0];
 			file_buf += buff[0];
 			if (buff[0] == '\n')
 			{
@@ -281,7 +284,8 @@ bool	Client::continue_client(fd_set *fdset)
 				}
 			}
 		}
-//		remove(tmpfile);
+		remove(tmpfile);
+		delete[] tmpfile;
 //		this->_multipart = false;
 		this->_sedding = true;
 	}
@@ -415,10 +419,13 @@ void	Client::make_error(int i)
 
 void	Client::chunk()
 {
-//	char	*tmpfile = strdup(".tmpXXXXXX");
+	char	*tmpfile;
 
-//	mkstemp(tmpfile);
-//	std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
+	tmpfile = new char[11];
+	strcpy(tmpfile, ".tmpXXXXXX");
+
+	mkstemp(tmpfile);
+	std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
 	std::string		file_buf;
 	std::string		temporary_stock;
 	int				recept = 1;
@@ -429,7 +436,7 @@ void	Client::chunk()
 	while (recept > 0)
 	{
 		recept = recv(this->_sock_fd, &buff, 1, 0);
-//		temporary << buff[0];
+		temporary << buff[0];
 		file_buf += buff[0];
 		if (buff[0] == '\n')
 		{
@@ -442,7 +449,7 @@ void	Client::chunk()
 				while (char_num >= 0)
 				{
 					recept = recv(this->_sock_fd, &buff, 1, 0);
-//					temporary << buff[0];
+					temporary << buff[0];
 					temporary_stock += buff[0];
 					--char_num;
 				}
@@ -451,8 +458,8 @@ void	Client::chunk()
 				break ;
 		}
 	}
-//		remove(tmpfile);
-//		free(tmpfile);
+		remove(tmpfile);
+		delete[] tmpfile;
 }
 
 int	Client::is_hex_line(std::string str)
