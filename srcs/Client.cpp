@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/14 20:23:03 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/14 20:35:23 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -517,7 +517,7 @@ size_t	Client::getMaxPower(std::string hex)
 ssize_t	Client::hextol(std::string hex)
 {
 	size_t  i;
-	size_t  power;
+	ssize_t  power;
 	ssize_t count;
 
 	i = 0;
