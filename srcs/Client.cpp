@@ -409,37 +409,52 @@ void	Client::chunk()
 {
 	std::string		file_buf;
 	char			buff[2];
+	int				len(0);
 
 	std::memset(buff, 0, 2);
 	// READ SOCKET JJUSQUA \R\N
 	//COVERTI EN INT
 	//
-	std::cout << "len: " << this->_data._in.size << std::endl;
-	while (this->_data._in.size == 0 && this->_data._in.receipt > 0 && file_buf.find("\r\n") == file_buf.npos)
+	while (this->_data._in.receipt > 0)
 	{
 		this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
 		file_buf += buff[0];
-		std::cout << "boucle:" << std::endl;
+		std::cout << buff[0] << std::endl;
 		if (buff[0] == '\n')
-			break ;
-	}
-	std::cout << "chunk!!" << std::endl;
-	int	len = strtoul(file_buf.c_str(), NULL, 16);
-	if (len > 0)
-	{
-		char	buffer[len];
+		{
+			if (!file_buf.find("\r\n"))
+				file_buf.clear();
+			if (is_hex_line(file_buf))
+			{
+				len = hextol(file_buf);
+				std::cout << "len: " << len << std::endl;
+				file_buf.clear();
+				while (this->_data._in.receipt > 0 && len >= 0)
+				{
+					this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
+					file_buf += buff[0];
+					--len;
+				}
+				*(this->_data._in.temporary) << file_buf;
+				std::cout << "buffer: " << file_buf << std::endl;
+				if (!len)
+				{
+					send_success_status();
+					return ;
+				}
 
-		std::memset(buffer, 0, len);
-		this->_data._in.receipt = recv(this->_sock_fd, &buffer, len, 0);
-		this->_data._in.temporary->write(buffer, this->_data._in.receipt);
-		file_buf.clear();
-		if (this->_data._in.receipt == len)
-			return ;
-		else
-			this->_data._in.size = this->_data._in.receipt - len;
+			}
+//			else
+//			{
+//				this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
+//				this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
+//				if (this->_data._in.receipt == (int)len)
+//					return ;
+//				else
+//					this->_data._in.size = this->_data._in.receipt - len;
+//			}
+		}
 	}
-	else if (!len)
-		send_success_status();
 }
 
 int	Client::is_hex_line(std::string str)
