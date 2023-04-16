@@ -424,7 +424,10 @@ void	Client::chunk()
 			break;
 	}
 	if (!file_buf.find("\r\n"))
+	{
+		std::cout << "ça rentre" << std::endl;
 		file_buf.clear();
+	}
 	if (is_hex_line(file_buf))
 	{
 		len = hextol(file_buf);
@@ -437,7 +440,7 @@ void	Client::chunk()
 		else
 		{
 			file_buf.clear();
-			while (this->_data._in.receipt > 0 && len >= 0)
+			while (this->_data._in.receipt > 0 && len > 0)
 			{
 				this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
 				file_buf += buff[0];
