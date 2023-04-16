@@ -421,44 +421,37 @@ void	Client::chunk()
 		file_buf += buff[0];
 		std::cout << buff[0] << std::endl;
 		if (buff[0] == '\n')
+			break;
+	}
+	if (!file_buf.find("\r\n"))
+		file_buf.clear();
+	if (is_hex_line(file_buf))
+	{
+		len = hextol(file_buf);
+		if (!len)
 		{
-			if (!file_buf.find("\r\n"))
-				file_buf.clear();
-			if (is_hex_line(file_buf))
+			file_buf.clear();
+			send_success_status();
+			return ;
+		}
+		else
+		{
+			file_buf.clear();
+			while (this->_data._in.receipt > 0 && len >= 0)
 			{
-				len = hextol(file_buf);
-				std::cout << "len: " << len << std::endl;
-				file_buf.clear();
-				while (this->_data._in.receipt > 0 && len >= 0)
-				{
-					this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
-					file_buf += buff[0];
-					--len;
-				}
-				*(this->_data._in.temporary) << file_buf;
-				std::cout << "buffer: " << file_buf << std::endl;
-				if (!len)
-				{
-					send_success_status();
-					return ;
-				}
-
+				this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
+				file_buf += buff[0];
+				--len;
 			}
-//			else
-//			{
-//				this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
-//				this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
-//				if (this->_data._in.receipt == (int)len)
-//					return ;
-//				else
-//					this->_data._in.size = this->_data._in.receipt - len;
-//			}
+			*(this->_data._in.temporary) << file_buf;
+			this->_data._in.temporary->close();
 		}
 	}
 }
 
 int	Client::is_hex_line(std::string str)
 {
+	std::cout << "string: " << str << std::endl; 
 	size_t	i;
 
 	i = 0;
