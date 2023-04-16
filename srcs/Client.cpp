@@ -424,10 +424,7 @@ void	Client::chunk()
 			break;
 	}
 	if (!file_buf.find("\r\n"))
-	{
-		std::cout << "ça rentre" << std::endl;
 		file_buf.clear();
-	}
 	if (is_hex_line(file_buf))
 	{
 		len = hextol(file_buf);
@@ -454,7 +451,6 @@ void	Client::chunk()
 
 int	Client::is_hex_line(std::string str)
 {
-	std::cout << "string: " << str << std::endl; 
 	size_t	i;
 
 	i = 0;
