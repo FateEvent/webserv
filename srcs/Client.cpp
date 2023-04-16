@@ -234,22 +234,14 @@ bool	Client::continue_client(fd_set *fdset)
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
 	else if (this->_multipart)
 	{
-		char	*tmpfile;
-
-		tmpfile = new char[11];
-		strcpy(tmpfile, ".tmpXXXXXX");
-
-		mkstemp(tmpfile);
-		std::fstream	temporary(tmpfile, std::ios::out | std::ios::in | std::ios::binary);
 		std::string		file_buf;
-		int				recept = 1;
 		char			buff[2];
 
 		std::memset(buff, 0, 2);
-		while (recept > 0)
+		while (this->_data._in.receipt > 0)
 		{
-			recept = recv(this->_sock_fd, &buff, 1, 0);
-			temporary << buff[0];
+			this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
+			*(this->_data._in.temporary) << buff[0];
 			file_buf += buff[0];
 			if (buff[0] == '\n')
 			{
@@ -274,20 +266,16 @@ bool	Client::continue_client(fd_set *fdset)
 						_header.other.insert(std::make_pair(_header.entry_name, file_buf));
 					else if (_header.filename != "")
 					{
-						std::fstream	filename;
+						this->_data._in.filename = new std::fstream(_header.filename, std::ios::out);
 
-						filename.open(_header.filename, std::ios::out);
-						filename << file_buf;
-						filename.close();
+						*(this->_data._in.filename) << file_buf;
+						this->_data._in.filename->close();
 					}
 					file_buf.clear();
 				}
 			}
 		}
-		remove(tmpfile);
-		delete[] tmpfile;
-//		this->_multipart = false;
-		this->_sedding = true;
+		remove(this->_data._in.tmpfile);
 	}
 	else if (this->is_multipart())
 	{
