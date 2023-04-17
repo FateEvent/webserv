@@ -127,6 +127,13 @@ std::pair<std::string, std::string>	Client::get_file() const
 	return (this->_header.file);
 }
 
+int	Client::get_fd_cgi_0() const
+{
+	if (this->is_cgi())
+		return (this->_pipe_cgi[0]);
+	return (0);
+}
+
 int	Client::get_fd_cgi() const
 {
 	if (this->is_cgi())

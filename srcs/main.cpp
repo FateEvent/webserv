@@ -94,6 +94,7 @@ int main(int ac, char **av) //, char** ev)
 	std::cout << server.get_info_instance() << std::endl;
 
 	signal(SIGINT, false_while);
+//	signal(SIGPIPE, function);
 
 	char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
 	unsigned int	nbr = 0;

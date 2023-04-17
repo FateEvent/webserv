@@ -558,8 +558,18 @@ void	Webserv::exec_client()
 		{
 			if (FD_ISSET(it->second.get_sockfd(), &writefd) && it->second.get_close())
 			{
-				//std::cout << YELLOW << "PUT TO CLOSE" << RST << std::endl;
+//				int		receipt(1);
+//				char	buff[2];
+
+//				std::memset(buff, 0, 2);
+				std::cout << YELLOW << "PUT TO CLOSE" << RST << std::endl;
 				toclose.push_back(it->second.get_sockfd());
+				// while (receipt > 0)
+				// {
+				// 	receipt = read(it->second.get_fd_cgi(), &buff, 1);
+				// 	std::cout << GREEN << buff[0];
+				// }
+				// std::cout << std::endl;
 			}
 		}
 		else if (!it->second.is_seeding() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
@@ -577,10 +587,11 @@ void	Webserv::exec_client()
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
+		std::cout << BLUE << "Socket " << *it << " closed." << RST << std::endl;
 		//usleep(50000); // If not 0,5sec error when post have body??!!!!
 		//std::cout << YELLOW << this->_client.find(*it)->second.get_nbr_connected_client() << " client are already connected." << RST << std::endl;
 		this->_client.erase(*it);
 		::close(*it);
-		std::cout << BLUE << "Socket " << *it << " closed." << RST << std::endl;
+		
 	}
 }

@@ -85,6 +85,7 @@ class Client
 		header*						get_header();
 		const config*				get_config() const;
 		int							get_fd_cgi() const;
+		int							get_fd_cgi_0() const;
 		int							get_pid_cgi() const;
 		bool						get_close() const;
 		bool						continue_client(fd_set*);
