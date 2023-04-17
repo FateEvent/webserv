@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 16:53:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/14 01:38:45 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/17 15:19:39 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,33 @@ bool	Client::multipart()
 			this->_data._in.size += this->_data._in.receipt; 
 		}
 	}
-	/* else if (this->_data._in.receipt == 0)
+	
+	else if (this->_data._in.receipt == 0 && this->_data._in.pos_seek != -1)
 	{
-		for (int i = 0; i < this->_data._in.receipt; i++)
+		char	buff[BUFFER_SIZE_MB];
+		memset(&buff, 0, BUFFER_SIZE_MB);
+		this->_data._in.temporary->seekg(this->_data._in.pos_seek, this->_data._in.temporary->beg);
+		this->_data._in.temporary->read(buff, BUFFER_SIZE_MB);
+
+		// Check if boundary if end of search.
+		if (this->_data._in.temporary->eof())
+			this->_data._in.pos_seek = -1;	
+		else
+			this->_data._in.pos_seek = this->_data._in.temporary->gcount() - this->_header.Boundary.length() + 1;
+
+		std::string search_b(buff, this->_data._in.temporary->gcount() - this->_data._in.pos_seek);
+		// Check if boundary if end of search.
+		int	pos_str = 0;
+		while (pos_str = search_b.find(this->_header.Boundary, pos_str) != search_b.npos)
+		{
+			std::cout << RED << "Before push back: " << pos_str << RST << std::endl;
+			this->_data._in.bound_seek.push_back(pos_str++);
+			std::cout << RED << "After push back: " << pos_str << RST << std::endl;
+			std::cout << RED << "Push back: " << this->_data._in.bound_seek.back() << RST << std::endl;
+		}
+
+
+		/* for (int i = 0; i < this->_data._in.receipt; i++)
 		{
 			std::cout << PURPLE << buff[i] << RST;
 			this->_data._in.file_buf += buff[i];
@@ -73,8 +97,8 @@ bool	Client::multipart()
 					this->_data._in.file_buf.clear();
 				}
 			}
-		}
-	} */
+		}*/
+	}
 
 	// Use bool in if for finish?!
 	if (this->_header.Content_Length == this->_data._in.size)

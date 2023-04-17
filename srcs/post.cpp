@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/13 19:20:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/17 13:15:15 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ bool	Client::execute_post()
 		this->_data._in.receipt = 1;
 		this->_data._in.file_buf.clear();
 		this->_data._in.filename = NULL;
+		this->_data._in.pos_seek = 0;
 		this->_multipart = true;
 		this->_data._in.size = 0;
 	}
