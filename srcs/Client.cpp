@@ -405,6 +405,7 @@ void	Client::chunk()
 	{
 		this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
 		this->_data._in.file_buf += buff[0];
+		std::cout << GREEN << buff[0];
 		if (buff[0] == '\n')
 			break;
 	}
@@ -425,7 +426,8 @@ void	Client::chunk()
 			while (this->_data._in.receipt > 0 && len > 0)
 			{
 				this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
-				this->_data._in.file_buf += buff[0];
+				this->_data._in.file_buf.append(&buff[0]);
+				std::cout << PURPLE << buff[0];
 				--len;
 			}
 			*(this->_data._in.temporary) << this->_data._in.file_buf;
@@ -437,6 +439,7 @@ void	Client::chunk()
 
 int	Client::is_hex_line(std::string str)
 {
+	std::cout << "str: "<< str << std::endl;
 	size_t	i;
 
 	i = 0;

@@ -17,6 +17,10 @@ bool	Client::check_location()
 	static struct stat path_stat;
 	std::string	path;
 
+	if (_header.other.find("Expect")->second.find("100") != std::string::npos)
+	{
+		send(this->_sock_fd, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
+	}
 	this->_max_body = this->_ref_conf.max_body == 0 ? this->_ref_conf._base->max_body : this->_ref_conf.max_body;
 	if (!this->_download.empty())
 		this->_download = this->_ref_conf.download.empty() ? (this->_ref_conf._base->download.empty() ? this->_ref_conf.root : this->_ref_conf._base->download) : this->_ref_conf.download;
