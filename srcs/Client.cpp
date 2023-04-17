@@ -234,7 +234,6 @@ bool	Client::continue_client(fd_set *fdset)
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
 	else if (this->_multipart)
 	{
-		std::string		file_buf;
 		char			buff[2];
 
 		std::memset(buff, 0, 2);
@@ -242,36 +241,36 @@ bool	Client::continue_client(fd_set *fdset)
 		{
 			this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
 			*(this->_data._in.temporary) << buff[0];
-			file_buf += buff[0];
+			this->_data._in.file_buf += buff[0];
 			if (buff[0] == '\n')
 			{
-				if ((!file_buf.find("--" + _header.Boundary + "\r\n"))
-					|| (!file_buf.find("--" + _header.Boundary + "--\r\n")))
-					file_buf.clear();
-				if (!file_buf.find("Content-Disposition"))
+				if ((!this->_data._in.file_buf.find("--" + _header.Boundary + "\r\n"))
+					|| (!this->_data._in.file_buf.find("--" + _header.Boundary + "--\r\n")))
+					this->_data._in.file_buf.clear();
+				if (!this->_data._in.file_buf.find("Content-Disposition"))
 				{
-					ft::split_to_vectors(_header.Content_Disposition, file_buf, ';');
-					file_buf.clear();
+					ft::split_to_vectors(_header.Content_Disposition, this->_data._in.file_buf, ';');
+					this->_data._in.file_buf.clear();
 				}
-				if (!file_buf.find("Content-Type"))
-					file_buf.clear();
-				if (!file_buf.find("\r\n"))
-					file_buf.clear();
-				if (file_buf.find("\r\n--" + _header.Boundary) != file_buf.npos)
+				if (!this->_data._in.file_buf.find("Content-Type"))
+					this->_data._in.file_buf.clear();
+				if (!this->_data._in.file_buf.find("\r\n"))
+					this->_data._in.file_buf.clear();
+				if (this->_data._in.file_buf.find("\r\n--" + _header.Boundary) != this->_data._in.file_buf.npos)
 				{
-					file_buf.erase(file_buf.find("\r\n--" + _header.Boundary));
+					this->_data._in.file_buf.erase(this->_data._in.file_buf.find("\r\n--" + _header.Boundary));
 					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
 					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
 					if (_header.entry_name != "" && _header.filename == "")
-						_header.other.insert(std::make_pair(_header.entry_name, file_buf));
+						_header.other.insert(std::make_pair(_header.entry_name, this->_data._in.file_buf));
 					else if (_header.filename != "")
 					{
 						this->_data._in.filename = new std::fstream(_header.filename, std::ios::out);
 
-						*(this->_data._in.filename) << file_buf;
+						*(this->_data._in.filename) << this->_data._in.file_buf;
 						this->_data._in.filename->close();
 					}
-					file_buf.clear();
+					this->_data._in.file_buf.clear();
 				}
 			}
 		}
@@ -395,7 +394,6 @@ void	Client::make_error(int i)
 
 void	Client::chunk()
 {
-	std::string		file_buf;
 	char			buff[2];
 	int				len(0);
 
@@ -406,33 +404,33 @@ void	Client::chunk()
 	while (this->_data._in.receipt > 0)
 	{
 		this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
-		file_buf += buff[0];
-		std::cout << buff[0] << std::endl;
+		this->_data._in.file_buf += buff[0];
 		if (buff[0] == '\n')
 			break;
 	}
-	if (!file_buf.find("\r\n"))
-		file_buf.clear();
-	if (is_hex_line(file_buf))
+	if (!this->_data._in.file_buf.find("\r\n"))
+		this->_data._in.file_buf.clear();
+	if (is_hex_line(this->_data._in.file_buf))
 	{
-		len = hextol(file_buf);
+		len = hextol(this->_data._in.file_buf);
 		if (!len)
 		{
-			file_buf.clear();
+			this->_data._in.file_buf.clear();
 			send_success_status();
 			return ;
 		}
 		else
 		{
-			file_buf.clear();
+			this->_data._in.file_buf.clear();
 			while (this->_data._in.receipt > 0 && len > 0)
 			{
 				this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
-				file_buf += buff[0];
+				this->_data._in.file_buf += buff[0];
 				--len;
 			}
-			*(this->_data._in.temporary) << file_buf;
+			*(this->_data._in.temporary) << this->_data._in.file_buf;
 			this->_data._in.temporary->close();
+			this->_data._in.file_buf.clear();
 		}
 	}
 }
