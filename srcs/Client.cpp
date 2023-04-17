@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/14 20:35:23 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/17 20:54:44 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,7 +233,7 @@ bool	Client::continue_client(fd_set *fdset)
 	}
 	else if (this->is_chunk())
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
-	else if (this->_multipart)
+/* 	else if (this->_multipart)
 	{
 		char	*tmpfile;
 
@@ -298,7 +298,7 @@ bool	Client::continue_client(fd_set *fdset)
 		if (check == 0)
 			this->make_error(501);
 		this->_sedding = true;
-	}
+	} */
 	else if (this->is_multipart())
 	{
 		if (this->multipart())

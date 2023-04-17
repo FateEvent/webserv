@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 16:53:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/17 15:19:39 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/17 22:14:01 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 bool	Client::multipart()
 {
-	if (this->_data._in.receipt != 0)
+	if (this->_header.Content_Length != this->_data._in.size && this->_data._in.receipt != 0)
 	{
 		int size;
 		socklen_t len = sizeof(size);
@@ -33,31 +33,43 @@ bool	Client::multipart()
 		}
 	}
 	
-	else if (this->_data._in.receipt == 0 && this->_data._in.pos_seek != -1)
+	if (this->_header.Content_Length == this->_data._in.size && this->_data._in.pos_seek != -1)
 	{
 		char	buff[BUFFER_SIZE_MB];
 		memset(&buff, 0, BUFFER_SIZE_MB);
+		if (this->_data._in.temporary->eof())
+		{
+			this->_data._in.pos_seek = -1;
+			std::cout << "Boundary found at position:" << std::endl;
+			for (std::vector<int>::iterator it = this->_data._in.bound_seek.begin(); it != this->_data._in.bound_seek.end(); it++)
+				std::cout << GREEN << *it << RST << std::endl;
+			make_error(201);
+			return (true);
+		}
 		this->_data._in.temporary->seekg(this->_data._in.pos_seek, this->_data._in.temporary->beg);
 		this->_data._in.temporary->read(buff, BUFFER_SIZE_MB);
 
 		// Check if boundary if end of search.
-		if (this->_data._in.temporary->eof())
-			this->_data._in.pos_seek = -1;	
-		else
-			this->_data._in.pos_seek = this->_data._in.temporary->gcount() - this->_header.Boundary.length() + 1;
+			
+		//else
+		//	this->_data._in.pos_seek = this->_data._in.temporary->gcount() - this->_header.Boundary.length() + 1;
 
-		std::string search_b(buff, this->_data._in.temporary->gcount() - this->_data._in.pos_seek);
+		std::string search_b(buff, this->_data._in.temporary->gcount());
 		// Check if boundary if end of search.
-		int	pos_str = 0;
-		while (pos_str = search_b.find(this->_header.Boundary, pos_str) != search_b.npos)
+		size_t	pos_str = 0;
+		while ((pos_str = search_b.find("--" + this->_header.Boundary, pos_str)) != search_b.npos)
 		{
-			std::cout << RED << "Before push back: " << pos_str << RST << std::endl;
-			this->_data._in.bound_seek.push_back(pos_str++);
-			std::cout << RED << "After push back: " << pos_str << RST << std::endl;
-			std::cout << RED << "Push back: " << this->_data._in.bound_seek.back() << RST << std::endl;
+			//std::cout << RED << "Found in position: " << pos_str << RST << std::endl;
+			this->_data._in.bound_seek.push_back(this->_data._in.pos_seek + pos_str);
+			pos_str++;
 		}
+		if (this->_data._in.temporary->gcount() - pos_str == this->_data._in.temporary->gcount() - this->_header.Boundary.length())
+			this->_data._in.pos_seek = this->_data._in.pos_seek + this->_data._in.temporary->gcount() - this->_header.Boundary.length() - 2;
+		else
+			this->_data._in.pos_seek = this->_data._in.pos_seek + this->_data._in.temporary->gcount();
 
-
+//		std::cout << GREEN << "-----------------" << this->_data._in.pos_seek << "--------------------------\n" << search_b << "\n---------------------" << this->_data._in.temporary->tellg() << "---------------------" << RST << std::endl;
+		//sleep(5);
 		/* for (int i = 0; i < this->_data._in.receipt; i++)
 		{
 			std::cout << PURPLE << buff[i] << RST;
@@ -99,13 +111,17 @@ bool	Client::multipart()
 			}
 		}*/
 	}
+//	else if (this->_data._in.pos_seek == -1)
+//	{
+//
+//	}
 
 	// Use bool in if for finish?!
-	if (this->_header.Content_Length == this->_data._in.size)
-	{
-		 return (true);
+	//if (this->_header.Content_Length == this->_data._in.size)
+	//{
+	//	 return (true);
 		// make_error(201);
 		//remove(this->_data._in.tmpfile);
-	}
+	//}
 	return (false);
 }
