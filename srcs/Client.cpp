@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/17 20:54:44 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/17 23:02:27 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -301,7 +301,7 @@ bool	Client::continue_client(fd_set *fdset)
 	} */
 	else if (this->is_multipart())
 	{
-		if (this->multipart())
+		if (this->multipart() && this->process_multipart())
 		{
 			std::string	header;
 			this->_data.header = ft::make_header(200);

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/13 19:19:33 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/17 23:02:25 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ class Client
 		int							is_hex_digit(char c);
 		int							is_hex_line(std::string str);
 		bool						multipart();
+		bool						process_multipart();
 
 	protected:
 };

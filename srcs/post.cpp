@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/17 20:58:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/17 23:03:36 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,12 +65,13 @@ bool	Client::execute_post()
 			return (false);
 		}
 		this->_data._in.temporary = new std::fstream(this->_data._in.tmpfile, std::ios::out | std::ios::in | std::ios::binary);
-		this->_data._in.receipt = 1;
 		this->_data._in.file_buf.clear();
 		this->_data._in.filename = NULL;
 		this->_data._in.pos_seek = 0;
-		this->_multipart = true;
 		this->_data._in.size = 0;
+		this->_data._in.receipt = 1;
+		this->_multipart = true;
+		
 	}
 	else if (!this->is_chunk())
 	{
