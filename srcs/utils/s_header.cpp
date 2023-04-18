@@ -47,7 +47,7 @@ void	s_header::clear()
 
 void	s_header::print_all()
 {
-	std::cout << "Method        : \"" + Method + "\"" << std::endl; // ok
+	std::cout << "Method         : \"" + Method + "\"" << std::endl; // ok
 	std::cout << "Directory      : \"" + Dir + "\"" << std::endl; // ok
 	std::cout << "Host           : \"" + Host + "\"" << std::endl; // ok
 	std::cout << "UserAgent      : \"" + User_Agent + "\"" << std::endl; // ok
