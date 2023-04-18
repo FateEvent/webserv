@@ -28,14 +28,13 @@ void	Webserv::show_client_list()
 	
 	for (; first != last; ++first)
 	{
-		
 		if (waitpid(first->second.get_pid_cgi(), NULL, 0) != 0)
 		{
-			std::cout << first->first << std::endl;
+			std::cout << first->first << RST << std::endl;
 			::close(first->second.get_fd_cgi_0());
 			::close(first->second.get_sockfd());
 			this->_client.erase(first);
-			std::cout << GREEN << "The socket has been closed" << std::endl;
+			std::cout << GREEN << "The socket has been closed" << RST << std::endl;
 			return ;
 		}
 	}
