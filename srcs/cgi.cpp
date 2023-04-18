@@ -74,9 +74,7 @@ int	Client::launch_cgi(std::string path)
 
 	if (pipe(this->_pipe_cgi) == -1)
 		return (503);
-	std::cout << "avant le fork" << std::endl;
 	this->_pid_cgi = fork();
-	std::cout << "un peu plus tard..." << std::endl;
 	if (this->_pid_cgi > 0)
 	{
 		// MAIN
@@ -88,31 +86,24 @@ int	Client::launch_cgi(std::string path)
 	//		this->_header.Content_Length == 0)
 		//	close(this->_pipe_cgi[1]);
 		this->_cgi = true;
-		std::cout << "père..." << std::endl;
 	}
 	else if (this->_pid_cgi == -1)
 	{
 		std::cout << RED << "Fork error: can't create a fork!" << RST << std::endl;
 		this->_pid_cgi = 0;
-		std::cout << "error" << std::endl;
 		// CLOSE PIPE
 		return (503);
 	}
 	else
 	{
-		std::cout << "fils..." << std::endl;
 		// CHILD
 		close(this->_pipe_cgi[0]);
 //		fcntl(this->_pipe_cgi_out[0], F_SETFL, ~O_NONBLOCK);
 		if (this->_header.Method.find("GET") != this->_header.Method.npos ||
 			this->_header.Content_Length == 0)
-		{
 			close(STDIN_FILENO);
-			std::cout << "fils a fermé stdin" << std::endl;
-		}
 		else if (this->_header.Method.find("POST") != this->_header.Method.npos)
 		{
-			std::cout << "fils en post" << std::endl;
 			if (!this->is_chunk())
 			{
 				//fcntl(this->_sock_fd, F_SETFL, ~O_NONBLOCK);
@@ -124,10 +115,8 @@ int	Client::launch_cgi(std::string path)
 				//DO CHUNK MODE -- WE ARE IN CHILD WE CAN TAKE ALL THE DATA IN SOCKET AND WORK AFTER. CAN'T BLOCK IN MAIN PROGRAM ///
 			}
 		}
-		std::cout << "fils avant dup2" << std::endl;
 		dup2(this->_pipe_cgi[1], STDOUT_FILENO);
 		dup2(this->_pipe_cgi[1], STDERR_FILENO); // RECEIPT ERROR IN PIPE, TO SEE WHAT THE PROBLEM IF EXIST.
-		std::cout << "fils après dup2" << std::endl;
 		if (execve(path.c_str(), ARGV, ENVP) < 0)
 		{
 			std::string header(ft::make_header(500));
@@ -136,7 +125,6 @@ int	Client::launch_cgi(std::string path)
 					this->_ref_conf._base->error_page.find(500)->second : this->_ref_conf.error_page.find(500)->second) :
 					this->_error_page[500]));
 			std::cout << header;
-			std::cout << "fils execve" << std::endl;
 			delete[] ENVP; // not good lot of new inside ENVP
 			std::exit(EXIT_FAILURE);
       	}

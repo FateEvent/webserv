@@ -62,6 +62,7 @@ class Webserv
 		std::string		get_info_instance() const;
 		std::string		get_info_on(const config &) const;
 		int				get_greaterfd() const;
+		void			show_client_list();
 
 		// SOCKET
 		void			prepare_all();

@@ -19,6 +19,32 @@ fd_set          Webserv::readfd;
 fd_set          Webserv::writefd;
 fd_set          Webserv::errfd;
 bool _SIGNAL_END = true;
+bool _BROKEN_PIPE = false;
+
+void	Webserv::show_client_list()
+{
+	std::map<int, Client>::iterator first = this->_client.begin(), last = this->_client.end();
+	std::cout << PURPLE << "The socket of the following client is open and has to be closed:" << std::endl;
+	
+	for (; first != last; ++first)
+	{
+		if (waitpid(first->second.get_pid_cgi(), NULL, 0) != 0)
+		{
+			std::cout << first->first << std::endl;
+			::close(first->second.get_fd_cgi_0());
+			::close(first->second.get_sockfd());
+			this->_client.erase(first);
+			std::cout << GREEN << "The socket has been closed" << std::endl;
+			return ;
+		}
+	}
+}
+
+void	sigpipe_solving(int signal)
+{
+	std::cout << YELLOW << "Reception of a signal " << signal << RST << std::endl;
+	_BROKEN_PIPE = true;
+}
 
 void	false_while(int type)
 {
@@ -33,7 +59,6 @@ int main(int ac, char **av) //, char** ev)
 		std::cout << RED << "Argument error.\nNeed " << av[0] << " [CONFIG FILE] or nothing." << RST << std::endl;
 		return (1);
 	}
-
 	ft::make_header(0);
 	ft::make_content_type("");
 
@@ -94,7 +119,7 @@ int main(int ac, char **av) //, char** ev)
 	std::cout << server.get_info_instance() << std::endl;
 
 	signal(SIGINT, false_while);
-//	signal(SIGPIPE, function);
+	signal(SIGPIPE, sigpipe_solving);
 
 	char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
 	unsigned int	nbr = 0;
@@ -112,6 +137,11 @@ int main(int ac, char **av) //, char** ev)
 		server.timeout(1);	
 		server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALY GOES ONE TIME/REQUEST
 		recept = 0;
+		if (_BROKEN_PIPE)
+		{
+			server.show_client_list();
+			_BROKEN_PIPE = false;
+		}
 	}
 	server.stop_all();
 
