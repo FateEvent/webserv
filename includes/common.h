@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   common.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/14 00:09:58 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/18 14:43:14 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,12 +110,15 @@ typedef struct s_location
 
 typedef struct s_clt_data_in
 {
-	std::fstream	*temporary;
-	int				receipt; // Only for take socket to file don't change the value; 
-	ssize_t			size;
-	std::string		file_buf;
-	char			tmpfile[11];
-	std::fstream	*filename;
+	std::fstream		*temporary;
+	int					receipt; // Only for take socket to file don't change the value; 
+	ssize_t				size;
+	std::string			file_buf;
+	char				tmpfile[11];
+	std::fstream		*filename;
+	ssize_t				pos_seek;
+	std::vector<size_t>	bound_seek; // seek position of boundary starting/end
+	size_t				in_bound; // Maybe don t need .... not used actualy
 }	clt_data_in;
 
 typedef struct s_clt_data

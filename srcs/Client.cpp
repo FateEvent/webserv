@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: faventur <faventur@student.42mulhouse.fr>  +#+  +:+       +#+        */
+/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/14 09:40:16 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/17 23:02:27 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,11 +184,12 @@ bool	Client::continue_client(fd_set *fdset)
 	{
 		if (this->send_data(this->_sock_fd))
 		{
-			//this->clear_header();
+			//this->clear_header(); //
 			this->_index.clear();
 			this->_root.clear();
 			this->_close = true;
 			this->_sedding = false;
+			this->_close = true;
 			delete this->_data.file;
 			::shutdown(this->_sock_fd, SHUT_RDWR);
 			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
@@ -239,7 +240,7 @@ bool	Client::continue_client(fd_set *fdset)
 	}
 	else if (this->is_chunk())
 		this->chunk(); // need put data of chunked in s_clt_data::body_in
-	else if (this->_multipart)
+/* 	else if (this->_multipart)
 	{
 		char			buff[2];
 
@@ -281,12 +282,36 @@ bool	Client::continue_client(fd_set *fdset)
 				}
 			}
 		}
-		remove(this->_data._in.tmpfile);
-	}
+		remove(tmpfile);
+		delete[] tmpfile;
+		std::string	header;
+		this->_data.header = ft::make_header(200);
+		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
+		this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+		int check = 0;
+		check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
+		if (check == -1)
+			this->make_error(500);
+		if (check == 0)
+			this->make_error(501);
+		this->_sedding = true;
+	} */
 	else if (this->is_multipart())
 	{
-		if (this->multipart())
-			send_success_status();
+		if (this->multipart() && this->process_multipart())
+		{
+			std::string	header;
+			this->_data.header = ft::make_header(200);
+			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
+			this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+			int check = 0;
+			check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
+			if (check == -1)
+				this->make_error(500);
+			if (check == 0)
+				this->make_error(501);
+			this->_sedding = true;
+		}
 	}
 	else
 	{
@@ -366,7 +391,7 @@ void	Client::cgi_prepare_to_send()
 
 void	Client::kill_cgi()
 {
-	if (this->_pipe_cgi[0] > 0)
+	if (this->_pipe_cgi[0] > 0 && _data.wpid > 0)
 	{
 		kill(this->_pid_cgi, 2);
 		close(this->_pipe_cgi[0]);
@@ -490,7 +515,7 @@ size_t	Client::getMaxPower(std::string hex)
 ssize_t	Client::hextol(std::string hex)
 {
 	size_t  i;
-	size_t  power;
+	ssize_t  power;
 	ssize_t count;
 
 	i = 0;

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/11 16:50:41 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/14 19:46:16 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,8 +131,8 @@ int main(int ac, char **av) //, char** ev)
 		if (recept)
 		{
 			//std::cout << std::endl;
-			server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
 			server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
+			server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
 		}
 		server.timeout(1);	
 		server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALY GOES ONE TIME/REQUEST
@@ -143,6 +143,7 @@ int main(int ac, char **av) //, char** ev)
 			_BROKEN_PIPE = false;
 		}
 	}
+	std::cout << RED << "EXIT PROGRAM" << RST << std::endl;
 	server.stop_all();
 
 	return (0);
