@@ -63,9 +63,6 @@ bool	Client::execute_post()
 	else if (!this->_header.Boundary.empty())
 	{
 		std::cout << YELLOW << "Multipart POST" << RST << std::endl;
-		char	tmpfile[11];
-
-		//this->_data._in.tmpfile = TMP_FILE_NAMED;
 		strcpy(this->_data._in.tmpfile, "/tmp/tmpXXXXXX");
 		if (mkstemp(this->_data._in.tmpfile) == -1)
 		{

@@ -71,7 +71,7 @@ bool	Client::multipart()
 
 bool	Client::process_multipart()
 {
-	if (this->_data._in.temporary->tellg() == this->_data._in.bound_seek.back())
+	if (this->_data._in.temporary->tellg() == (long long)this->_data._in.bound_seek.back())
 		return (true);
 	size_t buf_size = 0;
 
