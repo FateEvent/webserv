@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/17 23:00:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/18 14:43:14 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,8 @@ typedef struct s_clt_data_in
 	char				tmpfile[11];
 	std::fstream		*filename;
 	ssize_t				pos_seek;
-	std::vector<int>	bound_seek; // seek position of boundary starting/end
+	std::vector<size_t>	bound_seek; // seek position of boundary starting/end
+	size_t				in_bound; // Maybe don t need .... not used actualy
 }	clt_data_in;
 
 typedef struct s_clt_data
