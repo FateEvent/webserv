@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/18 14:20:42 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/19 01:05:16 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ bool	Client::execute_post()
 		std::cout << YELLOW << "Multipart POST" << RST << std::endl;
 		this->_multipart = true;
 		//this->_data._in.tmpfile = TMP_FILE_NAMED;
-		strcpy(this->_data._in.tmpfile, "/tmp/tmpXXXXXX");
+		strcpy(this->_data._in.tmpfile, "/tmp/tmp.XXXXXX");
 		if (mkstemp(this->_data._in.tmpfile) == -1)
 		{
 			this->make_error(500);
