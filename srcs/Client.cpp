@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/17 23:02:27 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/19 01:12:33 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,69 +239,15 @@ bool	Client::continue_client(fd_set *fdset)
 		}
 	}
 	else if (this->is_chunk())
-		this->chunk(); // need put data of chunked in s_clt_data::body_in
-/* 	else if (this->_multipart)
-	{
-		char			buff[2];
-
-		std::memset(buff, 0, 2);
-		while (this->_data._in.receipt > 0)
-		{
-			this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
-			*(this->_data._in.temporary) << buff[0];
-			this->_data._in.file_buf += buff[0];
-			if (buff[0] == '\n')
-			{
-				if ((!this->_data._in.file_buf.find("--" + _header.Boundary + "\r\n"))
-					|| (!this->_data._in.file_buf.find("--" + _header.Boundary + "--\r\n")))
-					this->_data._in.file_buf.clear();
-				if (!this->_data._in.file_buf.find("Content-Disposition"))
-				{
-					ft::split_to_vectors(_header.Content_Disposition, this->_data._in.file_buf, ';');
-					this->_data._in.file_buf.clear();
-				}
-				if (!this->_data._in.file_buf.find("Content-Type"))
-					this->_data._in.file_buf.clear();
-				if (!this->_data._in.file_buf.find("\r\n"))
-					this->_data._in.file_buf.clear();
-				if (this->_data._in.file_buf.find("\r\n--" + _header.Boundary) != this->_data._in.file_buf.npos)
-				{
-					this->_data._in.file_buf.erase(this->_data._in.file_buf.find("\r\n--" + _header.Boundary));
-					ft::find_val(_header.Content_Disposition, _header.entry_name, "name");
-					ft::find_val(_header.Content_Disposition, _header.filename, "filename");
-					if (_header.entry_name != "" && _header.filename == "")
-						_header.other.insert(std::make_pair(_header.entry_name, this->_data._in.file_buf));
-					else if (_header.filename != "")
-					{
-						this->_data._in.filename = new std::fstream(_header.filename, std::ios::out);
-
-						*(this->_data._in.filename) << this->_data._in.file_buf;
-						this->_data._in.filename->close();
-					}
-					this->_data._in.file_buf.clear();
-				}
-			}
-		}
-		remove(tmpfile);
-		delete[] tmpfile;
-		std::string	header;
-		this->_data.header = ft::make_header(200);
-		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
-		this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
-		int check = 0;
-		check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
-		if (check == -1)
-			this->make_error(500);
-		if (check == 0)
-			this->make_error(501);
-		this->_sedding = true;
-	} */
+		this->chunk(); 
 	else if (this->is_multipart())
 	{
 		if (this->multipart() && this->process_multipart())
 		{
+			this->_data._in.temporary->close();
+			remove(this->_data._in.tmpfile);
 			std::string	header;
-			this->_data.header = ft::make_header(200);
+			this->_data.header = ft::make_header(201);
 			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
 			this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
 			int check = 0;

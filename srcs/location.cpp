@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/13 11:33:17 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/19 00:26:52 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ bool	Client::check_location()
 		send(this->_sock_fd, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
 	}
 	this->_max_body = this->_ref_conf.max_body == 0 ? this->_ref_conf._base->max_body : this->_ref_conf.max_body;
-	if (!this->_download.empty())
+	if (this->_download.empty())
 		this->_download = this->_ref_conf.download.empty() ? (this->_ref_conf._base->download.empty() ? this->_ref_conf.root : this->_ref_conf._base->download) : this->_ref_conf.download;
 	this->_allow = this->_ref_conf.allow;
 	this->_redirect = this->_ref_conf.redirect;
