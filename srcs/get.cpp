@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/13 10:14:44 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/19 22:31:30 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ bool	Client::execute_get()
 		this->make_error(405);
 		return (false);
 	}
-	if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
-		(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end()))
+	if (!this->_index.empty() && ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||
+		(!this->_ref_conf.cgi.empty() && _ref_conf.cgi.find(_index.substr(_index.find_last_of("."))) != _ref_conf.cgi.end())))
 	{
 		std::cout << YELLOW << "Execute by a CGI" << RST << std::endl;
 		static_cast<std::fstream*>(this->_data.file)->close();

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/18 14:43:14 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/19 22:25:43 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,8 @@ typedef struct s_clt_data
 
 
 namespace ft {
-	bool			parse_header(int, s_header&);
-	int				listing_creator(char const *directory);
+	bool				parse_header(int, s_header&);
+	std::stringstream*	listing_creator(char const *directory, std::string here);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 01:05:16 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/19 22:49:14 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,13 @@ bool	Client::execute_post()
 		}
 	if (this->_header.Content_Length == 0 && !this->is_chunk()) // Maybe change Content_Length to ssize_t and initialize it to -1. Compare with -1 instead of 0  
 	{
-		std::cout << RED << "False content-length POST?" << RST << std::endl;
 		this->make_error(411);
 		return (false);
 	}
 	else if (this->_header.Content_Length > this->_max_body && this->_max_body > 0)
 	{
-		std::cout << RED << "False content-length 2 POST?" << RST << std::endl;
 		this->make_error(413);
+		::shutdown(this->_sock_fd, SHUT_RD);
 		return (false);
 	}
 	if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||

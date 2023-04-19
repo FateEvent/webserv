@@ -1,6 +1,6 @@
 #include "../includes/common.h"
 
-int ft::listing_creator(char const *directory)
+std::stringstream *ft::listing_creator(char const *directory, std::string here)
 {
 	DIR				*dir;
 	struct dirent	*ent;
@@ -9,6 +9,12 @@ int ft::listing_creator(char const *directory)
 	std::string		path;
 	std::string		time_str;
 //	s_clt_data		data;
+
+	if (!here.empty())
+	{
+		here = here.substr(1);
+		here.append("/");
+	}
 
 	dir = opendir(directory);
 	if (dir != NULL)
@@ -20,27 +26,28 @@ int ft::listing_creator(char const *directory)
 		while ((ent = readdir(dir)) != NULL)
 		{
 			path = std::string(directory) + "/" + std::string(ent->d_name);
-			std::cout << path << std::endl;
+			//std::cout << path << std::endl;
 			stat(path.c_str(), &filestat);
 			time_str = std::asctime(std::localtime(&filestat.st_mtime));
 			time_str.pop_back();
 //			*static_cast<std::stringstream*>(data.file) << "\t\t\t\t<li>" << "<div><a href=\"\">" << ent->d_name << "</a></div>" << "<div>" << ent->d_reclen << " bytes " << time_str << "</div><li>\n";
-			*str << "\t\t\t\t<li>" << "<div><a href=\"\">" << ent->d_name << "</a></div>" << "<div>" << ent->d_reclen << " bytes " << time_str << "</div><li>\n";
+			*str << "\t\t\t\t<li>" << "<div><a href=\"" << here << ent->d_name << "\">" << ent->d_name << "</a></div>" << "<div>" << ent->d_reclen << " bytes " << time_str << "</div><li>\n";
 		}
 //		*static_cast<std::stringstream*>(data.file) << "\t\t\t</ul>\n\t\t</div>\n\t</body>\t</html>\n";
 		*str << "\t\t\t</ul>\n\t\t</div>\n\t</body>\n</html>\n";
-		std::cout << str->str() << std::endl;
+		//std::cout << str->str() << std::endl;
 		closed = closedir(dir);
 		if (closed)
 		{
 			std::cerr << strerror(errno) << std::endl;
 			throw std::invalid_argument("Couldn't close the directory stream!");
 		}
+		return (str);
 	}
 	else
 	{
 		std::cerr << strerror(errno) << std::endl;
 		throw std::invalid_argument("Invalid or unexisting directory!");
 	}
-	return (1);
+	return (0);
 }

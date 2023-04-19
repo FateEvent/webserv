@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 01:24:14 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/19 20:34:15 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,7 @@ int main(int ac, char **av) //, char** ev)
 	signal(SIGINT, false_while);
 	signal(SIGPIPE, sigpipe_solving);
 
-	ft::listing_creator("srcs");
+	//ft::listing_creator("srcs");
 
 	char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
 	unsigned int	nbr = 0;

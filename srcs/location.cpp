@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 00:26:52 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/19 22:30:43 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,10 @@ bool	Client::check_location()
 	std::string	path;
 
 	if (_header.other.find("Expect")->second.find("100") != std::string::npos)
-	{
 		send(this->_sock_fd, "HTTP/1.1 100 Continue\r\n\r\n", 25, 0);
-	}
 	this->_max_body = this->_ref_conf.max_body == 0 ? this->_ref_conf._base->max_body : this->_ref_conf.max_body;
 	if (this->_download.empty())
-		this->_download = this->_ref_conf.download.empty() ? (this->_ref_conf._base->download.empty() ? this->_ref_conf.root : this->_ref_conf._base->download) : this->_ref_conf.download;
+		this->_download = this->_ref_conf.download.empty() ? (this->_ref_conf._base != 0 && !this->_ref_conf._base->download.empty() ? this->_ref_conf._base->download : this->_ref_conf.root) : this->_ref_conf.download;
 	this->_allow = this->_ref_conf.allow;
 	this->_redirect = this->_ref_conf.redirect;
 	for (std::vector<struct s_location>::const_iterator it = this->_ref_conf.location.begin();
@@ -34,6 +32,15 @@ bool	Client::check_location()
 		else
 			this->condition_location(it);
 	}
+
+	// CHECK IF DOWNLOAD REPERTORY EXIST ELSE CREATE.
+	if (stat(this->_download.c_str(), &path_stat) == -1)
+	{
+		if (mkdir(this->_download.c_str(), S_IRWXU | S_IRGRP | S_IROTH))
+			this->_download = this->_ref_conf.root;
+	}
+	else if (S_ISREG(path_stat.st_mode) || S_ISLNK(path_stat.st_mode))
+			this->_download = this->_ref_conf.root;
 
 	// CHECK DIR IS A FILE AND CHECK THE ROOT
 	if (this->_root.empty())
@@ -55,24 +62,26 @@ bool	Client::check_location()
 	}
 	if (this->_index.empty())
 	{
-		if (this->_header.file.second.empty())
+		if (this->_header.file.second.empty() && this->_ref_conf.index.empty())
+		{
+			this->_data.file = ft::listing_creator(this->_root.c_str(), this->_header.Dir);
+			if (!this->_data.file->good())
+				return (false);
+			this->_data.file->seekg(0, this->_data.file->end);
+			this->_data.data_size = this->_data.file->tellg();
+			this->_data.file->seekg(0, this->_data.file->beg);
+			this->_index = "index.html";
+			return true;
+		}
+		else if (this->_header.file.second.empty())
 			this->_index = this->_ref_conf.index;
 		else
 			this->_index = this->_header.file.first + "." + this->_header.file.second; // ????
 	}
 
-	// CHECK IF DOWNLOAD REPERTORY EXIST ELSE CREATE.
-	if (stat(this->_download.c_str(), &path_stat) == -1)
-	{
-		if (mkdir(this->_download.c_str(), S_IRWXU | S_IRGRP | S_IROTH))
-			this->_download = this->_ref_conf.root;
-	}
-	else if (S_ISREG(path_stat.st_mode) || S_ISLNK(path_stat.st_mode))
-			this->_download = this->_ref_conf.root;
-
 	path = this->_root + "/" + this->_index;
 
-/*  	#ifdef DEBUG
+/*   	#ifdef DEBUG
 		std::cout << "Path of file is: \"" + path + "\"" << std::endl;
 	#endif */
 

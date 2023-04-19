@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/14 20:46:43 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/19 22:03:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	}
 	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
-	int optval = 1;
-	if (setsockopt(this->_base.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(socklen_t)) == - 1)
-		throw std::invalid_argument("Cannot REUSE the port! Usualy already used."); // ("Server bind error.");
+	//int optval = 1;
+	//if (setsockopt(this->_base.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(socklen_t)) == - 1)
+	//	throw std::invalid_argument("Cannot REUSE the port! Usualy already used."); // ("Server bind error.");
 	fcntl(this->_base.sock_fd, F_SETFL, O_NONBLOCK);
 	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
 		throw std::invalid_argument("Cannot bind port! Usualy already used."); // ("Server bind error.");
@@ -101,9 +101,9 @@ void	Webserv::prepare(config &instance)
 		if ((instance.sock_fd = socket(instance.addr.sin_family, instance.type, 0)) != -1)
 		{
 			//socket(instance.addr.sin_family, instance.type, instance.addr.sin_addr.s_addr)))
-			int optval = 1;
-			if (setsockopt(instance.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(int)) == - 1)
-				throw std::invalid_argument("Cannot REUSE the port in instance! Usualy already used."); // ("Server bind error.");
+			//int optval = 1;
+			//if (setsockopt(instance.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(int)) == - 1)
+			//	throw std::invalid_argument("Cannot REUSE the port in instance! Usualy already used."); // ("Server bind error.");
 			instance.prepare = true;
 			fcntl(instance.sock_fd, F_SETFL, O_NONBLOCK);
 		}
@@ -288,8 +288,8 @@ void	Webserv::_check_instance(config &conf)
 		throw std::invalid_argument("Error in config file, miss server name.");
 	if (conf.root.empty())
 		throw std::invalid_argument("Error in config file, miss root directory.");
-	if (conf.index.empty())
-		conf.index = this->_base.index;
+//	if (conf.index.empty())
+//		conf.index = this->_base.index;
 	if (conf.ip.empty())
 		conf.ip = this->_base.ip;
 	if (!conf.domain)
