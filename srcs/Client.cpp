@@ -19,7 +19,7 @@ Client::Client(config &config) : _ref_conf(config)
 	this->_sock_fd = accept(_ref_conf.sock_fd, reinterpret_cast<sockaddr *>(&this->_addr), reinterpret_cast<socklen_t *>(&this->_socklen));
 	if (this->_sock_fd == -1)
 	{
-		std::cout << strerror(errno) << std::endl;
+		std::cerr << strerror(errno) << std::endl;
 		throw std::invalid_argument("Socket error in constructor Client!");
 	}
 	fcntl(this->_sock_fd, F_SETFL, O_NONBLOCK);

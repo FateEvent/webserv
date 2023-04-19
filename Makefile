@@ -34,7 +34,8 @@ FILES		=	utils/file_to_map.cpp \
 				location.cpp \
 				main.cpp \
 				make_header.cpp \
-				Webserv.cpp
+				Webserv.cpp \
+				autoindex.cpp
 RM			=	rm -rf
 SRCS		=	$(addprefix ./srcs/, $(FILES))
 OBJS		=	$(SRCS:%.cpp=%.o)

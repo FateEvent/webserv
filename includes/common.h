@@ -10,28 +10,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef COMMON_H
-#define COMMON_H
-#define DEBUG
-#include <iostream>
-#include <string>
-#include <ctime>
-#include <map>
-#include <vector>
-#include <netinet/in.h>
-#include "./utils.hpp"
+# ifndef COMMON_H
+# define COMMON_H
+# define DEBUG
+# include <iostream>
+# include <string>
+# include <ctime>
+# include <map>
+# include <vector>
+# include <netinet/in.h>
+# include <sys/stat.h>
+# include <sys/types.h>
+# include <dirent.h>
+# include <sstream>
+# include "./utils.hpp"
 
-#define	RED "\033[0;31m"
-#define	BLUE "\033[0;34m"
-#define GREEN "\033[0;32m"
-#define	YELLOW "\033[0;33m"
-#define	PURPLE "\033[0;35m"
-#define	BLACK "\033[0;30m"
-#define WHITE "\033[0;37m"
-#define RST "\033[0m"
+# define RED "\033[0;31m"
+# define BLUE "\033[0;34m"
+# define GREEN "\033[0;32m"
+# define YELLOW "\033[0;33m"
+# define PURPLE "\033[0;35m"
+# define BLACK "\033[0;30m"
+# define WHITE "\033[0;37m"
+# define RST "\033[0m"
 
-#define BUFFER_SIZE_KB 1024
-#define BUFFER_SIZE_MB 1024 * 1024
+# define BUFFER_SIZE_KB 1024
+# define BUFFER_SIZE_MB 1024 * 1024
 
 typedef struct	s_config
 {
@@ -139,6 +143,7 @@ typedef struct s_clt_data
 
 namespace ft {
 	bool			parse_header(int, s_header&);
+	int				listing_creator(char const *directory);
 };
 
 #endif
