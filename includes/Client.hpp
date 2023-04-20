@@ -45,9 +45,10 @@ class Client
 		socklen_t					_socklen;
 //		sockaddr_un					_addr_local;	// sockaddr_un is a local socket
 		config&						_ref_conf;
-		std::string					_reponse;
+		std::string					_response;
 		std::string					_root;
 		std::string					_index;
+		std::string					_autoindex;
 		std::time_t					_timeout;
 		header						_header;
 		ssize_t						_max_body;
