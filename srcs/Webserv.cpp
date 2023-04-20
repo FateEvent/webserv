@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 22:03:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/20 09:23:54 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,15 +142,18 @@ void	Webserv::add(std::multimap<std::string, std::multimap<std::string, std::str
  */
 void	Webserv::stop(config &server)
 {
-	if (server.active == true && server.port != 80)
+	if (server._base == 0 || (server.active == true && server.port != server._base->port))
 	{
-		if (!::close(server.sock_fd))
+		shutdown(server.sock_fd,SHUT_RDWR);
+		if (::close(server.sock_fd))
 			return; //throw ("intern problem.");
+		
+		//unbind(server.sock_fd, reinterpret_cast<sockaddr *>(&server.addr), sizeof(server.addr));
 		server.sock_fd = -1;
-		std::cout << "Closed..." << std::endl;
+		std::cout << "  ╚═ Closed... " << GREEN << "(͡• ͜໒ ͡• )" << RST <<std::endl;
 	}
 	else
-		std::cout << "Not active, not need to close..." << std::endl;
+		std::cout << "  ╚═ Not active, not need to close... " << GREEN << "(͡• ͜໒ ͡• )" << RST << std::endl;
 //		throw ("Server was already shutdown.");
 }
 
