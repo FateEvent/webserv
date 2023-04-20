@@ -40,7 +40,6 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_response.clear();
 	this->_root.clear();
 	this->_index.clear();
-	this->_autoindex = "off";
 	this->_error_page.clear();
 	this->_proxy.clear();
 	this->_cgi_call.clear();
@@ -76,7 +75,6 @@ void	Client::clear_header()
 	this->_response.clear();
 	this->_root.clear();
 	this->_index.clear();
-	this->_autoindex = "off";
 	this->_redirect.clear();
 	this->_error_page.clear();
 	this->_proxy.clear();

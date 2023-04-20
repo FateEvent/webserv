@@ -113,12 +113,6 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 				else
 					this->_index = this->_header.file.first + "." + this->_header.file.second;
 			}
-			else if (!it->first.compare("autoindex"))
-			{
-				if (it->second.empty())
-					throw ("no autoindex referenced!");
-				this->_autoindex = it->second;
-			}
 			else if (!it->first.find("error_page"))
 			{
 				std::string err = it->second;

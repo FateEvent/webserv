@@ -48,7 +48,6 @@ class Client
 		std::string					_response;
 		std::string					_root;
 		std::string					_index;
-		std::string					_autoindex;
 		std::time_t					_timeout;
 		header						_header;
 		ssize_t						_max_body;
