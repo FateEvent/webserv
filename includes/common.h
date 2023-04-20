@@ -48,6 +48,7 @@ typedef struct	s_config
 	std::string							name;
 	std::string							root;
 	std::string							index;
+	std::string							autoindex;
 	std::string							ip;
 	uint16_t							port;
 	std::string							error_log;

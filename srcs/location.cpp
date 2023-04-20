@@ -113,6 +113,12 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 				else
 					this->_index = this->_header.file.first + "." + this->_header.file.second;
 			}
+			else if (!it->first.compare("autoindex"))
+			{
+				if (it->second.empty())
+					throw ("no autoindex referenced!");
+				this->_autoindex = it->second;
+			}
 			else if (!it->first.find("error_page"))
 			{
 				std::string err = it->second;
@@ -145,7 +151,7 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 void	Client::condition_location(std::vector<struct s_location>::const_iterator &location)
 {
 	if (std::strncmp((location->base + "/").c_str(), this->_header.Dir.c_str(), location->base.length()) == 0)
-		std::cout << "Location double condition can't work! Please fix this in your config file" << std::endl;
+		std::cout << "Location with double conditions doesn't work! Please fix this in your config file" << std::endl;
 //	for (std::map<std::string, std::string>::const_iterator it = location->to.begin(); it != location->to.end(); it++)
 //	{
 //	}	

@@ -92,6 +92,12 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 				throw ("no index referenced!");
 			this->index = it->second;
 		}
+		else if (!it->first.compare("autoindex"))
+		{
+			if (it->second.empty())
+				throw ("no autoindex referenced!");
+			this->autoindex = it->second;
+		}
 		else if (!it->first.compare("allow"))
 		{
 			if (it->second.find("GET") != it->second.npos)
@@ -131,6 +137,7 @@ void s_config::set_zero()
 	this->name.clear();
 	this->root.clear();
 	this->index.clear();
+	this->autoindex = "off";
 	this->ip.clear();
 	this->port = 0;
 	this->error_log.clear();
@@ -150,7 +157,6 @@ void s_config::set_zero()
 	this->domain = 2;
 	this->type = 0;	
 	this->root.clear();
-	this->index.clear();
 }
 
 void s_config::do_location(std::string loc)
