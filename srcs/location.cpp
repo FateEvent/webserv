@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 17:54:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 18:29:40 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,14 @@ bool	Client::check_location()
 	{
 		if (this->_header.file.second.empty() && this->_ref_conf.index.empty())
 		{
-			this->_data.file = ft::listing_creator(this->_root.c_str(), this->_header.Dir);
+			try
+			{
+				this->_data.file = ft::listing_creator(this->_root.c_str(), this->_header.Dir);
+			}
+			catch (std::invalid_argument &e)
+			{
+				return (false);
+			}
 			if (!this->_data.file->good())
 				return (false);
 			this->_data.file->seekg(0, this->_data.file->end);
