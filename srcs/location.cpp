@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 22:30:43 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 11:51:03 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,14 @@ bool	Client::check_location()
 			this->simple_location(it);
 		else
 			this->condition_location(it);
+	}
+
+	if (this->_timeout == 0)
+	{
+		if (this->_ref_conf.time_out == 0)
+			this->_timeout = this->_ref_conf._base->time_out + this->_header.time_out;
+		else
+			this->_timeout = this->_ref_conf.time_out + this->_header.time_out;
 	}
 
 	// CHECK IF DOWNLOAD REPERTORY EXIST ELSE CREATE.
@@ -139,6 +147,8 @@ void	Client::simple_location(std::vector<struct s_location>::const_iterator &loc
 			else if (!it->first.find("cgi"))
 				this->_cgi_call.insert(std::make_pair(it->second.substr(0, it->second.find_first_of(" \t\v\f")),
 													it->second.substr(it->second.find_last_of(" \t\v\f") + 1)));
+			else if (!it->first.find("time_out"))
+				this->_timeout = std::stol(it->second) + this->_header.time_out;
 		}
 }
 

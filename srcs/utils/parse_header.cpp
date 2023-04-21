@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/14 19:44:58 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 11:06:12 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,14 @@ bool	ft::parse_header(int fd, s_header &head)
 			head.Method = "POST";
 		else if (it->find("DELETE /") != it->npos)
 			head.Method = "DELETE";
+		else if (it->find("PUT /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("HEAD /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("PATCH /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("OPTION /") != it->npos)
+			head.Method = "NOT";
 		else
 		{
 			head.Method = "BAD";
@@ -123,6 +131,7 @@ bool	ft::parse_header(int fd, s_header &head)
 		else
 			ft::split_to_maposs(head.other, it->data());
 	}
+	head.time_out = std::time(nullptr);
 	head.split_dir();
 	#ifdef DEBUG
 		head.print_all();

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:21:50 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 22:25:43 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 11:31:20 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ typedef struct	s_config
 	bool								prepare;
 	std::vector<struct s_location>		location;
 	std::map<int, std::string>			error_page;
-	std::time_t							time_out;
+	long								time_out;
 	std::map<std::string, std::string>	other;
 	// Bind and socket
 	sockaddr_in							addr;

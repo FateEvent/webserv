@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/17 23:02:25 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 11:32:52 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ class Client
 		std::string					_response;
 		std::string					_root;
 		std::string					_index;
-		std::time_t					_timeout;
+		long						_timeout;
 		header						_header;
 		ssize_t						_max_body;
 		int							_allow;

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/20 21:49:07 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 11:49:17 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 		this->_base.max_client = std::strtoul(it.find("max_client")->second.data(), NULL, 10);
 	if (it.find("error_page") != it.end())
 		ft::parse_err_page(this->_base.error_page, itconfig->second);
+	if (it.find("time_out") != it.end())
+		this->_base.time_out = std::strtoul(it.find("time_out")->second.data(), NULL, 10);
 	if (it.find("allow") != it.end())
 	{
 		if (it.find("allow")->second.find("GET") != it.find("allow")->second.npos)
@@ -582,6 +584,8 @@ void	Webserv::exec_client()
 				it->second.kill_cgi();
 			}
 		}
+		else if (!it->second.is_seeding() && (it->second.get_method().compare("NOT") == 0))
+			it->second.make_error(501);
 		else if (!it->second.is_seeding() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
 			it->second.make_error(405);
 		else if (!it->second.is_seeding() && it->second.is_ready() && it->second.get_pid_cgi() == 0 && !it->second.is_multipart() && !it->second.is_chunk()) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())

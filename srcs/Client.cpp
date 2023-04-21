@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 22:47:56 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 11:41:30 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,8 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_sock_fd = fd;
 	this->_addr = sock;
 	this->_socklen = len;
-	this->_timeout = std::time(nullptr);
-	this->_header.time_out = std::time(nullptr);
+	//this->_timeout = std::time(nullptr);
+	//this->_header.time_out = std::time(nullptr);
 	this->_ready = true;
 	this->_close = false;
 	this->_multipart = false;
@@ -90,6 +90,7 @@ void	Client::clear_header()
 	this->_ready = false;
 	this->_close = false;
 	this->_multipart = false;
+	this->_timeout = 0;
 }
 
 Client::~Client()
@@ -148,7 +149,6 @@ bool	Client::new_request()
 	if (!ft::parse_header(this->_sock_fd, this->_header))
 			return (false);
 	this->add_nbr_client();
-	this->_timeout = std::time(nullptr);
 	this->_header.time_out = std::time(nullptr);
 	this->_ready = true;
 	std::cout << GREEN << "Connexion accepted to socket " << this->_sock_fd << RST << std::endl;
