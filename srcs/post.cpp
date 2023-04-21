@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 23:12:54 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 13:18:46 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,15 +77,14 @@ bool	Client::execute_post()
 		this->_data._in.receipt = 1;
 		this->_multipart = true;
 	}
-	else if (!this->is_chunk())
+	else if (this->is_chunk())
 	{
-
 		// TO THAT AND THINK ABOUT CHUNKED CGI
 		std::cout << YELLOW << "Chunked POST" << RST << std::endl;
 	}
 	else
 	{
-		// SAME AS POST METHODE! CAN DO ONE FUNCTION USUALY
+		// SAME AS GET METHODE! CAN DO ONE FUNCTION USUALY
 		send_success_status();
 		//std::cout << BLUE << "\"" << this->_data.header << "\"" << RST << std::endl;
 	}
