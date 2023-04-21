@@ -8,7 +8,6 @@ std::stringstream *ft::listing_creator(char const *directory, std::string here)
 	struct stat		filestat;
 	std::string		path;
 	std::string		time_str;
-//	s_clt_data		data;
 
 	if (!here.empty())
 	{
@@ -19,23 +18,17 @@ std::stringstream *ft::listing_creator(char const *directory, std::string here)
 	dir = opendir(directory);
 	if (dir != NULL)
 	{
-//		data.file = new std::stringstream();
 		std::stringstream *str = new std::stringstream(); 
-//		*static_cast<std::stringstream*>(data.file) << "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Autoindex Page</title>\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"error_page.css\">\n\t</head>\n\t<body>\n\t\t<h1>Autoindex Page</h1>\n\t\t<div>\n\t\t\t<h2>Listing</h2>\n\t\t\t<ul>\n";
-		*str << "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Autoindex Page</title>\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"error_page.css\">\n\t</head>\n\t<body>\n\t\t<h1>Autoindex Page</h1>\n\t\t<div>\n\t\t\t<h2>Listing</h2>\n\t\t\t<ul>\n";
+		*str << "<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<meta charset=\"UTF-8\">\n\t\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n\t\t<title>Autoindex Page</title>\n\t\t<style>\n\t\t\ttable {\n\t\t\tfont-family: arial, sans-serif;\n\t\t\tborder-collapse: collapse;\n\t\t\twidth: 100%;\n\t\t\t}\n\n\n\t\t\ttd, th {\n\t\t\tborder: 1px solid #dddddd;\n\t\t\ttext-align: left;\n\t\t\tpadding: 8px;\n\t\t\t}\n\n\n\t\t\ttr:nth-child(even) {\n\t\t\tbackground-color: #dddddd;\n\t\t\t}\n\t\t</style>\n\t</head>\n\t<body>\n\t\t<h1>Autoindex Page</h1>\n\t\t<table>\t\t\t<tr>\n\t\t\t\t<th>Listing</th>\n\t\t\t\t<th>Size</th>\n\t\t\t\t<th>Last accessed</th>\n\t\t\t</tr>\n";
 		while ((ent = readdir(dir)) != NULL)
 		{
 			path = std::string(directory) + "/" + std::string(ent->d_name);
-			//std::cout << path << std::endl;
 			stat(path.c_str(), &filestat);
 			time_str = std::asctime(std::localtime(&filestat.st_mtime));
 			time_str.pop_back();
-//			*static_cast<std::stringstream*>(data.file) << "\t\t\t\t<li>" << "<div><a href=\"\">" << ent->d_name << "</a></div>" << "<div>" << ent->d_reclen << " bytes " << time_str << "</div><li>\n";
-			*str << "\t\t\t\t<li>" << "<div><a href=\"" << here << ent->d_name << "\">" << ent->d_name << "</a></div>" << "<div>" << ent->d_reclen << " bytes " << time_str << "</div><li>\n";
+			*str << "\t\t\t<tr>\n\t\t\t\t<td><a href=\"" << here << ent->d_name << "\">" << ent->d_name << "</a></td>\n\t\t\t\t<td>" << ent->d_reclen << " bytes</td>\n\t\t\t\t<td>" << time_str << "</td>\n\t\t\t</tr>\n";
 		}
-//		*static_cast<std::stringstream*>(data.file) << "\t\t\t</ul>\n\t\t</div>\n\t</body>\t</html>\n";
-		*str << "\t\t\t</ul>\n\t\t</div>\n\t</body>\n</html>\n";
-		//std::cout << str->str() << std::endl;
+		*str << "\t\t</table>\n\t</body>\n</html>\n";
 		closed = closedir(dir);
 		if (closed)
 		{
