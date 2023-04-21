@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 18:07:10 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 23:54:05 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ bool	Client::execute_post()
 	std::cout << "POST METHOD" << std::endl;
 	if (!(this->_allow >> 1 & 1) && this->_allow != 0)
 	{
+		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
+			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		std::cout << RED << "False methode POST?" << RST << std::endl;
 		this->make_error(405);
 		return (false);
@@ -37,11 +39,15 @@ bool	Client::execute_post()
 		}
 	if (this->_header.Content_Length == 0 && !this->is_chunk()) // Maybe change Content_Length to ssize_t and initialize it to -1. Compare with -1 instead of 0  
 	{
+		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
+			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		this->make_error(411);
 		return (false);
 	}
 	else if (this->_header.Content_Length > this->_max_body && this->_max_body > 0)
 	{
+		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
+			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		this->make_error(413);
 		::shutdown(this->_sock_fd, SHUT_RD);
 		return (false);
@@ -84,7 +90,8 @@ bool	Client::execute_post()
 	}
 	else
 	{
-		// SAME AS GET METHODE! CAN DO ONE FUNCTION USUALY
+		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
+			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		send_success_status();
 		//std::cout << BLUE << "\"" << this->_data.header << "\"" << RST << std::endl;
 	}

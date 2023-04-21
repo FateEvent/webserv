@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 17:47:10 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 22:26:25 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,6 @@ int main(int ac, char **av) //, char** ev)
 		int recept = select(server.get_greaterfd(), &server.get_readfd(), &server.get_writefd(), NULL, &server.timeout());
 		if (recept)
 		{
-			//std::cout << std::endl;
 			server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
 			server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
 		}

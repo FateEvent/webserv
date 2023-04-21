@@ -76,11 +76,11 @@
 									</button>
 								</h2>
 							<div id="flush-collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-								<div class="accordion-body">Call a page that don't exist in repertory, usualy return a error 404, if file exist, it should return the file.</div>
+								<div class="accordion-body">Call a wrong page in repertory, usualy return a error 404, if file exist, it should return the file.</div>
 								<form action="/pasla.html"><button type="submit" class="btn btn-primary">404</button></form>
 								<div class="accordion-body">Method not allowed 405.</div>
-								<form action="/pasla.html" method="POST"><input type="hidden" /><button type="submit" class="btn btn-primary">411</button></form><br/>
-								<div class="accordion-body">500 Internal Server Error. We launch a binary not compatible with the system, this make a crash and no reponse on to the server, so the server send a internal error.</div>
+								<form action="/index.html" method="POST"><input type="hidden" /><button type="submit" class="btn btn-primary">405</button></form><br/>
+								<div class="accordion-body">500 Internal Server Error. We launch a binary not compatible with the system, this make a crash also the server send a internal error.</div>
 								<form action="/bad_sys" method="PUT"><button type="submit" class="btn btn-primary">500</button></form><br/>
 								<div class="accordion-body">Method not implemented 501.</div>
 								<form action="/test.html" method="post"><input type="hidden" name="_method" value="put" /><button type="submit" class="btn btn-primary">501</button></form><br/>
@@ -94,8 +94,8 @@
 									</button>
 								</h2>
 							<div id="flush-collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
-								<div class="accordion-body">This test send a file with enctype="multipart/form-data". To do that select your file a send it to the server, the file is save on the directory given by config file. You can try a file bigger that body can accept, at this time you should receipt a error 413.</div>
-								<form action="/index.html" method="post" enctype="multipart/form-data">
+								<div class="accordion-body">Select a file and send it to the server, the file is save on the directory given by config file.</div>
+								<form action="post_body/index.html" method="post" enctype="multipart/form-data">
 									<div class="container text-center"></div>
 									<input type="text" id="fname" name="fname"><br><br>
 									<input type="file" class="btn btn-secondary" name="fichier"/><br><br>
@@ -123,6 +123,7 @@
 										</div>
 									</div>
 								</form>
+								<form action="/upload" method="get"><button type="submit" class="btn btn-primary">See folder</button></form><br/>
 								<br/>
 							</div>
 							</div>
@@ -147,6 +148,20 @@
 									<form action="/seecookie.py">
 										<button type="submit" class="btn btn-primary">Test</button>
 									</form>
+								</div>
+							</div>
+							<div class="accordion-item">
+								<h2 class="accordion-header">
+									<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseEight" aria-expanded="false" aria-controls="flush-collapseEight">
+										Time out
+									</button>
+								</h2>
+							<div id="flush-collapseEight" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+								<div class="accordion-body">Call a script that waits 30sec. this creates a time-out, the server returns an error.</div>
+									<form action="/php/wait.php" methode="get">
+										<button type="submit" class="btn btn-primary">Time!</button>
+									</form>
+								</br>
 								</div>
 							</div>
 						</div>

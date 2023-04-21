@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 17:48:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 00:07:06 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
 	int optval = 1;
-	if (setsockopt(this->_base.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(socklen_t)) == - 1)
+	if (setsockopt(this->_base.sock_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(socklen_t)) == - 1)
 		throw std::invalid_argument("Cannot REUSE the port! Usualy already used."); // ("Server bind error.");
 	fcntl(this->_base.sock_fd, F_SETFL, O_NONBLOCK);
 	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
@@ -531,15 +531,11 @@ void	Webserv::check_client()
 		{
 			if (it->second.new_request())
 			{
-				std::cout << GREEN << "Valid Header." << RST << std::endl;
 				it->second.add_nbr_client();
 				FD_CLR(it->second.get_sockfd(), &this->readfd);
 			}
 			else
-			{
-				// send error 400 to client.
 				to_close.insert(std::make_pair(it->second.get_sockfd(), &it->second));
-			}
 			continue;
 		}
 		else if (FD_ISSET(it->second.get_sockfd(), &this->readfd) &&
@@ -558,8 +554,6 @@ void	Webserv::check_client()
 				it->second->kill_cgi();
 			std::cout << GREEN << "Connexion number: " << it->first << " close" << RST << std::endl;
 			::close(it->first);
-			//std::cout << YELLOW << it->second->get_nbr_connected_client() << " client are already connected." << RST << std::endl;
-			//delete this->_client(it->first)->second;
 			this->_client.erase(it->first);
 		}
 	}
@@ -569,36 +563,25 @@ void	Webserv::exec_client()
 {
 	std::list<int> toclose;
 	std::time_t now = std::time(NULL);
-	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
+	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); ++it)
 	{
 		if (it->second.get_timeout() > 0 && now > it->second.get_timeout())
 		{
 			std::cout << YELLOW << "TIMEOUT CLIENT NUMBER: " << it->first << RST << std::endl;
 			if (!it->second.get_method().empty())
-			{
 				it->second.make_error(408);
-				it->second.set_timeout(5);
-			}
-			toclose.push_back(it->second.get_sockfd());
-		}
-		//std::cout << YELLOW << "PASSAGE CLIENT" << RST << std::endl;
-		if (it->second.get_method().empty() && it->second.get_timeout() == 0)
-		{
-			std::cout << YELLOW << "METHODE VIDE: " << it->first << " : " << it->second.get_sockfd() << RST << std::endl;
-			it->second.set_timeout(2);
+			toclose.push_back(it->first);
 			continue;
 		}
+		if (it->second.get_method().empty() && it->second.get_timeout() == 0)
+			continue;
 		if (it->second.get_close())
 		{
-			//std::cout << YELLOW << "DEMANDE CLOSE NUMBER: " << it->first << RST << std::endl;
-			if (FD_ISSET(it->second.get_sockfd(), &writefd) && it->second.get_close())
+			if (shutdown(it->first, SHUT_RDWR) == -1)
+				std::cout << RED << "ERROR SHUTDOWN SOCKET" << RST << std::endl;
+			if (FD_ISSET(it->second.get_sockfd(), &this->get_writefd()) && it->second.get_close())
 			{
-//				int		receipt(1);
-//				char	buff[2];
-
-//				std::memset(buff, 0, 2);
-				std::cout << YELLOW << "PUT TO CLOSE" << RST << std::endl;
-				toclose.push_back(it->second.get_sockfd());
+				toclose.push_back(it->first);
 				it->second.kill_cgi();
 			}
 		}
@@ -621,22 +604,9 @@ void	Webserv::exec_client()
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
+		if (::close(this->_client.find(*it)->second.get_sockfd()) == -1)
+			continue;
 		std::cout << YELLOW << "Close client number: " << *it << RST << std::endl;
-		//usleep(50000); // If not 0,5sec error when post have body??!!!!
-
 		this->_client.erase(*it);
-
-//int yes = 0;
-struct linger lin;
-lin.l_onoff = 0;
-lin.l_linger = 0;
-
-setsockopt(*it, SOL_SOCKET, SO_LINGER, (const char *)&lin, sizeof(lin));
-//setsockopt(*it, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-
-	//	shutdown(*it,SHUT_RDWR);
-
-		::close(*it);
-		
 	}
 }

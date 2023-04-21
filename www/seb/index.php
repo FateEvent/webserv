@@ -1,6 +1,6 @@
 <?php
 	echo "content-type: text/html; charset=UTF-8\r\n\r\n";
-	//include('functions/general.php');
+	//include('functions/general.php'); 
 ?>
 
 <!DOCTYPE html>

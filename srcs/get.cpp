@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:50:29 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 22:31:30 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 21:38:48 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,21 @@ bool	Client::execute_get()
 	{
 		std::string	header;
 		this->_data.header = ft::make_header(200);
-		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
-		this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+		if (this->_data.data_size >= 0)
+		{
+			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
+			this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+		}
+		else
+			this->_data.header.append("\r\n");
 		int check = 0;
 		check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
 		if (check == -1)
 			this->make_error(500);
 		if (check == 0)
 			this->make_error(501);
+		if (this->_data.data_size == 0)
+			this->_close = true;
 		//std::cout << BLUE << "\"" << this->_data.header << "\"" << RST << std::endl;
 		this->_sedding = true;
 	}

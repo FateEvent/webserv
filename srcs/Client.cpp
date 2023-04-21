@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 18:04:07 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 23:55:28 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Client::Client(config &config) : _ref_conf(config)
 	this->_sock_fd = accept(_ref_conf.sock_fd, reinterpret_cast<sockaddr *>(&this->_addr), reinterpret_cast<socklen_t *>(&this->_socklen));
 	//const int set = 1;
 	//setsockopt(this->_sock_fd, SOL_SOCKET, SO_REUSEPORT, &set, sizeof(set));
-	if (this->_sock_fd == -1)
+	if (this->_sock_fd <= 0)
 	{
 		std::cerr << strerror(errno) << std::endl;
 		throw std::invalid_argument("Socket error in constructor Client!");
@@ -53,8 +53,6 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_sock_fd = fd;
 	this->_addr = sock;
 	this->_socklen = len;
-	//this->_timeout = std::time(nullptr);
-	//this->_header.time_out = std::time(nullptr);
 	this->_ready = true;
 	this->_close = false;
 	this->_multipart = false;
@@ -100,7 +98,7 @@ Client::~Client()
 	if (this->_pipe_cgi[0] > 0)
 	{
 		::close(this->_pipe_cgi[0]);
-		::close(this->_pipe_cgi[1]);
+		//::close(this->_pipe_cgi[1]);
 	}
 	//delete this->_data.file;
 	this->_ref_conf.nbr_client--;
@@ -189,13 +187,12 @@ bool	Client::continue_client(fd_set *fdset)
 		if (this->send_data(this->_sock_fd))
 		{
 			//this->clear_header(); //
-			this->_index.clear();
-			this->_root.clear();
-			this->_close = true;
+			//this->_index.clear();
+			//this->_root.clear();
 			this->_sedding = false;
 			this->_close = true;
 			delete this->_data.file;
-			::shutdown(this->_sock_fd, SHUT_RDWR);
+			::shutdown(this->_sock_fd, SHUT_WR);
 			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
@@ -274,17 +271,27 @@ bool	Client::continue_client(fd_set *fdset)
 bool	Client::execute_client(bool path)
 {
 	if (!this->_redirect.empty())
+	{
+		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
+			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		this->make_error(301);
+	}
 	else if (!path && !this->is_working())
 	{
 		#ifdef DEBUG
 			std::cout << PURPLE << "File not found or can't open!" << RST << std::endl;
 		#endif
+		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
+			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		this->make_error(404);
 	}
 	// MAY BE TEST CGI HERE AND NOT IN GET,POST OR DELETE METHODE
 	else if (_header.Method.compare("GET") == 0)
+	{
+		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
+			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		return (this->execute_get());
+	}
 	else if (_header.Method.compare("POST") == 0)
 		return (this->execute_post());
 	else if (_header.Method.compare("DELETE") != 0)
