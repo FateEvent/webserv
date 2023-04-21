@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/13 11:51:08 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/20 22:30:46 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,8 @@ int	Client::launch_cgi(std::string path)
 	env.push_back(remote); // L'adresse IP de l'utilisateur qui a envoyé la requête.
     if (!getnameinfo((struct sockaddr*)&this->_addr, sizeof(this->_addr), hostName, sizeof(hostName), NULL, 0, 0))
 		env.push_back(std::string("REMOTE_HOST=") + hostName); // Le nom d'hôte de l'utilisateur qui a envoyé la requête.
-	env.push_back("DATE_GMT="); // 	Date actuelle au format GMT
-	env.push_back("DATE_LOCAL="); // 	Date actuelle au format local
+	//env.push_back("DATE_GMT="); // 	Date actuelle au format GMT
+	//env.push_back("DATE_LOCAL="); // 	Date actuelle au format local
 	
 	std::string file(this->_root + "/" + this->_index);
 	char **ENVP = ft::vector_to_tab(env);

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/20 09:23:54 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/20 21:49:07 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,8 @@ void	Webserv::stop(config &server)
 {
 	if (server._base == 0 || (server.active == true && server.port != server._base->port))
 	{
+		int optval = 1;
+		setsockopt(server.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(int));
 		shutdown(server.sock_fd,SHUT_RDWR);
 		if (::close(server.sock_fd))
 			return; //throw ("intern problem.");
