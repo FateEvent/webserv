@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 11:51:03 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 17:54:53 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ bool	Client::check_location()
 		else
 			this->_root = this->_ref_conf.root + this->_header.Dir;
 	}
-	if (this->_index.empty())
+	if (this->_index.empty() && this->_redirect.empty())
 	{
 		if (this->_header.file.second.empty() && this->_ref_conf.index.empty())
 		{

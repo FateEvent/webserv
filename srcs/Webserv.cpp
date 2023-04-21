@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 15:21:48 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 17:48:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -496,7 +496,7 @@ void	Webserv::check_server()
 			}
 			catch (std::exception &e)
 			{
-				std::cout << e.what() << std::endl;
+				//std::cout << e.what() << std::endl;
 			}
 		}
 	}
@@ -515,7 +515,7 @@ void	Webserv::check_server()
 			}
 			catch (std::exception &e)
 			{
-				std::cout << e.what() << std::endl;
+				//std::cout << e.what() << std::endl;
 				FD_CLR(it->second.sock_fd, &this->readfd);
 			}
 		}
@@ -585,7 +585,7 @@ void	Webserv::exec_client()
 		if (it->second.get_method().empty() && it->second.get_timeout() == 0)
 		{
 			std::cout << YELLOW << "METHODE VIDE: " << it->first << " : " << it->second.get_sockfd() << RST << std::endl;
-			it->second.set_timeout(10);
+			it->second.set_timeout(2);
 			continue;
 		}
 		if (it->second.get_close())

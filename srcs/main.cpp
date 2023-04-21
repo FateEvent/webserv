@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 23:41:03 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 17:47:10 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	sigpipe_solving(int signal)
 
 void	false_while(int type)
 {
-	std::cout << YELLOW << "Stopping server by signal " << type << RST << std::endl;
+	std::cout << std::flush << YELLOW << "Stopping server by signal " << type << RST << std::endl;
 	_SIGNAL_END = false;
 }
 

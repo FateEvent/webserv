@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 17:11:40 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 18:04:07 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -364,7 +364,7 @@ void	Client::make_error(int i)
 	*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(i,
 		this->_error_page[i].empty() ?
 			(this->_ref_conf.error_page[i].empty() ?
-				(this->_ref_conf._base->error_page[404].empty() ? "\n" : this->_ref_conf._base->error_page.find(i)->second) :
+				(this->_ref_conf._base->error_page[i].empty() ? "\n" : this->_ref_conf._base->error_page.find(i)->second) :
 			this->_ref_conf.error_page.find(i)->second) :
 		this->_error_page[i]);
 	this->_data.file->seekg(0, this->_data.file->end);
