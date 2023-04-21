@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 12:25:09 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 17:11:40 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Client::Client(config &config) : _ref_conf(config)
 	_socklen = sizeof(this->_addr);
 	this->_sock_fd = accept(_ref_conf.sock_fd, reinterpret_cast<sockaddr *>(&this->_addr), reinterpret_cast<socklen_t *>(&this->_socklen));
 	//const int set = 1;
-	//setsockopt(_ref_conf.sock_fd, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
+	//setsockopt(this->_sock_fd, SOL_SOCKET, SO_REUSEPORT, &set, sizeof(set));
 	if (this->_sock_fd == -1)
 	{
 		std::cerr << strerror(errno) << std::endl;

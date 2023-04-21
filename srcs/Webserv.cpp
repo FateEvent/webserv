@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 12:35:58 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 15:21:48 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::string> >& config) : _nbr_server(0)
 {
 	if (this->created)
-		throw err_init(); // Classe webserv already exist
+		throw err_init(); // Class webserv already exist
 	if (config.find("http") == config.end())
 		throw std::invalid_argument("No http in config file!"); //("No default configuration set in config file.");
 	std::multimap<std::string, std::multimap<std::string, std::string> >::iterator itconfig = config.find("http");
@@ -49,9 +49,9 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	}
 	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
-	//int optval = 1;
-	//if (setsockopt(this->_base.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(socklen_t)) == - 1)
-	//	throw std::invalid_argument("Cannot REUSE the port! Usualy already used."); // ("Server bind error.");
+	int optval = 1;
+	if (setsockopt(this->_base.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(socklen_t)) == - 1)
+		throw std::invalid_argument("Cannot REUSE the port! Usualy already used."); // ("Server bind error.");
 	fcntl(this->_base.sock_fd, F_SETFL, O_NONBLOCK);
 	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
 		throw std::invalid_argument("Cannot bind port! Usualy already used."); // ("Server bind error.");
@@ -146,8 +146,14 @@ void	Webserv::stop(config &server)
 {
 	if (server._base == 0 || (server.active == true && server.port != server._base->port))
 	{
-		int optval = 1;
-		setsockopt(server.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(int));
+		int yes = 1;
+		struct linger lin;
+lin.l_onoff = 0;
+lin.l_linger = 0;
+
+setsockopt(server.sock_fd, SOL_SOCKET, SO_LINGER, (const char *)&lin, sizeof(lin));
+setsockopt(server.sock_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+
 		shutdown(server.sock_fd,SHUT_RDWR);
 		if (::close(server.sock_fd))
 			return; //throw ("intern problem.");
@@ -579,7 +585,7 @@ void	Webserv::exec_client()
 		if (it->second.get_method().empty() && it->second.get_timeout() == 0)
 		{
 			std::cout << YELLOW << "METHODE VIDE: " << it->first << " : " << it->second.get_sockfd() << RST << std::endl;
-			it->second.set_timeout(5);
+			it->second.set_timeout(10);
 			continue;
 		}
 		if (it->second.get_close())
@@ -615,9 +621,21 @@ void	Webserv::exec_client()
 	}
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
-		//std::cout << YELLOW << "Close client number: " << *it << RST << std::endl;
+		std::cout << YELLOW << "Close client number: " << *it << RST << std::endl;
 		//usleep(50000); // If not 0,5sec error when post have body??!!!!
+
 		this->_client.erase(*it);
+
+//int yes = 0;
+struct linger lin;
+lin.l_onoff = 0;
+lin.l_linger = 0;
+
+setsockopt(*it, SOL_SOCKET, SO_LINGER, (const char *)&lin, sizeof(lin));
+//setsockopt(*it, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+
+	//	shutdown(*it,SHUT_RDWR);
+
 		::close(*it);
 		
 	}

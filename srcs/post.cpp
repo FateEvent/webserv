@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 13:18:46 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 17:08:16 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ bool	Client::execute_post()
 	else if (!this->_header.Boundary.empty())
 	{
 		std::cout << YELLOW << "Multipart POST" << RST << std::endl;
-		strcpy(this->_data._in.tmpfile, "/tmp/tmp.XXXXXX");
+		strcpy(this->_data._in.tmpfile, "tmp.XXXXXX");
 		if (mkstemp(this->_data._in.tmpfile) == -1)
 		{
 			this->make_error(500);

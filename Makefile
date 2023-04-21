@@ -6,13 +6,13 @@
 #    By: stissera <stissera@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/04/13 17:03:05 by stissera         ###   ########.fr        #
+#    Updated: 2023/04/21 15:28:34 by stissera         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	webserv
 CC			=	c++
-FLAGS		=	-Wall -Werror -Wextra -std=c++11 -Og -g -fsanitize=address
+FLAGS		=	-Wall -Werror -Wextra -std=c++11 -Og -g # -fsanitize=address
 INCLUDES	=	./includes/utils.h
 FILES		=	utils/file_to_map.cpp \
 				utils/multi_to_config.cpp \

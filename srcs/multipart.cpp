@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 16:53:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/19 01:15:41 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 17:34:53 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,14 @@ bool	Client::multipart()
 		{
 			this->_data._in.temporary->clear();
 			this->_data._in.pos_seek = -1;
-/* 			std::cout << "Boundary found at position:" << std::endl;
+/*  			std::cout << "Boundary found at position:" << std::endl;
 			for (std::vector<size_t>::iterator it = this->_data._in.bound_seek.begin(); it != this->_data._in.bound_seek.end(); it++)
 				std::cout << GREEN << *it << RST << std::endl; */
 			//make_error(201); // for test
 			return (true);
 		}
+		else
+		{
 		char	buff[BUFFER_SIZE_MB];
 		memset(&buff, 0, BUFFER_SIZE_MB);
 		size_t	pos_str = 0;
@@ -65,6 +67,7 @@ bool	Client::multipart()
 			this->_data._in.pos_seek = this->_data._in.pos_seek + this->_data._in.temporary->gcount() - this->_header.Boundary.length() - 2;
 		else
 			this->_data._in.pos_seek = this->_data._in.pos_seek + this->_data._in.temporary->gcount();
+		}
 	}
 	return (false);
 }
@@ -118,7 +121,10 @@ bool	Client::process_multipart()
 				this->_data._in.filename->open(file, std::ios::out | std::ios::binary | std::ios::trunc);
 			}
 			else
+			{
 				this->_data._in.temporary->seekg(this->_data._in.bound_seek.front(), this->_data._in.temporary->beg);
+				this->_data._in.bound_seek.erase(this->_data._in.bound_seek.begin());
+			}
 		}
 	}
 	return (false);
