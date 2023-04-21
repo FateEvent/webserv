@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 11:41:30 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 12:25:09 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,9 @@ bool			Client::is_ready() const					{ return (this->_ready?true:false); }
 unsigned int	Client::get_nbr_connected_client() const	{ return (this->_ref_conf.nbr_client); }
 void			Client::add_nbr_client()					{ this->_ref_conf.nbr_client++; }
 bool			Client::get_close() const					{ return (this->_close); }
-
+long			Client::get_max_body() const				{ return (this->_max_body); }
+long			Client::get_timeout() const					{ return (this->_timeout); }
+void			Client::set_timeout(long timeout)			{ this->_timeout = std::time(nullptr) + timeout; }
 std::pair<std::string, std::string>	Client::get_file() const
 {
 	if (this->_header.file.first.empty())

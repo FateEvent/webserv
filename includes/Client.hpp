@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 11:32:52 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 12:23:47 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,10 @@ class Client
 		int							get_fd_cgi() const;
 		int							get_fd_cgi_0() const;
 		int							get_pid_cgi() const;
+		long						get_timeout() const;
 		bool						get_close() const;
+		long						get_max_body() const;
+		void						set_timeout(long);
 		bool						continue_client(fd_set*);
 		bool						execute_client(bool);
 		bool						is_working() const;

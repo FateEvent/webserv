@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 11:49:17 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/21 12:35:58 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -562,12 +562,24 @@ void	Webserv::check_client()
 void	Webserv::exec_client()
 {
 	std::list<int> toclose;
+	std::time_t now = std::time(NULL);
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); it++)
 	{
+		if (it->second.get_timeout() > 0 && now > it->second.get_timeout())
+		{
+			std::cout << YELLOW << "TIMEOUT CLIENT NUMBER: " << it->first << RST << std::endl;
+			if (!it->second.get_method().empty())
+			{
+				it->second.make_error(408);
+				it->second.set_timeout(5);
+			}
+			toclose.push_back(it->second.get_sockfd());
+		}
 		//std::cout << YELLOW << "PASSAGE CLIENT" << RST << std::endl;
-		if (it->second.get_method().empty())
+		if (it->second.get_method().empty() && it->second.get_timeout() == 0)
 		{
 			std::cout << YELLOW << "METHODE VIDE: " << it->first << " : " << it->second.get_sockfd() << RST << std::endl;
+			it->second.set_timeout(5);
 			continue;
 		}
 		if (it->second.get_close())
