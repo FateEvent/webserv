@@ -121,8 +121,6 @@ int main(int ac, char **av) //, char** ev)
 	signal(SIGINT, false_while);
 	signal(SIGPIPE, sigpipe_solving);
 
-	//ft::listing_creator("srcs");
-
 	char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
 	unsigned int	nbr = 0;
 	while (_SIGNAL_END)
