@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:56:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 11:58:20 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 19:09:57 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,15 @@ bool	Client::execute_delete()
 	}
 	else
 	{
-		// check file and delete it
-		// return 202 if ok
-		// otherwise return 404
-		make_error(202);
-		return (true);
+		static_cast<std::fstream *>(this->_data.file)->close();
+		this->_data.file = NULL;
+		std::string path = this->_root + "/" + this->_index;
+		std::cout << GREEN << "PATH: " << RST << path << std::endl;
+		if (remove(path.c_str()) == 0)
+			this->make_error(202);
+		else
+			this->make_error(403);
+		return (false);
 	}
 	return (false);
 }

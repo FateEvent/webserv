@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 13:52:50 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 19:08:41 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,8 @@ void	Client::clear_header()
 
 Client::~Client()
 {
+	std::cout << RED << "Client destructor:" << RST << std::endl;
+	std::cout << RED << "Client number: " << this->_sock_fd << RST << std::endl;
 	if (this->_pid_cgi > 0)
 		::kill(this->_pid_cgi, 2);
 	if (this->_pipe_cgi[0] > 0)
@@ -100,6 +102,8 @@ Client::~Client()
 		::close(this->_pipe_cgi[0]);
 		//::close(this->_pipe_cgi[1]);
 	}
+	if (this->_data.file != 0)
+		delete this->_data.file;
 	// check if stringstream or fstream, need close and delete
 	// check all variable with new and check if not null and delete
 	//delete this->_data.file;
@@ -297,7 +301,7 @@ bool	Client::execute_client(bool path)
 	}
 	else if (_header.Method.compare("POST") == 0)
 		return (this->execute_post());
-	else if (_header.Method.compare("DELETE") != 0)
+	else if (_header.Method.compare("DELETE") == 0)
 		return (this->execute_delete());	
 	else
 		std::cout << "BAD REQUEST / BAD HEADER" << std::endl; // Should not goto inside.
@@ -366,8 +370,8 @@ void	Client::make_error(int i)
 		// check if fstream, close and delete it
 		// if stringstream just delete it
 		delete this->_data.file;
+		this->_data.file = NULL;
 	}
-	this->_data.file = 0;
 	this->_data.file = new std::stringstream();
 	std::string header;
 	header = ft::make_header(i);
