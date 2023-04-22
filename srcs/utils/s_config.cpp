@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 15:23:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 11:47:09 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 12:20:12 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,9 +202,4 @@ void	s_config::get_all_loc(std::string loc, struct s_location *st)
 	}
 }
 
-bool	s_config::if_max_client() const
-{
-	if (this->nbr_client >= this->max_client)
-		std::cout << YELLOW << "Client in qeue." << RST << std::endl;
-	return (this->nbr_client < this->max_client ? false : true);
-}
+bool	s_config::if_max_client() const		{ return (this->nbr_client < this->max_client ? false : true); }

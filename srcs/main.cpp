@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/10 08:32:08 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 02:33:16 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 13:46:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,18 @@ bool _BROKEN_PIPE = false;
 void	Webserv::show_client_list()
 {
 	std::map<int, Client>::iterator first = this->_client.begin(), last = this->_client.end();
-	std::cout << PURPLE << "The socket of the following client has caused a SIG_PIPE and has to be closed:" << std::endl;
+	//std::cout << PURPLE << "The socket of the following client has caused a SIG_PIPE and has to be closed: ";
 	
 	for (; first != last; ++first)
 	{
 		if (waitpid(first->second.get_pid_cgi(), NULL, 0) != 0)
 		{
-			std::cout << first->first << RST << std::endl;
+			//std::cout << first->first << RST << std::endl;
+			first->second.clear_header();
 			::close(first->second.get_fd_cgi_0());
 			::close(first->second.get_sockfd());
 			this->_client.erase(first);
-			std::cout << GREEN << "The socket has been closed" << RST << std::endl;
+			std::cout << GREEN << "Socket has been closed." << RST << std::endl;
 			return ;
 		}
 	}

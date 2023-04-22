@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/18 00:57:51 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 12:23:47 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 13:44:12 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ class Client
 		int							_sock_fd;
 		sockaddr_in					_addr;			// sockaddr_in is a internet socket
 		socklen_t					_socklen;
-//		sockaddr_un					_addr_local;	// sockaddr_un is a local socket
 		config&						_ref_conf;
 		std::string					_response;
 		std::string					_root;
@@ -69,8 +68,7 @@ class Client
 		bool						_ready;
 		bool						_close;
 
-		std::map<std::string, std::string>	other;
-//		fd_set						_writefd;		
+		std::map<std::string, std::string>	other;	
 		void						_make_struct();
 
 	public:
@@ -101,7 +99,7 @@ class Client
 		bool						is_multipart() const;
 		bool						new_request();
 		void						clear_header();
-		void						clear();
+		// void						clear();
 		bool						check_location();
 		void						simple_location(std::vector<struct s_location>::const_iterator &);
 		void						condition_location(std::vector<struct s_location>::const_iterator &);
@@ -124,8 +122,6 @@ class Client
 		bool						multipart();
 		void						send_success_status();
 		bool						process_multipart();
-
-	protected:
 };
 
 #endif

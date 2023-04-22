@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 01:18:42 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 12:20:10 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -454,15 +454,10 @@ void	Webserv::check_server()
 		socklen_t		socklen;
 		header			head;
 
-		//std::cout << "Ask of new client on vhost." << std::endl;
 		socklen = sizeof(addr);
 		sock_fd = accept(_base.sock_fd, reinterpret_cast<sockaddr *>(&addr), reinterpret_cast<socklen_t *>(&socklen));
 		if (sock_fd == -1)
-		{
-			//std::cout << strerror(errno) << std::endl;
 			goto spring_block;
-			//throw std::invalid_argument("Socket error in vhost!");
-		}
 		fcntl(sock_fd, F_SETFL, O_NONBLOCK);
 		if (!ft::parse_header(sock_fd, head))
 		{
@@ -473,7 +468,7 @@ void	Webserv::check_server()
 		for (; serv != this->_servers.end(); serv++)
 			if (serv->first.compare(head.Host) == 0)
 				break;
-		if (serv == this->_servers.end()) // If instance not found give a webserv page... // Header with postman don't work??!!!
+		if (serv == this->_servers.end()) // If instance not found give a webserv page...
 		{
 			try
 			{
@@ -496,29 +491,28 @@ void	Webserv::check_server()
 			}
 			catch (std::exception &e)
 			{
-				//std::cout << e.what() << std::endl;
+				std::cout << PURPLE << "Info: " << e.what() << RST << std::endl;
 			}
 		}
 	}
 	spring_block:
 	for (std::map<std::string, config>::iterator it = this->_servers.begin(); it != this->_servers.end(); it++)
+	{
 		if (it->second.active && FD_ISSET(it->second.sock_fd, &this->readfd) && !it->second.if_max_client())
 		{
-			//std::cout << "Ask of new client." << std::endl;
 			try
 			{
 				Client *ret = new Client(it->second);
 				this->_client.insert(std::make_pair(ret->get_sockfd(), *ret));
 				delete ret;
-				//std::cout << GREEN << "New client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
-				FD_CLR(it->second.sock_fd, &this->readfd);
 			}
 			catch (std::exception &e)
 			{
-				//std::cout << e.what() << std::endl;
-				FD_CLR(it->second.sock_fd, &this->readfd);
+				std::cout << PURPLE << "Info: " << e.what() << RST << std::endl;
 			}
 		}
+		FD_CLR(it->second.sock_fd, &this->readfd);
+	}
 }
 
 void	Webserv::check_client()

@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 02:41:34 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 13:52:50 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,7 @@ bool			Client::get_close() const					{ return (this->_close); }
 long			Client::get_max_body() const				{ return (this->_max_body); }
 long			Client::get_timeout() const					{ return (this->_timeout); }
 void			Client::set_timeout(long timeout)			{ this->_timeout = std::time(nullptr) + timeout; }
+
 std::pair<std::string, std::string>	Client::get_file() const
 {
 	if (this->_header.file.first.empty())
@@ -188,6 +189,7 @@ bool	Client::continue_client(fd_set *fdset)
 	{
 		if (this->send_data(this->_sock_fd))
 		{
+			//this->clear_header();
 			this->_sedding = false;
 			this->_close = true;
 			delete this->_data.file;
