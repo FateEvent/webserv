@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 19:54:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 02:30:58 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 20:59:39 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ bool	Client::execute_post()
 		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
 			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		this->make_error(413);
-		::shutdown(this->_sock_fd, SHUT_RD);
 		return (false);
 	}
 	if ((!this->_cgi_call.empty() && _cgi_call.find(_index.substr(_index.find_last_of("."))) != _cgi_call.end()) ||

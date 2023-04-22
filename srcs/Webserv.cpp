@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 12:20:10 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 21:38:06 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -559,12 +559,13 @@ void	Webserv::exec_client()
 	std::time_t now = std::time(NULL);
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); ++it)
 	{
-		if (it->second.get_timeout() > 0 && now > it->second.get_timeout())
+		if (!it->second.is_seeding() && it->second.get_timeout() > 0 && now > it->second.get_timeout())
 		{
 			std::cout << YELLOW << "TIMEOUT CLIENT NUMBER: " << it->first << RST << std::endl;
 			if (!it->second.get_method().empty())
 				it->second.make_error(408);
-			toclose.push_back(it->first);
+			else
+				toclose.push_back(it->first);
 			continue;
 		}
 		if (it->second.get_method().empty() && it->second.get_timeout() == 0)

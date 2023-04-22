@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 19:21:46 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 21:38:55 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,20 +93,12 @@ void	Client::clear_header()
 
 Client::~Client()
 {
-	std::cout << RED << "Client destructor:" << RST << std::endl;
-	std::cout << RED << "Client number: " << this->_sock_fd << RST << std::endl;
 	if (this->_pid_cgi > 0)
 		::kill(this->_pid_cgi, 2);
 	if (this->_pipe_cgi[0] > 0)
-	{
 		::close(this->_pipe_cgi[0]);
-		//::close(this->_pipe_cgi[1]);
-	}
 	if (this->_data.file != 0)
 		delete this->_data.file;
-	// check if stringstream or fstream, need close and delete
-	// check all variable with new and check if not null and delete
-	//delete this->_data.file;
 	this->_ref_conf.nbr_client--;
 }
 
