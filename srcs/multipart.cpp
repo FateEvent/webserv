@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 16:53:24 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 17:34:53 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 01:53:28 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ bool	Client::process_multipart()
 		{
 			this->_data._in.temporary->seekg(this->_data._in.bound_seek.front(), this->_data._in.temporary->beg);
 			this->_data._in.filename->close();
+			delete this->_data._in.filename;
 			this->_data._in.filename =  NULL;
 		}
 		//this->_data._in.in_bound = this->_data._in.temporary->tellg();

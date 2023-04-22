@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 20:38:09 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 00:07:06 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 01:18:42 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -577,8 +577,7 @@ void	Webserv::exec_client()
 			continue;
 		if (it->second.get_close())
 		{
-			if (shutdown(it->first, SHUT_RDWR) == -1)
-				std::cout << RED << "ERROR SHUTDOWN SOCKET" << RST << std::endl;
+			shutdown(it->first, SHUT_RDWR);
 			if (FD_ISSET(it->second.get_sockfd(), &this->get_writefd()) && it->second.get_close())
 			{
 				toclose.push_back(it->first);

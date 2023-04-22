@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 10:49:12 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 22:41:22 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 02:30:54 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,11 @@ bool	Client::check_location()
 
 	this->_data.file = new std::fstream(path, std::ios::in | std::ios::binary);
 	if (!this->_data.file->good())
+	{
+		delete this->_data.file;
+		this->_data.file = 0;
 		return (false);
+	}
 	this->_data.file->seekg(0, this->_data.file->end);
 	this->_data.data_size = this->_data.file->tellg();
 	this->_data.file->seekg(0, this->_data.file->beg);

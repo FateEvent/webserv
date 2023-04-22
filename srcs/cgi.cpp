@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/20 22:30:46 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 02:27:20 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ int	Client::launch_cgi(std::string path)
 	char **ENVP = ft::vector_to_tab(env);
 	char *ARGV[] = {const_cast<char*>(path.c_str()), const_cast<char*>(file.c_str()), NULL};
 
+
 	if (pipe(this->_pipe_cgi) == -1)
 		return (503);
 	this->_pid_cgi = fork();
@@ -129,6 +130,9 @@ int	Client::launch_cgi(std::string path)
 			std::exit(EXIT_FAILURE);
       	}
 	}
-	delete[] ENVP; // not good lot of new inside ENVP
+	int i = 0;
+	while (ENVP[i])
+		delete[] ENVP[i++];
+	delete[] ENVP;
 	return (0);
 }

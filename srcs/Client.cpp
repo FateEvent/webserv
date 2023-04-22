@@ -6,7 +6,7 @@
 /*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/19 23:20:41 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 23:55:28 by stissera         ###   ########.fr       */
+/*   Updated: 2023/04/22 02:41:34 by stissera         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,8 @@ Client::~Client()
 		::close(this->_pipe_cgi[0]);
 		//::close(this->_pipe_cgi[1]);
 	}
+	// check if stringstream or fstream, need close and delete
+	// check all variable with new and check if not null and delete
 	//delete this->_data.file;
 	this->_ref_conf.nbr_client--;
 }
@@ -186,12 +188,10 @@ bool	Client::continue_client(fd_set *fdset)
 	{
 		if (this->send_data(this->_sock_fd))
 		{
-			//this->clear_header(); //
-			//this->_index.clear();
-			//this->_root.clear();
 			this->_sedding = false;
 			this->_close = true;
 			delete this->_data.file;
+			this->_data.file = 0;
 			::shutdown(this->_sock_fd, SHUT_WR);
 			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
@@ -247,6 +247,7 @@ bool	Client::continue_client(fd_set *fdset)
 		{
 			this->_data._in.temporary->close();
 			remove(this->_data._in.tmpfile);
+			delete this->_data._in.temporary;
 			std::string	header;
 			this->_data.header = ft::make_header(201);
 			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
@@ -359,7 +360,11 @@ void	Client::kill_cgi()
 void	Client::make_error(int i)
 {
 	if (this->_data.file != 0)
+	{
+		// check if fstream, close and delete it
+		// if stringstream just delete it
 		delete this->_data.file;
+	}
 	this->_data.file = 0;
 	this->_data.file = new std::stringstream();
 	std::string header;
