@@ -61,6 +61,7 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 	this->_base.prepare = true;
 	this->_base.active = false;
 	this->created = true;
+	this->_base._base = &_base;
 }
 
 Webserv::~Webserv()
