@@ -34,7 +34,6 @@ bool	ft::parse_header(int fd, s_header &head)
 			break;
 		tmp.push_back(buffer[0]);
 	}
-	std::cout << "step  1: " << tmp << std::endl;
 	std::cout << PURPLE << tmp << RST << std::endl;
 	if (recept == 0 || (tmp.find("\r\n\r\n") == tmp.npos)) // close client
 		return (false);
@@ -62,7 +61,6 @@ bool	ft::parse_header(int fd, s_header &head)
 	std::vector<std::string>::iterator it = header.begin();
 	if (it->find(" HTTP/1.1"))
 	{
-		std::cout << "step  1: " << *it << std::endl;
 		if (it->find("GET /") != it->npos)
 			head.Method = "GET";
 		else if (it->find("POST /") != it->npos)
@@ -131,22 +129,6 @@ bool	ft::parse_header(int fd, s_header &head)
 			ft::split_to_vectors(head.Transfer_Encoding, it->data(), ',');
 		else
 			ft::split_to_maposs(head.other, it->data());
-	}
-	std::cout << "step  2: " << head.Dir << std::endl;
-	if (::access(head.Dir.data(), F_OK) == -1)
-	{
-		if (head.other.find("Referer") != head.other.end())
-		{
-			std::string	missingPart = head.other.find("Referer")->second;
-			missingPart = missingPart.substr(missingPart.find_last_of("/"), missingPart.find("?") - missingPart.find_last_of("/"));
-			if (missingPart.length() > 1 && missingPart.find(".") == missingPart.npos)
-			{
-				std::cout << "step  3: " << missingPart << std::endl;
-				missingPart += head.Dir;
-				head.Dir = missingPart;
-				std::cout << "step  4: " << head.Dir << std::endl;
-			}
-		}
 	}
 	head.time_out = std::time(nullptr);
 	head.split_dir();
