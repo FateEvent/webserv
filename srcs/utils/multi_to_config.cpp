@@ -72,7 +72,7 @@ void	ft::check_host(std::multimap<std::string, std::string> &config)
 	if (it->second.find(":") != it->second.npos)
 	{
 		if (config.find("listen") != config.end())
-			throw std::invalid_argument("Confilt in host, listen already exist");
+			throw std::invalid_argument("Conflict in host, listen already exists");
 		end = it->second.find_first_not_of("1234567890", it->second.find(":") + 1);
 		config.insert(std::pair<std::string, std::string>("listen", it->second.substr(it->second.find(":") + 1, end - it->second.find(":") - 1)));
 		it->second = it->second.substr(0, it->second.find_first_of(":"));

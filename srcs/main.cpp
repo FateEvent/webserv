@@ -60,8 +60,12 @@ int main(int ac, char **av) //, char** ev)
 		std::cout << RED << "Argument error.\nNeed " << av[0] << " [CONFIG FILE] or nothing." << RST << std::endl;
 		return (1);
 	}
-	ft::make_header(0);
-	ft::make_content_type("");
+	try {
+		ft::make_header(0);
+		ft::make_content_type("");
+	} catch (std::exception &e) {
+		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
+	}
 
 	// FIRST PARSE IN MAP STRING STRING
 	std::ifstream file;
@@ -71,7 +75,7 @@ int main(int ac, char **av) //, char** ev)
 		std::cout << "Can't open config file." << std::endl;
 		return (1);
 	}
-	std::multimap<std::string, std::string> block;
+	std::multimap<std::string, std::string> 								block;
 	std::multimap<std::string, std::multimap<std::string, std::string> >	pre_conf;
 	try {
 		ft::file_to_map(file, block); // file to map -> block name / value
@@ -94,8 +98,8 @@ int main(int ac, char **av) //, char** ev)
 		}
 		ft::parse_map(block.begin(), block.end(), pre_conf); // map to config -> title / map< name / value >
 	}
-	catch (std::invalid_argument &e) {
-		std::cout << "Config file error: " << e.what() << std::endl;
+	catch (std::exception &e) {
+		std::cerr << "Config file error: " << e.what() << std::endl;
 		return (1);
 	}
 	file.close();
@@ -109,42 +113,48 @@ int main(int ac, char **av) //, char** ev)
 	}
 #endif */
 
-	Webserv server(pre_conf);
-	server.add(pre_conf);
+	try {
+		Webserv server(pre_conf);
+		server.add(pre_conf);
 
-	server.prepare_all();
-	server.bind_all();
-	server.listen_all();
-	server.timeout(1);
-	std::cout << server.get_info_server() << std::endl;
-	std::cout << server.get_info_instance() << std::endl;
+		server.prepare_all();
+		server.bind_all();
+		server.listen_all();
+		server.timeout(1);
+		std::cout << server.get_info_server() << std::endl;
+		std::cout << server.get_info_instance() << std::endl;
 
-	signal(SIGINT, false_while);
-	signal(SIGPIPE, sigpipe_solving);
+		signal(SIGINT, false_while);
+		signal(SIGPIPE, sigpipe_solving);
 
-	char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
-	unsigned int	nbr = 0;
-	while (_SIGNAL_END)
-	{	
-		server.fd_rst();
-		std::cout << "wait... " << wait[nbr++ % 8] << "\r" << std::flush;
-		int recept = select(server.get_greaterfd(), &server.get_readfd(), &server.get_writefd(), NULL, &server.timeout());
-		if (recept)
-		{
-			server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
-			server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
+		char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
+		unsigned int	nbr = 0;
+		while (_SIGNAL_END)
+		{	
+			server.fd_rst();
+			std::cout << "wait... " << wait[nbr++ % 8] << "\r" << std::flush;
+			int recept = select(server.get_greaterfd(), &server.get_readfd(), &server.get_writefd(), NULL, &server.timeout());
+			if (recept)
+			{
+				server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
+				server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
+			}
+			server.timeout(1);	
+			server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALY GOES ONE TIME/REQUEST
+			recept = 0;
+			if (_BROKEN_PIPE)
+			{
+				server.show_client_list();
+				_BROKEN_PIPE = false;
+			}
 		}
-		server.timeout(1);	
-		server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALY GOES ONE TIME/REQUEST
-		recept = 0;
-		if (_BROKEN_PIPE)
-		{
-			server.show_client_list();
-			_BROKEN_PIPE = false;
-		}
+		std::cout << RED << "EXIT PROGRAM" << RST << std::endl;
+		server.stop_all();
 	}
-	std::cout << RED << "EXIT PROGRAM" << RST << std::endl;
-	server.stop_all();
+	catch (std::exception &e) {
+		std::cerr << "Webserv encountered a problem: " << e.what() << std::endl;
+		return (1);
+	}
 
 	return (0);
 }

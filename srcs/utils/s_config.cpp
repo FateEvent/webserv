@@ -22,7 +22,7 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		if (!it->first.compare("name"))
 		{
 			if (it->second.empty())
-				throw ("No instance name!");
+				throw std::invalid_argument("No instance name!");
 			this->name = it->second;
 		}
 		else if (!it->first.compare("protocol"))
@@ -36,14 +36,14 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 			else if (it->second.compare("local") || it->second.compare("LOCAL"))
 				this->domain = AF_LOCAL;
 			else
-				throw ("Socket protocol invalid!");
+				throw std::invalid_argument("Socket protocol invalid!");
 			this->addr.sin_family = this->domain;
 		}
 		else if (!it->first.compare("host"))
 		{
 			unsigned int ip[4];
 			if (!sscanf(it->second.data(), "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3]))
-				throw ("IP bad host in config file");
+				throw std::invalid_argument("Bad IP host in config file");
 			this->ip = it->second;
 			this->addr.sin_addr.s_addr =  (ip[0] % 256 << 0 | 0) |\
 										(ip[1] % 256 << 8 | 0) |\
@@ -53,7 +53,7 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		else if (!it->first.compare("listen"))
 		{
 			if ((std::stoul(it->second) < 1) && (std::stoul(it->second) >= 0xFFFFFF))
-				throw ("Invalid port");
+				throw std::invalid_argument("Invalid port");
 			this->port = std::stoul(it->second);
 			this->addr.sin_port = htons(this->port);
 		}
@@ -70,26 +70,26 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		{
 			ssize_t max = std::stol(it->second);
 			if (!(max > 0 && max < static_cast<ssize_t>(0x7FFFFFFF)))
-				throw ("Max client incorrect in instance!");
+				throw std::invalid_argument("Incorrect max client number in instance!");
 			this->max_client = max;
 		}
 		else if (!it->first.compare("max_body_size"))
 		{
 			ssize_t max = std::stol(it->second);
 			if (max < 0)
-				throw ("Max body size incorrect in instance!");
+				throw std::invalid_argument("Incorrect max body size in instance!");
 			this->max_body = max;
 		}
 		else if (!it->first.compare("root"))
 		{
 			if (it->second.empty())
-				throw ("root destination empty!");
+				throw std::invalid_argument("root destination empty!");
 			this->root = it->second;
 		}
 		else if (!it->first.compare("index_page"))
 		{
 			if (it->second.empty())
-				throw ("no index referenced!");
+				throw std::invalid_argument("no index referenced!");
 			this->index = it->second;
 		}
 		else if (!it->first.compare("allow"))
@@ -121,7 +121,7 @@ s_config::s_config(std::multimap<std::string, std::string>& server)
 		else
 		{
 			std::cout << "Unknown key " << it->first << " in config file - s_config.cpp" << std::endl;
-			//throw ("Unknow parameter in config file!");
+			//throw std::invalid_argument("Unknow parameter in config file!");
 		}
 		//std::cout << "\033[0;33m" + it->first << " | " << it->second + "\033[0m" << std::endl;
 		#endif
@@ -157,7 +157,7 @@ void s_config::set_zero()
 void s_config::do_location(std::string loc)
 {
 	t_location st;
-	size_t start , end;
+	size_t start, end;
 	
 	start = loc.find_first_not_of(" \v\f\r\n\t");
 	end = loc.find_first_of(" \v\f\r\n\t{", start);

@@ -120,12 +120,17 @@ int	Client::launch_cgi(std::string path)
 		dup2(this->_pipe_cgi[1], STDERR_FILENO); // RECEIPT ERROR IN PIPE, TO SEE WHAT THE PROBLEM IF EXIST.
 		if (execve(path.c_str(), ARGV, ENVP) < 0)
 		{
-			std::string header(ft::make_header(500));
-			header.append(ft::get_page_error(500, this->_error_page[500].empty() ?
-					(this->_ref_conf.error_page.find(500)->second.empty() ?
-					this->_ref_conf._base->error_page.find(500)->second : this->_ref_conf.error_page.find(500)->second) :
-					this->_error_page[500]));
-			std::cout << header;
+			try {
+				std::string header(ft::make_header(500));
+				header.append(ft::get_page_error(500, this->_error_page[500].empty() ?
+						(this->_ref_conf.error_page.find(500)->second.empty() ?
+						this->_ref_conf._base->error_page.find(500)->second : this->_ref_conf.error_page.find(500)->second) :
+						this->_error_page[500]));
+				std::cout << header;
+			} catch (std::exception &e) {
+				std::string header = "0";
+				std::cerr << "The header couldn't be created: " << e.what() << std::endl;
+			}
 			delete[] ENVP; // not good lot of new inside ENVP
 			std::exit(EXIT_FAILURE);
       	}

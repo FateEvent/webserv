@@ -79,7 +79,6 @@ class Client
 		std::string					get_method() const;
 		time_t						get_time_alive() const;
 		std::string					get_directory() const;
-		std::pair<std::string, std::string>	get_file() const;
 		header*						get_header();
 		const config*				get_config() const;
 		int							get_fd_cgi() const;

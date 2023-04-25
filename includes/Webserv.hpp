@@ -83,7 +83,6 @@ class Webserv
 		void			check_client();
 		void			exec_client();
 
-
 		// TRHOW
 		class err_init : public std::exception
 		{

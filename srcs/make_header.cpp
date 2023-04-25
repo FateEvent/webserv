@@ -22,7 +22,7 @@ std::string ft::make_header(int http_err)
 		std::fstream	file("./etc/error_http.ini");
 		std::string		line;
 		if (!file.is_open())
-			throw std::invalid_argument("Can't found etc/error_http.ini!");
+			throw std::invalid_argument("etc/error_http.ini couldn't be found!");
 		while(std::getline(file, line))
 		{
 			std::string key = line.substr(line.find_first_not_of(" \t"), line.find_first_of("\t"));

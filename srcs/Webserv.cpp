@@ -47,16 +47,16 @@ Webserv::Webserv(std::multimap<std::string, std::multimap<std::string, std::stri
 			this->_base.allow |= 0b100; //0x004;
 		this->_base.max_client = std::strtoul(it.find("max_client")->second.data(), NULL, 10);
 	}
-	// Do socket, bind and listen on general port (usualy on port 80 given in config file)
+	// Do socket, bind and listen on general port (usually on port 80 given in config file)
 	this->_base.sock_fd = socket(this->_base.addr.sin_family, this->_base.type, 0);
 	int optval = 1;
 	if (setsockopt(this->_base.sock_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(socklen_t)) == - 1)
-		throw std::invalid_argument("Cannot REUSE the port! Usualy already used."); // ("Server bind error.");
+		throw std::invalid_argument("Cannot REUSE the port! Usually already used."); // ("Server bind error.");
 	fcntl(this->_base.sock_fd, F_SETFL, O_NONBLOCK);
 	if (::bind(this->_base.sock_fd, reinterpret_cast<sockaddr *>(&this->_base.addr), sizeof(this->_base.addr)) != 0)
-		throw std::invalid_argument("Cannot bind port! Usualy already used."); // ("Server bind error.");
+		throw std::invalid_argument("Cannot bind port! Usually already used."); // ("Server bind error.");
 	if (::listen(this->_base.sock_fd, this->_base.max_client) != 0)
-		throw std::invalid_argument("Cannot listen port! Usualy already used."); // ("Server listen error.");
+		throw std::invalid_argument("Cannot listen to the port! Usually already used."); // ("Server listen error.");
 	// Set prepare and active on true
 	this->_base.prepare = true;
 	this->_base.active = false;
@@ -106,7 +106,7 @@ void	Webserv::prepare(config &instance)
 			//socket(instance.addr.sin_family, instance.type, instance.addr.sin_addr.s_addr)))
 			//int optval = 1;
 			//if (setsockopt(instance.sock_fd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(int)) == - 1)
-			//	throw std::invalid_argument("Cannot REUSE the port in instance! Usualy already used."); // ("Server bind error.");
+			//	throw std::invalid_argument("Cannot REUSE the port in instance! Usually already used."); // ("Server bind error.");
 			instance.prepare = true;
 			fcntl(instance.sock_fd, F_SETFL, O_NONBLOCK);
 		}
@@ -157,7 +157,7 @@ setsockopt(server.sock_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
 
 		shutdown(server.sock_fd,SHUT_RDWR);
 		if (::close(server.sock_fd))
-			return; //throw ("intern problem.");
+			return; //throw std::invalid_argument("intern problem.");
 		
 		//unbind(server.sock_fd, reinterpret_cast<sockaddr *>(&server.addr), sizeof(server.addr));
 		server.sock_fd = -1;
@@ -165,7 +165,7 @@ setsockopt(server.sock_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
 	}
 	else
 		std::cout << "  ╚═ Not active, not need to close... " << GREEN << "(͡• ͜໒ ͡• )" << RST << std::endl;
-//		throw ("Server was already shutdown.");
+//		throw std::invalid_argument("Server was already shutdown.");
 }
 
 /**
@@ -179,16 +179,16 @@ void	Webserv::stop_all()
 	{
 		try
 		{
-			std::cout << PURPLE << "Stopping server " << it->second.name << "..." << RST << std::endl;
+			std::cout << PURPLE << "Stopping the server " << it->second.name << "..." << RST << std::endl;
 			this->stop(it->second);
 		}
 		catch (std::exception &e)
 		{
-			std::cout << "\033[0;31mServer " << it->second.name << "was stopped not correctly!\033[0m" << std::endl;
+			std::cerr << "\033[0;31mServer " << it->second.name << "was stopped not correctly!\033[0m" << std::endl;
 			std::cerr << e.what() << std::endl;
 		}
 	}
-	std::cout << GREEN << "All server stopped!" << RST << std::endl;
+	std::cout << GREEN << "All servers stopped!" << RST << std::endl;
 }
 
 /**
@@ -253,7 +253,7 @@ void	Webserv::bind(config &bind)
 	else
 	{
 		bind.active = false;
-		throw ("Error: instance " + bind.name + " not initialized!");
+		throw std::invalid_argument("Error: instance " + bind.name + " not initialized!");
 	}
 }
 
@@ -266,12 +266,10 @@ void	Webserv::bind_all()
 {
 	for (std::map<std::string, config>::iterator server = this->_servers.begin(); server != this->_servers.end(); server++)
 	{
-		try
-		{
+		try {
 			this->bind(server->second);
 		}
-		catch (std::exception &e)
-		{
+		catch (std::exception &e) {
 			std::cerr << e.what() << std::endl;
 		}
 	}
@@ -343,10 +341,8 @@ void	Webserv::listen_all()
 void	Webserv::listen(config &instance)
 {
 	if (::listen(instance.sock_fd, instance.max_client) != 0)
-		throw ("Error on listen for " + instance.name + " with error " + std::to_string(errno));
+		throw std::invalid_argument("Error on listen for " + instance.name + " with error " + std::to_string(errno));
 }
-
-
 
 unsigned	Webserv::get_nbr_server() const		{ return (this->_nbr_server);}
 

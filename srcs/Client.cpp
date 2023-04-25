@@ -122,13 +122,6 @@ long			Client::get_max_body() const				{ return (this->_max_body); }
 long			Client::get_timeout() const					{ return (this->_timeout); }
 void			Client::set_timeout(long timeout)			{ this->_timeout = std::time(nullptr) + timeout; }
 
-std::pair<std::string, std::string>	Client::get_file() const
-{
-	if (this->_header.file.first.empty())
-		throw;
-	return (this->_header.file);
-}
-
 int	Client::get_fd_cgi_0() const
 {
 	if (this->is_cgi())
@@ -246,10 +239,14 @@ bool	Client::continue_client(fd_set *fdset)
 			this->_data._in.temporary->close();
 			remove(this->_data._in.tmpfile);
 			delete this->_data._in.temporary;
-			std::string	header;
-			this->_data.header = ft::make_header(201);
-			this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
-			this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+			try {
+				this->_data.header = ft::make_header(201);
+				this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
+				this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+			} catch (std::exception &e) {
+				this->_data.header = "0";
+				std::cerr << "The header couldn't be created: " << e.what() << std::endl;
+			}
 			int check = 0;
 			check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
 			if (check == -1)
@@ -334,7 +331,14 @@ void	Client::cgi_prepare_to_send()
 	this->_data.minus_header = header_test.find("\r\n\r\n") == header_test.npos ? 0 : header_test.find("\r\n\r\n");
 	if (header_test.find("Status: ") < this->_data.minus_header)
 		err_header = std::strtoul(header_test.substr(header_test.find("Status: ") + 8, 3).c_str(), NULL, 10);
-	this->_data.header = ft::make_header(err_header);
+	try {
+		this->_data.header = ft::make_header(err_header);
+	}
+	catch (std::exception &e) {
+		this->_data.header = "0";
+		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
+	}
+	
 	if (header_test.find("Content-Length:") > this->_data.minus_header && header_test.find("content-length:") > this->_data.minus_header)
 		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size - (this->_data.minus_header != header_test.npos ? this->_data.minus_header + 4 : 0)) + "\r\n");
 	if (header_test.find("Content-Type:") > this->_data.minus_header && header_test.find("content-type:") > this->_data.minus_header)
@@ -365,8 +369,13 @@ void	Client::make_error(int i)
 		this->_data.file = NULL;
 	}
 	this->_data.file = new std::stringstream();
-	std::string header;
-	header = ft::make_header(i);
+	std::string	header;
+	try {
+		header = ft::make_header(i);
+	} catch (std::exception &e) {
+		header = "0";
+		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
+	}
 	if (send(this->_sock_fd, header.c_str(), header.length(), 0) == -1)
 		std::cout << "ERROR OF SEND!!" << std::endl;
 	if (!this->_redirect.empty())
@@ -499,9 +508,14 @@ ssize_t	Client::hextol(std::string hex)
 
 void	Client::send_success_status()
 {
-	this->_data.header = ft::make_header(200);
-	this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
-	this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+	try {
+		this->_data.header = ft::make_header(200);
+		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
+		this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
+	} catch (std::exception &e) {
+		this->_data.header = "0";
+		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
+	}
 	int check = 0;
 	check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
 	if (check == -1)
