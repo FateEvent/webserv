@@ -63,7 +63,8 @@ int main(int ac, char **av) //, char** ev)
 		ft::make_header(0);
 		ft::make_content_type("");
 	} catch (std::exception &e) {
-		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
+		std::cerr << YELLOW << "Webserv encountered a problem: " << e.what() << RST << std::endl;
+		return (1);
 	}
 
 	// FIRST PARSE IN MAP STRING STRING
