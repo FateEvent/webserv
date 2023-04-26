@@ -47,7 +47,7 @@ bool	Client::execute_get()
 			else
 				this->_data.header.append("\r\n");
 		} catch (std::exception &e) {
-			this->_data.header = "0 No Response";
+			this->_data.header = "0 No Response\r\n";
 			std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 		}
 		int check = 0;

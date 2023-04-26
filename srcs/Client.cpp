@@ -244,7 +244,7 @@ bool	Client::continue_client(fd_set *fdset)
 				this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
 				this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
 			} catch (std::exception &e) {
-				this->_data.header = "0 No Response";
+				this->_data.header = "0 No Response\r\n";
 				std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 			}
 			int check = 0;
@@ -258,7 +258,7 @@ bool	Client::continue_client(fd_set *fdset)
 	}
 	else
 	{
-		std::cout << "PROBLEME EXIST IF ON SCREEN!!!!!continue_client" << std::endl;
+		std::cout << "THE PROBLEM EXISTS IF ON SCREEN!!!!! continue_client" << std::endl;
 		return (true);
 	}
 	return (false);
@@ -275,7 +275,7 @@ bool	Client::execute_client(bool path)
 	else if (!path && !this->is_working())
 	{
 		#ifdef DEBUG
-			std::cout << PURPLE << "File not found or can't open!" << RST << std::endl;
+			std::cout << PURPLE << "The file hasn't been found or can't be opened!" << RST << std::endl;
 		#endif
 		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
 			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
@@ -335,7 +335,7 @@ void	Client::cgi_prepare_to_send()
 		this->_data.header = ft::make_header(err_header);
 	}
 	catch (std::exception &e) {
-		this->_data.header = "0 No Response";
+		this->_data.header = "0 No Response\r\n";
 		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 	}
 	
@@ -373,7 +373,7 @@ void	Client::make_error(int i)
 	try {
 		header = ft::make_header(i);
 	} catch (std::exception &e) {
-		header = "0 No Response";
+		header = "0 No Response\r\n";
 		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 	}
 	if (send(this->_sock_fd, header.c_str(), header.length(), 0) == -1)
@@ -512,7 +512,7 @@ void	Client::send_success_status()
 		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
 		this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
 	} catch (std::exception &e) {
-		this->_data.header = "0 No Response";
+		this->_data.header = "0 No Response\r\n";
 		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 	}
 	int check = 0;

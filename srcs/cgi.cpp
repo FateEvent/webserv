@@ -128,7 +128,7 @@ int	Client::launch_cgi(std::string path)
 						this->_error_page[500]));
 				std::cout << header;
 			} catch (std::exception &e) {
-				std::string header = "0 No Response";
+				std::string header = "0 No Response\r\n";
 				std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 			}
 			delete[] ENVP; // not good lot of new inside ENVP

@@ -24,7 +24,6 @@ bool _BROKEN_PIPE = false;
 void	Webserv::show_client_list()
 {
 	std::map<int, Client>::iterator first = this->_client.begin(), last = this->_client.end();
-	std::cout << PURPLE << "The socket of the following client has caused a SIG_PIPE and has to be closed: ";
 	
 	for (; first != last; ++first)
 	{
@@ -33,8 +32,8 @@ void	Webserv::show_client_list()
 			first->second.clear_header();
 			::close(first->second.get_fd_cgi_0());
 			::close(first->second.get_sockfd());
+			std::cout << GREEN << "The socket " << first->first <<  " has been closed." << RST << std::endl;
 			this->_client.erase(first);
-			std::cout << GREEN << "Socket has been closed." << RST << std::endl;
 			return ;
 		}
 	}
@@ -114,50 +113,56 @@ int main(int ac, char **av) //, char** ev)
 
 	try {
 		Webserv server(pre_conf);
-		server.add(pre_conf);
+		try {
+			server.add(pre_conf);
 
-		server.prepare_all();
-		server.bind_all();
-		server.listen_all();
-		server.timeout(1);
-		std::cout << server.get_info_server() << std::endl;
-		std::cout << server.get_info_instance() << std::endl;
-
-		signal(SIGINT, false_while);
-		signal(SIGPIPE, sigpipe_solving);
-
-		char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
-		unsigned int	nbr = 0;
-		while (_SIGNAL_END)
-		{	
-			server.fd_rst();
-			std::cout << "wait... " << wait[nbr++ % 8] << "\r" << std::flush;
-			int recept = select(server.get_greaterfd(), &server.get_readfd(), &server.get_writefd(), NULL, &server.timeout());
-			if (recept)
-			{
-				server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
-				server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
-			}
+			server.prepare_all();
+			server.bind_all();
+			server.listen_all();
 			server.timeout(1);
-			try {
-				server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALLY GOES ONE TIME/REQUEST
-			} catch (std::exception &e) {
-				std::cerr << "Webserv encountered a problem: " << e.what() << std::endl;
-				server.stop_all();
-				return (1);
+			std::cout << server.get_info_server() << std::endl;
+			std::cout << server.get_info_instance() << std::endl;
+
+			signal(SIGINT, false_while);
+			signal(SIGPIPE, sigpipe_solving);
+
+			char			wait[] = {'/', '-', '\\', '|', '/', '-', '\\', '|'};
+			unsigned int	nbr = 0;
+			while (_SIGNAL_END)
+			{	
+				server.fd_rst();
+				std::cout << "wait... " << wait[nbr++ % 8] << "\r" << std::flush;
+				int recept = select(server.get_greaterfd(), &server.get_readfd(), &server.get_writefd(), NULL, &server.timeout());
+				if (recept)
+				{
+					server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
+					server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
+				}
+				server.timeout(1);
+				try {
+					server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALLY GOES ONE TIME/REQUEST
+				} catch (std::exception &e) {
+					std::cerr << "Webserv encountered a problem: " << e.what() << std::endl;
+					server.show_client_list();
+					return (1);
+				}
+				recept = 0;
+				if (_BROKEN_PIPE)
+				{
+					server.show_client_list();
+					_BROKEN_PIPE = false;
+				}
 			}
-			recept = 0;
-			if (_BROKEN_PIPE)
-			{
-				server.show_client_list();
-				_BROKEN_PIPE = false;
-			}
+			std::cout << RED << "EXIT PROGRAM" << RST << std::endl;
+			server.stop_all();
+		} catch (std::exception &e) {
+			std::cerr << "Webserv encountered a problem: " << e.what() << std::endl;
+			server.stop_all();
+			return (1);
 		}
-		std::cout << RED << "EXIT PROGRAM" << RST << std::endl;
-		server.stop_all();
 	}
 	catch (std::exception &e) {
-		std::cerr << "Webserv encountered a problem: " << e.what() << std::endl;
+		std::cerr << "Webserv couldn't be initialised: " << e.what() << std::endl;
 		return (1);
 	}
 
