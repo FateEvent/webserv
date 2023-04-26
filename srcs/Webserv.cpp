@@ -489,6 +489,8 @@ void	Webserv::check_server()
 			catch (std::exception &e)
 			{
 				std::cout << PURPLE << "Info: " << e.what() << RST << std::endl;
+				show_client_list();
+				return ;
 			}
 		}
 	}
@@ -506,6 +508,8 @@ void	Webserv::check_server()
 			catch (std::exception &e)
 			{
 				std::cout << PURPLE << "Info: " << e.what() << RST << std::endl;
+				show_client_list();
+				return ;
 			}
 		}
 		FD_CLR(it->second.sock_fd, &this->readfd);
