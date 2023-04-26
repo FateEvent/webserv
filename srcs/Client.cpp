@@ -244,7 +244,7 @@ bool	Client::continue_client(fd_set *fdset)
 				this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
 				this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
 			} catch (std::exception &e) {
-				this->_data.header = "0";
+				this->_data.header = "0 No Response";
 				std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 			}
 			int check = 0;
@@ -335,7 +335,7 @@ void	Client::cgi_prepare_to_send()
 		this->_data.header = ft::make_header(err_header);
 	}
 	catch (std::exception &e) {
-		this->_data.header = "0";
+		this->_data.header = "0 No Response";
 		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 	}
 	
@@ -373,11 +373,11 @@ void	Client::make_error(int i)
 	try {
 		header = ft::make_header(i);
 	} catch (std::exception &e) {
-		header = "0";
+		header = "0 No Response";
 		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 	}
 	if (send(this->_sock_fd, header.c_str(), header.length(), 0) == -1)
-		std::cout << "ERROR OF SEND!!" << std::endl;
+		std::cout << "SENDING ERROR!" << std::endl;
 	if (!this->_redirect.empty())
 		*static_cast<std::stringstream*>(_data.file) << ("Location: " + this->_redirect + "\r\n\r\n");
 	*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(i,
@@ -440,7 +440,6 @@ void	Client::chunk()
 
 int	Client::is_hex_line(std::string str)
 {
-	std::cout << "str: "<< str << std::endl;
 	size_t	i;
 
 	i = 0;
@@ -513,7 +512,7 @@ void	Client::send_success_status()
 		this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
 		this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
 	} catch (std::exception &e) {
-		this->_data.header = "0";
+		this->_data.header = "0 No Response";
 		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
 	}
 	int check = 0;

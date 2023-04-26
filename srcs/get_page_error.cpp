@@ -28,11 +28,6 @@ std::string	ft::get_page_error(int nbr_error, std::string dir)
 	}
 	std::string	header;
 
-	try {
-		header = std::to_string(ft::make_header(nbr_error).substr(9).length()) + "\r\n\r\n" + ft::make_header(nbr_error).substr(9);
-	} catch (std::exception &e) {
-		header = "0";
-		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
-	}
-	return ("Content-Length: " + header); // Generation de lerreur.. A refaire sur une generation standard
+	header = std::to_string(ft::make_header(nbr_error).substr(9).length()) + "\r\n\r\n" + ft::make_header(nbr_error).substr(9);
+	return ("Content-Length: " + header); // Generation de l'erreur.. A refaire sur une generation standard
 }
