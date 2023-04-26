@@ -26,8 +26,6 @@ std::string	ft::get_page_error(int nbr_error, std::string dir)
 			return ("Content-Length: " + std::to_string(data.length()) + "\r\n\r\n" + data);
 		}
 	}
-	std::string	header;
-
-	header = std::to_string(ft::make_header(nbr_error).substr(9).length()) + "\r\n\r\n" + ft::make_header(nbr_error).substr(9);
+	std::string	header = std::to_string(ft::make_header(nbr_error).substr(9).length()) + "\r\n\r\n" + ft::make_header(nbr_error).substr(9);
 	return ("Content-Length: " + header); // Generation de l'erreur.. A refaire sur une generation standard
 }

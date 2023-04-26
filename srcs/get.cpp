@@ -37,29 +37,8 @@ bool	Client::execute_get()
 	}
 	else
 	{
-		try {
-			this->_data.header = ft::make_header(200);
-			if (this->_data.data_size >= 0)
-			{
-				this->_data.header.append("Content-Length: " + std::to_string(this->_data.data_size) + "\r\n");
-				this->_data.header.append(ft::make_content_type(this->_index.substr(this->_index.find_last_of(".") + 1)));
-			}
-			else
-				this->_data.header.append("\r\n");
-		} catch (std::exception &e) {
-			this->_data.header = "0 No Response\r\n";
-			std::cerr << "The header couldn't be created: " << e.what() << std::endl;
-		}
-		int check = 0;
-		check = send(this->_sock_fd, this->_data.header.c_str(), this->_data.header.length(), 0);
-		if (check == -1)
-			this->make_error(500);
-		if (check == 0)
-			this->make_error(501);
-		if (this->_data.data_size == 0)
-			this->_close = true;
+		send_success_status();
 		//std::cout << BLUE << "\"" << this->_data.header << "\"" << RST << std::endl;
-		this->_sedding = true;
 	}
 	return (false);
 }

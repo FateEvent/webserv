@@ -62,7 +62,8 @@ int main(int ac, char **av) //, char** ev)
 		ft::make_header(0);
 		ft::make_content_type("");
 	} catch (std::exception &e) {
-		std::cerr << "The header couldn't be created: " << e.what() << std::endl;
+		std::cerr << YELLOW << "Webserv couldn't be initialised: " << e.what() << RST << std::endl;
+		return (1);
 	}
 
 	// FIRST PARSE IN MAP STRING STRING
@@ -139,13 +140,7 @@ int main(int ac, char **av) //, char** ev)
 					server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
 				}
 				server.timeout(1);
-				try {
-					server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALLY GOES ONE TIME/REQUEST
-				} catch (std::exception &e) {
-					std::cerr << "Webserv encountered a problem: " << e.what() << std::endl;
-					server.show_client_list();
-					return (1);
-				}
+				server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALLY GOES ONE TIME/REQUEST
 				recept = 0;
 				if (_BROKEN_PIPE)
 				{
@@ -162,7 +157,7 @@ int main(int ac, char **av) //, char** ev)
 		}
 	}
 	catch (std::exception &e) {
-		std::cerr << "Webserv couldn't be initialised: " << e.what() << std::endl;
+		std::cerr << YELLOW << "Webserv couldn't be initialised: " << e.what() << RST << std::endl;
 		return (1);
 	}
 
