@@ -24,13 +24,12 @@ bool _BROKEN_PIPE = false;
 void	Webserv::show_client_list()
 {
 	std::map<int, Client>::iterator first = this->_client.begin(), last = this->_client.end();
-	//std::cout << PURPLE << "The socket of the following client has caused a SIG_PIPE and has to be closed: ";
+	std::cout << PURPLE << "The socket of the following client has caused a SIG_PIPE and has to be closed: ";
 	
 	for (; first != last; ++first)
 	{
 		if (waitpid(first->second.get_pid_cgi(), NULL, 0) != 0)
 		{
-			//std::cout << first->first << RST << std::endl;
 			first->second.clear_header();
 			::close(first->second.get_fd_cgi_0());
 			::close(first->second.get_sockfd());
@@ -139,8 +138,14 @@ int main(int ac, char **av) //, char** ev)
 				server.check_server(); // TO CREATE CLIENT AND ACCEPT SOCKET
 				server.check_client(); // TO IMPLEMENTE HEADER OR CONTINUE WORKING
 			}
-			server.timeout(1);	
-			server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALY GOES ONE TIME/REQUEST
+			server.timeout(1);
+			try {
+				server.exec_client(); // TO LAUNCH CLIENT IF WORKING FALSE, USUALLY GOES ONE TIME/REQUEST
+			} catch (std::exception &e) {
+				std::cerr << "Webserv encountered a problem: " << e.what() << std::endl;
+				server.stop_all();
+				return (1);
+			}
 			recept = 0;
 			if (_BROKEN_PIPE)
 			{

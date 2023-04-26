@@ -30,7 +30,7 @@ bool	ft::parse_header(int fd, s_header &head)
 			return (false);
 			continue;
 		}
-		if (recept == 0 || buffer[0] == 0) // Usualy client close connection...
+		if (recept == 0 || buffer[0] == 0) // Usually client close connection...
 			break;
 		tmp.push_back(buffer[0]);
 	}

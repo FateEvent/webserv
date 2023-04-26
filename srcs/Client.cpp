@@ -204,7 +204,7 @@ bool	Client::continue_client(fd_set *fdset)
 				recept = recv(this->_sock_fd, &buff, 1, 0);
  				if (recept == -1)
 					continue;
-				if (recept == 0 || buff[0] == 0) // Usualy client close connection...
+				if (recept == 0 || buff[0] == 0) // Usually client close connection...
 					break;
 				tmp.push_back(buff[0]);
 			}
