@@ -27,13 +27,12 @@ body {
   
 .header {
 	grid-area: header;
-	background: linear-gradient(45deg, ivory, lightgrey, rgba(245, 245, 245, 0.938));
 	width: 100%;
 	height: auto;
-	position: fixed;
+	position: static;
 	top: 0;
-	left: 0;
 	line-height: 0.7;
+	background: linear-gradient(45deg, ivory, lightgrey, rgba(245, 245, 245, 0.938));
 }
 
 .navbar {
@@ -65,7 +64,6 @@ body {
 }
 
 .title {
-	grid-area: title;
 	font-family: Harrington, 'Permanent Marker', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 	font-size: 2.8rem;
 	text-align: center;
@@ -74,9 +72,9 @@ body {
 
 @media (max-width: 460px) {
 	.title {
-	  font-family: Harrington, 'Permanent Marker', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-	  font-size: 3.5rem;
-	  text-align: center;
+		font-family: Harrington, 'Permanent Marker', 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+		font-size: 3.5rem;
+		text-align: center;
 	}
 }
 
@@ -239,7 +237,7 @@ button[type=button] {
 	width: 100%;
 	font-size: 2rem;
 	line-height: 2.5rem;
-	grid-template-columns: 1fr 4fr 1fr;
+	grid-template-columns: 2fr 3fr 2fr;
 	grid-template-areas:
 	"trademark nothing other-links";
 	background: linear-gradient(45deg, ivory, lightgrey, rgba(245, 245, 245, 0.938));
