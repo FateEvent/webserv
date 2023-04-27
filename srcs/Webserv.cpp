@@ -471,7 +471,7 @@ void	Webserv::check_server()
 			{
 				Client *ret = new Client(this->_base, addr, socklen, sock_fd, head);
 				this->_client.insert(std::make_pair(sock_fd, *ret));
-				std::cout << GREEN << "New bad adress vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+				std::cout << GREEN << "New bad address vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
 				delete ret;
 			}
 			catch (std::exception &e)
