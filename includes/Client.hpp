@@ -76,6 +76,7 @@ class Client
 		Client(config&, sockaddr_in, socklen_t, int, header&);
 		~Client();
 		int							get_sockfd() const;
+		void						set_sockfd(int sock_fd);
 		std::string					get_method() const;
 		time_t						get_time_alive() const;
 		std::string					get_directory() const;

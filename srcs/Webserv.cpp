@@ -472,10 +472,12 @@ void	Webserv::check_server()
 				Client *ret = new Client(this->_base, addr, socklen, sock_fd, head);
 				this->_client.insert(std::make_pair(sock_fd, *ret));
 				std::cout << GREEN << "New bad adress vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+				delete ret;
 			}
 			catch (std::exception &e)
 			{
 				std::cout << e.what() << std::endl;
+				::close(sock_fd);
 			}
 		}
 		else
@@ -485,12 +487,12 @@ void	Webserv::check_server()
 				Client *ret = new Client(serv->second, addr, socklen, sock_fd, head);
 				this->_client.insert(std::make_pair(sock_fd, *ret));
 				std::cout << GREEN << "New vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
+				delete ret;
 			}
 			catch (std::exception &e)
 			{
 				std::cout << PURPLE << "Info: " << e.what() << RST << std::endl;
-				show_client_list();
-				return ;
+				::close(sock_fd);
 			}
 		}
 	}
@@ -508,8 +510,6 @@ void	Webserv::check_server()
 			catch (std::exception &e)
 			{
 				std::cout << PURPLE << "Info: " << e.what() << RST << std::endl;
-				show_client_list();
-				return ;
 			}
 		}
 		FD_CLR(it->second.sock_fd, &this->readfd);
@@ -602,6 +602,7 @@ void	Webserv::exec_client()
 		if (::close(this->_client.find(*it)->second.get_sockfd()) == -1)
 			continue;
 		std::cout << YELLOW << "Close client number: " << *it << RST << std::endl;
+		// this->_client.find(*it)->set_sockfd(-1);
 		this->_client.erase(*it);
 	}
 }

@@ -97,12 +97,15 @@ Client::~Client()
 		::kill(this->_pid_cgi, 2);
 	if (this->_pipe_cgi[0] > 0)
 		::close(this->_pipe_cgi[0]);
+	// if (this->_sock_fd != -1)
+	// 	::close(_sock_fd);
 	if (this->_data.file != 0)
 		delete this->_data.file;
 	this->_ref_conf.nbr_client--;
 }
 
 int				Client::get_sockfd() const 					{ return (this->_sock_fd); }
+void			Client::set_sockfd(int sock_fd)				{ this->_sock_fd = sock_fd; }
 time_t			Client::get_time_alive() const				{ return (this->_timeout); }
 std::string 	Client::get_method() const					{ return (this->_header.Method); }
 std::string		Client::get_directory() const				{ return (this->_header.Dir); }
