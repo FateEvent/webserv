@@ -149,11 +149,11 @@ void	Webserv::stop(config &server)
 	{
 		int yes = 1;
 		struct linger lin;
-lin.l_onoff = 0;
-lin.l_linger = 0;
+		lin.l_onoff = 0;
+		lin.l_linger = 0;
 
-setsockopt(server.sock_fd, SOL_SOCKET, SO_LINGER, (const char *)&lin, sizeof(lin));
-setsockopt(server.sock_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+		setsockopt(server.sock_fd, SOL_SOCKET, SO_LINGER, (const char *)&lin, sizeof(lin));
+		setsockopt(server.sock_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
 
 		shutdown(server.sock_fd,SHUT_RDWR);
 		if (::close(server.sock_fd))
@@ -405,9 +405,9 @@ void	Webserv::fd_rst()
 	for (std::map<int, Client>::iterator it = this->_client.begin();
 			it != this->_client.end(); it++)
 	{
-		if (it->second.get_close())
+		if (it->second.get_close())// && it->second.get_sockfd() > 0)
 			FD_SET(it->first, &this->writefd);
-		if (!it->second.get_close())
+		if (!it->second.get_close())// && it->second.get_sockfd() > 0)
 			FD_SET(it->first, &this->readfd);
 		//if (it->second.is_cgi()) // without in test in moment
 		//	FD_SET(it->second.get_fd_cgi(), &this->readfd);
@@ -602,7 +602,7 @@ void	Webserv::exec_client()
 		if (::close(this->_client.find(*it)->second.get_sockfd()) == -1)
 			continue;
 		std::cout << YELLOW << "Close client number: " << *it << RST << std::endl;
-		// this->_client.find(*it)->set_sockfd(-1);
+		this->_client.find(*it)->second.set_sockfd(-1);
 		this->_client.erase(*it);
 	}
 }
