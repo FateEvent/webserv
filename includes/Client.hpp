@@ -94,7 +94,7 @@ class Client
 		bool						is_working() const;
 		bool						is_cgi() const;
 		bool						is_chunk() const;
-		bool						is_seeding() const;
+		bool						is_sending() const;
 		bool						is_ready() const;
 		bool						is_multipart() const;
 		bool						new_request();

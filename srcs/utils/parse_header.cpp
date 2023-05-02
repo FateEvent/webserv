@@ -6,7 +6,7 @@
 /*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/05/02 17:01:11 by averon           ###   ########.fr       */
+/*   Updated: 2023/05/02 18:33:16 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,9 @@ bool	ft::parse_header(int fd, s_header &head)
 	{
 		recept = recv(fd, &buffer, 1, 0);
  		if (recept == -1)
-		{
-			return (false);	
-		}
+			return (false);
 		if (recept == 0 || buffer[0] == 0) // Usually client close connection...
-			break;
+			break ;
 		tmp.push_back(buffer[0]);
 	}
 	std::cout << PURPLE << tmp << RST << std::endl;
@@ -39,7 +37,6 @@ bool	ft::parse_header(int fd, s_header &head)
 		return (false);
 	else if (recept == -1)	// empty
 	{
-		std::cout << strerror(errno) << std::endl;
 		std::cout << RED << "Not HTTP/1.1 request, connexion closed!" << RST << std::endl;
 		return (false);
 	}

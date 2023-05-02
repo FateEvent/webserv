@@ -14,7 +14,6 @@
 
 bool	Client::execute_post()
 {
-	std::cout << "POST METHOD" << std::endl;
 	if (!(this->_allow >> 1 & 1) && this->_allow != 0)
 	{
 		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
