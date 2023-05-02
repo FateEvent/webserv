@@ -92,10 +92,11 @@ bool	Client::process_multipart()
 		this->_data._in.filename->write(buff, buf_size);
 		if (buf_size < BUFFER_SIZE_MB)
 		{
+			std::cout << "BUFFER_SIZE_MB: " << BUFFER_SIZE_MB << std::endl;
 			this->_data._in.temporary->seekg(this->_data._in.bound_seek.front(), this->_data._in.temporary->beg);
 			this->_data._in.filename->close();
 			delete this->_data._in.filename;
-			this->_data._in.filename =  NULL;
+			this->_data._in.filename = NULL;
 		}
 		//this->_data._in.in_bound = this->_data._in.temporary->tellg();
 		return (false);

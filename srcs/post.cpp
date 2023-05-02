@@ -14,12 +14,11 @@
 
 bool	Client::execute_post()
 {
-	std::cout << "POST METHOD" << std::endl;
 	if (!(this->_allow >> 1 & 1) && this->_allow != 0)
 	{
 		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
 			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
-		std::cout << RED << "False methode POST?" << RST << std::endl;
+		std::cout << RED << "false method POST?" << RST << std::endl;
 		this->make_error(405);
 		return (false);
 	}

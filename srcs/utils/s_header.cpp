@@ -68,9 +68,10 @@ void	s_header::print_all()
 	std::cout << "Time Out       : \"" << time_out << "\"" << std::endl;
 	std::cout << "Get variables  : \"" << get_var << "\"" << std::endl;
 	std::cout << "FILE FIRST     : \"" << file.first << "\"" << std::endl;
-	std::cout << "FILE SECOND    : \"" << file.second << "\"" << std::endl << std::endl;
+	std::cout << "FILE SECOND    : \"" << file.second << "\"" << std::endl;
 	for (std::map<std::string, std::string>::iterator it = other.begin(); it != other.end(); it++) // ok
 		std::cout << "Other          : \"" << it->first << "\" = \"" << it->second << "\"" << std::endl;
+	std::cout << std::endl;
 }
 
 bool	s_header::split_dir()

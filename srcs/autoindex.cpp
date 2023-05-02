@@ -31,16 +31,10 @@ std::stringstream *ft::listing_creator(char const *directory, std::string here)
 		*str << "\t\t</table>\n\t</body>\n</html>\n";
 		closed = closedir(dir);
 		if (closed)
-		{
-			std::cerr << strerror(errno) << std::endl;
 			throw std::invalid_argument("Couldn't close the directory stream!");
-		}
 		return (str);
 	}
 	else
-	{
-		std::cerr << strerror(errno) << std::endl;
 		throw std::invalid_argument("Invalid or unexisting directory!");
-	}
 	return (0);
 }

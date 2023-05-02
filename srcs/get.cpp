@@ -14,10 +14,9 @@
 
 bool	Client::execute_get()
 {
-	std::cout << "GET METHOD" << std::endl;
 	if (!(this->_allow & 1) && this->_allow != 0)
 	{
-		std::cout << RED << "False methode GET?" << RST << std::endl;
+		std::cout << RED << "false method GET?" << RST << std::endl;
 		this->make_error(405);
 		return (false);
 	}

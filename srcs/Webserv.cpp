@@ -112,7 +112,7 @@ void	Webserv::prepare(config &instance)
 		}
 	}
 	else
-		std::cout << "Info: " + instance.name + " have already a socket!" << std::endl;
+		std::cout << "Info: " + instance.name + " has already a socket!" << std::endl;
 }
 
 /**
@@ -456,6 +456,7 @@ void	Webserv::check_server()
 		if (sock_fd == -1)
 			goto spring_block;
 		fcntl(sock_fd, F_SETFL, O_NONBLOCK);
+		usleep(200);
 		if (!ft::parse_header(sock_fd, head))
 		{
 			::close(sock_fd);
@@ -471,12 +472,10 @@ void	Webserv::check_server()
 			{
 				Client *ret = new Client(this->_base, addr, socklen, sock_fd, head);
 				this->_client.insert(std::make_pair(sock_fd, *ret));
-				std::cout << GREEN << "New bad adress vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
 				delete ret;
 			}
 			catch (std::exception &e)
 			{
-				std::cout << e.what() << std::endl;
 				::close(sock_fd);
 			}
 		}
@@ -486,12 +485,10 @@ void	Webserv::check_server()
 			{
 				Client *ret = new Client(serv->second, addr, socklen, sock_fd, head);
 				this->_client.insert(std::make_pair(sock_fd, *ret));
-				std::cout << GREEN << "New vhost client accepted on connexion number " << ret->get_sockfd() << "." << RST << std::endl;
 				delete ret;
 			}
 			catch (std::exception &e)
 			{
-				std::cout << PURPLE << "Info: " << e.what() << RST << std::endl;
 				::close(sock_fd);
 			}
 		}
@@ -545,7 +542,7 @@ void	Webserv::check_client()
 	{
 		for (std::map<int, Client*>::iterator it = to_close.begin(); it != to_close.end(); ++it)
 		{
-			if (it->second->is_seeding() == false)
+			if (it->second->is_sending() == false)
 				it->second->kill_cgi();
 			std::cout << GREEN << "Connexion number: " << it->first << " close" << RST << std::endl;
 			::close(it->first);
@@ -560,11 +557,14 @@ void	Webserv::exec_client()
 	std::time_t now = std::time(NULL);
 	for (std::map<int, Client>::iterator it = this->_client.begin(); it != this->_client.end(); ++it)
 	{
-		if (!it->second.is_seeding() && it->second.get_timeout() > 0 && now > it->second.get_timeout())
+		if (!it->second.is_sending() && it->second.get_timeout() > 0 && now > it->second.get_timeout())
 		{
 			std::cout << YELLOW << "TIMEOUT CLIENT NUMBER: " << it->first << RST << std::endl;
 			if (!it->second.get_method().empty())
+			{
 				it->second.make_error(408);
+				it->second.set_timeout(1);
+			}
 			else
 				toclose.push_back(it->first);
 			continue;
@@ -580,19 +580,19 @@ void	Webserv::exec_client()
 				it->second.kill_cgi();
 			}
 		}
-		else if (!it->second.is_seeding() && (it->second.get_method().compare("NOT") == 0))
+		else if (!it->second.is_sending() && (it->second.get_method().compare("NOT") == 0))
 			it->second.make_error(501);
-		else if (!it->second.is_seeding() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
+		else if (!it->second.is_sending() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
 			it->second.make_error(405);
-		else if (!it->second.is_seeding() && it->second.is_ready() && it->second.get_pid_cgi() == 0 && !it->second.is_multipart() && !it->second.is_chunk()) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_seeding() && it->second.is_ready())
+		else if (!it->second.is_sending() && it->second.is_ready() && it->second.get_pid_cgi() == 0 && !it->second.is_multipart() && !it->second.is_chunk()) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_sending() && it->second.is_ready())
 		{
 			//std::cout << YELLOW << "EXECUTION CLIENT NUMBER: " << it->first << RST << std::endl;
 			if (it->second.execute_client(it->second.check_location()))
 				it->second.clear_header();
 		}
-		else if ((it->second.is_seeding() && it->second.is_ready()) || it->second.is_cgi() || it->second.is_multipart() || it->second.is_chunk())
+		else if ((it->second.is_sending() && it->second.is_ready()) || it->second.is_cgi() || it->second.is_multipart() || it->second.is_chunk())
 		{
-			//std::cout << YELLOW << "Seeding client number: " << it->first << RST << std::endl;
+			//std::cout << YELLOW << "Sending client number: " << it->first << RST << std::endl;
 			if (!it->second.continue_client(&this->readfd))
 				this->timeout(0);
 		}
