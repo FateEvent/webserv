@@ -96,7 +96,10 @@ Client::~Client()
 	if (this->_pid_cgi > 0)
 		::kill(this->_pid_cgi, 2);
 	if (this->_pipe_cgi[0] > 0)
+	{
+		std::cout << "close ~ this->_pipe_cgi[0]" << this->_pipe_cgi[0] << std::endl;
 		::close(this->_pipe_cgi[0]);
+	}
 	// if (this->_sock_fd != -1)
 	// 	::close(_sock_fd);
 	if (this->_data.file != 0)
