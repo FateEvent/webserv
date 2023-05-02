@@ -32,7 +32,6 @@ void	Webserv::show_client_list()
 			first->second.clear_header();
 			::close(first->second.get_fd_cgi_0());
 			::close(first->second.get_sockfd());
-			std::cout << GREEN << "The socket " << first->first <<  " has been closed." << RST << std::endl;
 			this->_client.erase(first);
 			return ;
 		}
@@ -41,7 +40,7 @@ void	Webserv::show_client_list()
 
 void	sigpipe_solving(int signal)
 {
-	std::cout << YELLOW << "Reception of a signal " << signal << RST << std::endl;
+	(void)signal;
 	_BROKEN_PIPE = true;
 }
 
@@ -151,7 +150,6 @@ int main(int ac, char **av) //, char** ev)
 			std::cout << RED << "EXIT PROGRAM" << RST << std::endl;
 			server.stop_all();
 		} catch (std::exception &e) {
-			std::cerr << "Webserv encountered a problem: " << e.what() << std::endl;
 			server.stop_all();
 			return (1);
 		}

@@ -101,12 +101,12 @@
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="nHaCIXskjP1a-PBL-bLx-9" value="ready but not seeding" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="j5luijee8m4oYJYaj9H2-53" vertex="1" connectable="0">
+                <mxCell id="nHaCIXskjP1a-PBL-bLx-9" value="ready but not sending" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="j5luijee8m4oYJYaj9H2-53" vertex="1" connectable="0">
                     <mxGeometry x="-0.3976" y="-1" relative="1" as="geometry">
                         <mxPoint as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="HqOk_YzYO7hrj4Uxzlcc-22" value="Verification du client si header ok, si ready, si seeding." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="HqOk_YzYO7hrj4Uxzlcc-442" vertex="1">
+                <mxCell id="HqOk_YzYO7hrj4Uxzlcc-22" value="Verification du client si header ok, si ready, si sending." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="HqOk_YzYO7hrj4Uxzlcc-442" vertex="1">
                     <mxGeometry x="35" y="821" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="HqOk_YzYO7hrj4Uxzlcc-32" value="&lt;font color=&quot;#000000&quot;&gt;method?&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="HqOk_YzYO7hrj4Uxzlcc-442" vertex="1">
@@ -415,7 +415,7 @@
                 <mxCell id="HqOk_YzYO7hrj4Uxzlcc-132" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="HqOk_YzYO7hrj4Uxzlcc-442" source="HqOk_YzYO7hrj4Uxzlcc-93" target="HqOk_YzYO7hrj4Uxzlcc-65" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="9" value="seeding = true" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="HqOk_YzYO7hrj4Uxzlcc-442" source="HqOk_YzYO7hrj4Uxzlcc-22" target="HqOk_YzYO7hrj4Uxzlcc-65" edge="1">
+                <mxCell id="9" value="sending = true" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="HqOk_YzYO7hrj4Uxzlcc-442" source="HqOk_YzYO7hrj4Uxzlcc-22" target="HqOk_YzYO7hrj4Uxzlcc-65" edge="1">
                     <mxGeometry x="-0.2292" relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="190" y="866"/>
@@ -809,7 +809,7 @@
                         <mxRectangle width="120" height="30" as="alternateBounds"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="4" value="_seeding" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;" parent="2" vertex="1">
+                <mxCell id="4" value="_sending" style="shape=partialRectangle;connectable=0;fillColor=none;top=0;left=0;bottom=0;right=0;align=left;spacingLeft=6;overflow=hidden;" parent="2" vertex="1">
                     <mxGeometry x="120" width="130" height="30" as="geometry">
                         <mxRectangle width="130" height="30" as="alternateBounds"/>
                     </mxGeometry>

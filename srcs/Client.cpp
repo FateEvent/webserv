@@ -20,10 +20,7 @@ Client::Client(config &config) : _ref_conf(config)
 	//const int set = 1;
 	//setsockopt(this->_sock_fd, SOL_SOCKET, SO_REUSEPORT, &set, sizeof(set));
 	if (this->_sock_fd <= 0)
-	{
-		std::cerr << strerror(errno) << std::endl;
 		throw std::invalid_argument("Socket error in constructor Client!");
-	}
 	fcntl(this->_sock_fd, F_SETFL, O_NONBLOCK);
 }
 
@@ -98,7 +95,10 @@ Client::~Client()
 	if (this->_pipe_cgi[0] > 0)
 		::close(this->_pipe_cgi[0]);
 	// if (this->_sock_fd != -1)
+	// {
+	// 	std::cout << "-1 here and there" << std::endl;
 	// 	::close(_sock_fd);
+	// }
 	if (this->_data.file != 0)
 		delete this->_data.file;
 	this->_ref_conf.nbr_client--;
@@ -116,7 +116,7 @@ header*			Client::get_header()						{ return (&this->_header); }
 const config*	Client::get_config() const					{ return (&this->_ref_conf); }
 bool			Client::is_cgi() const						{ return (this->_cgi?true:false); }
 bool			Client::is_multipart() const				{ return (this->_multipart); }
-bool			Client::is_seeding() const					{ return (this->_sedding?true:false); }
+bool			Client::is_sending() const					{ return (this->_sedding?true:false); }
 bool			Client::is_ready() const					{ return (this->_ready?true:false); }
 unsigned int	Client::get_nbr_connected_client() const	{ return (this->_ref_conf.nbr_client); }
 void			Client::add_nbr_client()					{ this->_ref_conf.nbr_client++; }
@@ -155,10 +155,7 @@ bool	Client::send_data(int fd)
 	int size;
 	socklen_t len = sizeof(size);
 	if (getsockopt(this->_sock_fd, SOL_SOCKET, SO_SNDBUF, &size, &len) == -1)
-	{
-		std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
 		return (false);
-	}
 	this->_data.file->clear();
 	this->_data.file->seekg(this->_data.data_sended - 1, this->_data.file->beg);
 	char buff[size + 1];
@@ -187,7 +184,6 @@ bool	Client::continue_client(fd_set *fdset)
 			delete this->_data.file;
 			this->_data.file = 0;
 			::shutdown(this->_sock_fd, SHUT_WR);
-			std::cout << YELLOW << "Sending finish for socket " << this->_sock_fd << RST << std::endl;
 			return (true);
 		}
 	}
@@ -275,15 +271,13 @@ bool	Client::execute_client(bool path)
 		#ifdef DEBUG
 			std::cout << PURPLE << "The file hasn't been found or can't be opened!" << RST << std::endl;
 		#endif
-		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
-			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
+		shutdown(this->_sock_fd, SHUT_RD);
 		this->make_error(404);
 	}
 	// MAY BE TEST CGI HERE AND NOT IN GET,POST OR DELETE METHODE
 	else if (_header.Method.compare("GET") == 0)
 	{
-		if (shutdown(this->_sock_fd, SHUT_RD) == -1)
-			std::cout << RED << "SOCKET PROBLEM!" << RST << std::endl;
+		shutdown(this->_sock_fd, SHUT_RD);
 		return (this->execute_get());
 	}
 	else if (_header.Method.compare("POST") == 0)
@@ -363,8 +357,7 @@ void	Client::make_error(int i)
 	this->_data.file = new std::stringstream();
 	std::string	header;
 		header = ft::make_header(i);
-	if (send(this->_sock_fd, header.c_str(), header.length(), 0) == -1)
-		std::cout << "SENDING ERROR!" << std::endl;
+	send(this->_sock_fd, header.c_str(), header.length(), 0);
 	if (!this->_redirect.empty())
 		*static_cast<std::stringstream*>(_data.file) << ("Location: " + this->_redirect + "\r\n\r\n");
 	*static_cast<std::stringstream*>(_data.file) << ft::get_page_error(i,
