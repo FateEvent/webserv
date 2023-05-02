@@ -156,8 +156,12 @@ setsockopt(server.sock_fd, SOL_SOCKET, SO_LINGER, (const char *)&lin, sizeof(lin
 setsockopt(server.sock_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
 
 		shutdown(server.sock_fd,SHUT_RDWR);
+		std::cout << "close?" << server.sock_fd << std::endl;
 		if (::close(server.sock_fd))
+		{
+			std::cout << "closed!" << std::endl;
 			return; //throw std::invalid_argument("intern problem.");
+		}
 		
 		//unbind(server.sock_fd, reinterpret_cast<sockaddr *>(&server.addr), sizeof(server.addr));
 		server.sock_fd = -1;
@@ -458,7 +462,9 @@ void	Webserv::check_server()
 		fcntl(sock_fd, F_SETFL, O_NONBLOCK);
 		if (!ft::parse_header(sock_fd, head))
 		{
+			std::cout << "closing: " << sock_fd << std::endl << "header: " << head.Method << std::endl;
 			::close(sock_fd);
+			std::cout << "close 1" << std::endl;
 			goto spring_block;
 		}
 		std::map<std::string, config>::iterator serv = this->_servers.find(head.Host);
@@ -477,7 +483,9 @@ void	Webserv::check_server()
 			catch (std::exception &e)
 			{
 				std::cout << e.what() << std::endl;
+				std::cout << "closing: " << sock_fd << std::endl;
 				::close(sock_fd);
+				std::cout << "close 2" << std::endl;
 			}
 		}
 		else
@@ -492,7 +500,9 @@ void	Webserv::check_server()
 			catch (std::exception &e)
 			{
 				std::cout << PURPLE << "Info: " << e.what() << RST << std::endl;
+				std::cout << "closing: " << sock_fd << std::endl;
 				::close(sock_fd);
+				std::cout << "close 3" << std::endl;
 			}
 		}
 	}
@@ -549,6 +559,8 @@ void	Webserv::check_client()
 				it->second->kill_cgi();
 			std::cout << GREEN << "Connexion number: " << it->first << " close" << RST << std::endl;
 			::close(it->first);
+			std::cout << "close 4" << std::endl;
+
 			this->_client.erase(it->first);
 		}
 	}
@@ -564,7 +576,10 @@ void	Webserv::exec_client()
 		{
 			std::cout << YELLOW << "TIMEOUT CLIENT NUMBER: " << it->first << RST << std::endl;
 			if (!it->second.get_method().empty())
+			{
 				it->second.make_error(408);
+				it->second.set_timeout(1);
+			}
 			else
 				toclose.push_back(it->first);
 			continue;
@@ -600,7 +615,10 @@ void	Webserv::exec_client()
 	for (std::list<int>::iterator it = toclose.begin(); it != toclose.end(); it++)
 	{
 		if (::close(this->_client.find(*it)->second.get_sockfd()) == -1)
+		{
 			continue;
+			std::cout << "close 5" << std::endl;
+		}
 		std::cout << YELLOW << "Close client number: " << *it << RST << std::endl;
 		// this->_client.find(*it)->set_sockfd(-1);
 		this->_client.erase(*it);

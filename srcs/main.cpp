@@ -30,7 +30,9 @@ void	Webserv::show_client_list()
 		if (waitpid(first->second.get_pid_cgi(), NULL, 0) != 0)
 		{
 			first->second.clear_header();
+			std::cout << "close client_list 1: " << first->second.get_fd_cgi_0() << std::endl;
 			::close(first->second.get_fd_cgi_0());
+			std::cout << "close client_list 2: " << first->second.get_sockfd() << std::endl;
 			::close(first->second.get_sockfd());
 			std::cout << GREEN << "The socket " << first->first <<  " has been closed." << RST << std::endl;
 			this->_client.erase(first);
