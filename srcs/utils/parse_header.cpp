@@ -26,12 +26,9 @@ bool	ft::parse_header(int fd, s_header &head)
 	{
 		recept = recv(fd, &buffer, 1, 0);
  		if (recept == -1)
-		{
 			return (false);
-			continue;
-		}
 		if (recept == 0 || buffer[0] == 0) // Usually client close connection...
-			break;
+			break ;
 		tmp.push_back(buffer[0]);
 	}
 	std::cout << PURPLE << tmp << RST << std::endl;
@@ -39,7 +36,6 @@ bool	ft::parse_header(int fd, s_header &head)
 		return (false);
 	else if (recept == -1)	// empty
 	{
-		std::cout << strerror(errno) << std::endl;
 		std::cout << RED << "Not HTTP/1.1 request, connexion closed!" << RST << std::endl;
 		return (false);
 	}
