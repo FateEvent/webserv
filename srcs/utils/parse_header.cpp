@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_header.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:09:13 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/21 11:06:12 by stissera         ###   ########.fr       */
+/*   Updated: 2023/05/02 17:01:11 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,13 @@ bool	ft::parse_header(int fd, s_header &head)
 	size_t 						e_str;
 	ssize_t						recept = 1;
 
+	usleep(150);
 	while (tmp.find("\r\n\r\n") == tmp.npos)
 	{
 		recept = recv(fd, &buffer, 1, 0);
  		if (recept == -1)
 		{
-			return (false);
-			continue;
+			return (false);	
 		}
 		if (recept == 0 || buffer[0] == 0) // Usually client close connection...
 			break;
