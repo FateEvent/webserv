@@ -506,7 +506,7 @@ void	Webserv::check_server()
 			}
 			catch (std::exception &e)
 			{
-				std::cout << PURPLE << "Info: " << e.what() << RST << std::endl;
+				;
 			}
 		}
 		FD_CLR(it->second.sock_fd, &this->readfd);
