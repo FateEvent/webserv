@@ -37,7 +37,6 @@ std::string ft::make_header(int http_err)
 
 	if (it != head_err.end())
 		header = "HTTP/1.1 " + std::to_string(it->first) + " " + it->second + "\r\n";
-
 	return (header);
 }
 

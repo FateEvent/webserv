@@ -33,7 +33,7 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_pipe_cgi[1] = 0;
 	this->_pid_cgi = 0;
 	this->_cgi = false;
-	this->_sedding = false;
+	this->_sending = false;
 	this->_response.clear();
 	this->_root.clear();
 	this->_index.clear();
@@ -66,7 +66,7 @@ void	Client::clear_header()
 	this->_pid_cgi = 0;
 	this->_allow = 0x000;
 	this->_cgi = false;
-	this->_sedding = false;
+	this->_sending = false;
 	this->_response.clear();
 	this->_root.clear();
 	this->_index.clear();
@@ -116,7 +116,7 @@ header*			Client::get_header()						{ return (&this->_header); }
 const config*	Client::get_config() const					{ return (&this->_ref_conf); }
 bool			Client::is_cgi() const						{ return (this->_cgi?true:false); }
 bool			Client::is_multipart() const				{ return (this->_multipart); }
-bool			Client::is_sending() const					{ return (this->_sedding?true:false); }
+bool			Client::is_sending() const					{ return (this->_sending?true:false); }
 bool			Client::is_ready() const					{ return (this->_ready?true:false); }
 unsigned int	Client::get_nbr_connected_client() const	{ return (this->_ref_conf.nbr_client); }
 void			Client::add_nbr_client()					{ this->_ref_conf.nbr_client++; }
@@ -174,12 +174,12 @@ bool	Client::send_data(int fd)
 bool	Client::continue_client(fd_set *fdset)
 {
 	(void)fdset;
-	if (this->_sedding)
+	if (this->_sending)
 	{
 		if (this->send_data(this->_sock_fd))
 		{
 			//this->clear_header();
-			this->_sedding = false;
+			this->_sending = false;
 			this->_close = true;
 			delete this->_data.file;
 			this->_data.file = 0;
@@ -221,7 +221,7 @@ bool	Client::continue_client(fd_set *fdset)
 				{
 					cgi_prepare_to_send();
 					close(this->_pipe_cgi[0]);
-					this->_sedding = true;
+					this->_sending = true;
 				}
 				//else if (taking == -1)
 				//	std::cout << RED << "Read error -1 for cgi" << RST << std::endl;
@@ -247,7 +247,7 @@ bool	Client::continue_client(fd_set *fdset)
 				this->make_error(500);
 			if (check == 0)
 				this->make_error(501);
-			this->_sedding = true;
+			this->_sending = true;
 		}
 	}
 	else
@@ -285,7 +285,9 @@ bool	Client::execute_client(bool path)
 	else if (_header.Method.compare("DELETE") == 0)
 		return (this->execute_delete());	
 	else
-		std::cout << "BAD REQUEST / BAD HEADER" << std::endl; // Should not goto inside.
+	{
+		std::cout << "BAD REQUEST / BAD HEADER: " << _header.Method << std::endl; // Should not goto inside.
+	}
 	return (false);
 }
 
@@ -370,7 +372,7 @@ void	Client::make_error(int i)
 	this->_data.data_size = this->_data.file->tellg();
 	this->_data.file->clear();
 	this->_data.file->seekg(0, this->_data.file->beg);
-	this->_sedding = true;
+	this->_sending = true;
 }
 
 void	Client::chunk()
@@ -503,5 +505,5 @@ void	Client::send_success_status()
 		this->make_error(501);
 	if (this->_data.data_size == 0)
 		this->_close = true;
-	this->_sedding = true;
+	this->_sending = true;
 }
