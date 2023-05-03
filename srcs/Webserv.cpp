@@ -585,7 +585,7 @@ void	Webserv::exec_client()
 		else if (!it->second.is_sending() && (it->second.get_method().compare("NOT") == 0))
 			it->second.make_error(501);
 		else if (!it->second.is_sending() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))
-			it->second.make_error(405);
+			it->second.make_error(400);
 		else if (!it->second.is_sending() && it->second.is_ready() && it->second.get_pid_cgi() == 0 && !it->second.is_multipart() && !it->second.is_chunk()) // else if (!it->second.get_method().empty() && !it->second.is_working() && !it->second.is_sending() && it->second.is_ready())
 		{
 			//std::cout << YELLOW << "EXECUTION CLIENT NUMBER: " << it->first << RST << std::endl;
