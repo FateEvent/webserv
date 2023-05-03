@@ -63,7 +63,7 @@ class Client
 		bool						_cgi;
 		bool						_multipart;
 		fd_set						_readfd;
-		bool						_sedding;
+		bool						_sending;
 		struct s_clt_data			_data;
 		bool						_ready;
 		bool						_close;
