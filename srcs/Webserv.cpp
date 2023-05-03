@@ -580,6 +580,8 @@ void	Webserv::exec_client()
 				it->second.kill_cgi();
 			}
 		}
+		else if (!it->second.is_sending() && (it->second.get_method().compare("HEAD") == 0))
+			it->second.send_success_status();
 		else if (!it->second.is_sending() && (it->second.get_method().compare("NOT") == 0))
 			it->second.make_error(501);
 		else if (!it->second.is_sending() && (it->second.get_method().compare("BAD") == 0 || it->second.get_method().compare("CLOSE") == 0))

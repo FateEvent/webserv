@@ -66,10 +66,14 @@ bool	ft::parse_header(int fd, s_header &head)
 		else if (it->find("PUT /") != it->npos)
 			head.Method = "NOT";
 		else if (it->find("HEAD /") != it->npos)
-			head.Method = "NOT";
+			head.Method = "HEAD";
 		else if (it->find("PATCH /") != it->npos)
 			head.Method = "NOT";
-		else if (it->find("OPTION /") != it->npos)
+		else if (it->find("OPTIONS /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("COPY /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("PURGE /") != it->npos)
 			head.Method = "NOT";
 		else
 		{
