@@ -61,19 +61,31 @@ bool	ft::parse_header(int fd, s_header &head)
 			head.Method = "GET";
 		else if (it->find("POST /") != it->npos)
 			head.Method = "POST";
+		else if (it->find("PUT /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("PATCH /") != it->npos)
+			head.Method = "NOT";
 		else if (it->find("DELETE /") != it->npos)
 			head.Method = "DELETE";
-		else if (it->find("PUT /") != it->npos)
+		else if (it->find("COPY /") != it->npos)
 			head.Method = "NOT";
 		else if (it->find("HEAD /") != it->npos)
 			head.Method = "HEAD";
-		else if (it->find("PATCH /") != it->npos)
-			head.Method = "NOT";
 		else if (it->find("OPTIONS /") != it->npos)
 			head.Method = "NOT";
-		else if (it->find("COPY /") != it->npos)
+		else if (it->find("LINK /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("UNLINK /") != it->npos)
 			head.Method = "NOT";
 		else if (it->find("PURGE /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("LOCK /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("UNLOCK /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("PROPFIND /") != it->npos)
+			head.Method = "NOT";
+		else if (it->find("VIEW /") != it->npos)
 			head.Method = "NOT";
 		else
 		{
