@@ -15,12 +15,12 @@
         <?php
             if($id_session)
 			{
-                echo 'ID found! id session: ' .$id_session. '<br>';
+                echo 'PHP id session: ' .$id_session. '<br>';
             }
             echo '<br><br>';
             if(isset($_COOKIE['PHPSESSID']))
 			{
-                echo 'ID cookie : <br>' .$_COOKIE['PHPSESSID'];
+                echo 'ID cookie : ' .$_COOKIE['PHPSESSID'] . ' <br>';
             }
 
 			if(isset($_SESSION['test']))

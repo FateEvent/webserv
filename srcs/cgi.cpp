@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: stissera <stissera@student.42.fr>          +#+  +:+       +#+        */
+/*   By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/20 19:53:10 by stissera          #+#    #+#             */
-/*   Updated: 2023/04/22 02:27:20 by stissera         ###   ########.fr       */
+/*   Updated: 2023/05/04 14:25:55 by averon           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ int	Client::launch_cgi(std::string path)
 		cookie.resize(cookie.size() - 2);
 		env.push_back("HTTP_COOKIE=" + cookie); // Les cookies HTTP envoyés avec la requête.
 	}
+	env.push_back("REDIRECT_STATUS=CGI");
 	std::string remote = "REMOTE_ADDR=";
 	remote += inet_ntoa(this->_addr.sin_addr);
 	env.push_back(remote); // L'adresse IP de l'utilisateur qui a envoyé la requête.
