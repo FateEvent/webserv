@@ -18,7 +18,7 @@ s_clt_data::s_clt_data()
 	minus_header = 0;
 	header.clear();
 	data_size = 0;
-	data_sended = 1;
+	data_sent = 1;
 	wsatus = 0;
 	wpid = -1;
 }

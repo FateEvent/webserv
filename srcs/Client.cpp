@@ -43,7 +43,7 @@ Client::Client(config &config, sockaddr_in sock, socklen_t len, int fd, header& 
 	this->_max_body = 0;
 	this->_redirect.clear();
 	this->other.clear();
-	this->_data.data_sended = 1;
+	this->_data.data_sent = 1;
 	this->_data.data_size = 0;
 	this->_data.header.clear();
 	this->_data.file = NULL;
@@ -76,7 +76,7 @@ void	Client::clear_header()
 	this->_cgi_call.clear();
 	this->_max_body = 0;
 	this->other.clear();
-	this->_data.data_sended = 1;
+	this->_data.data_sent = 1;
 	this->_data.data_size = 0;
 	this->_data.header.clear();
 	if (this->_data.file != 0)
@@ -157,14 +157,14 @@ bool	Client::send_data(int fd)
 	if (getsockopt(this->_sock_fd, SOL_SOCKET, SO_SNDBUF, &size, &len) == -1)
 		return (false);
 	this->_data.file->clear();
-	this->_data.file->seekg(this->_data.data_sended - 1, this->_data.file->beg);
+	this->_data.file->seekg(this->_data.data_sent - 1, this->_data.file->beg);
 	char buff[size + 1];
 	std::memset(buff, 0, size + 1);
 	this->_data.file->read(buff, size);
 	ssize_t s = send(fd, buff, this->_data.file->gcount(), 0);
 	if (s > 0)
-		this->_data.data_sended += s;
-	if (this->_data.data_sended >= this->_data.data_size)
+		this->_data.data_sent += s;
+	if (this->_data.data_sent >= this->_data.data_size)
 		return (true);
 	//if (s <= 0)
 	//	return (false);
