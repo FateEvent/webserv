@@ -383,12 +383,10 @@ void	Client::chunk()
 	std::memset(buff, 0, 2);
 	// READ SOCKET JJUSQUA \R\N
 	//COVERTI EN INT
-	//
 	while (this->_data._in.receipt > 0)
 	{
 		this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
 		this->_data._in.file_buf += buff[0];
-		std::cout << GREEN << buff[0];
 		if (buff[0] == '\n')
 			break;
 	}
@@ -410,7 +408,6 @@ void	Client::chunk()
 			{
 				this->_data._in.receipt = recv(this->_sock_fd, &buff, 1, 0);
 				this->_data._in.file_buf.append(&buff[0]);
-				std::cout << PURPLE << buff[0];
 				--len;
 			}
 			*(this->_data._in.temporary) << this->_data._in.file_buf;
