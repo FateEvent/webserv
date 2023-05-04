@@ -26,7 +26,7 @@ std::stringstream *ft::listing_creator(char const *directory, std::string here)
 			stat(path.c_str(), &filestat);
 			time_str = std::asctime(std::localtime(&filestat.st_mtime));
 			time_str.pop_back();
-			*str << "\t\t\t<tr>\n\t\t\t\t<td><a href=\"" << here << ent->d_name << "\">" << ent->d_name << "</a></td>\n\t\t\t\t<td>" << ent->d_reclen << " bytes</td>\n\t\t\t\t<td>" << time_str << "</td>\n\t\t\t</tr>\n";
+			*str << "\t\t\t<tr>\n\t\t\t\t<td><a href=\"" << here << ent->d_name << "\">" << ent->d_name << "</a></td>\n\t\t\t\t<td>" << filestat.st_size << " bytes</td>\n\t\t\t\t<td>" << time_str << "</td>\n\t\t\t</tr>\n";
 		}
 		*str << "\t\t</table>\n\t</body>\n</html>\n";
 		closed = closedir(dir);
