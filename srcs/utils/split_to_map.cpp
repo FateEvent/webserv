@@ -58,18 +58,13 @@ bool	ft::split_to_mapss(std::map<std::string, std::string> &mapss, std::string l
 	{
 		if (line.find_first_of("=") == line.npos)
 			return (false);
-	//	std::cout << "Key:   " << line.substr(0, line.find_first_of("=")) << std::endl;
-	//	std::cout << "Value: " << line.substr(line.find_first_of("=") + 1,
-	//											line.find_first_of(";") - line.find_first_of("=") - 1) << std::endl;
 		mapss.insert(std::make_pair<std::string, std::string>(
 						line.substr(line.find_first_not_of(" \t\v\n"), line.find_first_of("=") - line.find_first_not_of(" \t\v\n")),
 						line.substr(line.find_first_of("=") + 1, line.find_first_of(sep) - line.find_first_of("=") - 1)));
 		line = line.substr(i + 1);
 	}
-	//std::cout <<  "Key:   " << line.substr(0, line.find_first_of("=")) << std::endl;
-	//std::cout <<  "Value: " << line.substr(line.find_first_of("=") + 1, line.length()) << std::endl;
 	mapss.insert(std::make_pair<std::string, std::string>(
-						line.substr(line.find_first_not_of(" \t\v\n"), line.find_first_of("=") - 1),
+						line.substr(line.find_first_not_of(" \t\v\n"), line.find_first_of("=") - line.find_first_not_of(" \t\v\n")),
 						line.substr(line.find_first_of("=") + 1, line.find_last_not_of(" \r\n") - line.find_first_of("="))));
 	return (true);
 }

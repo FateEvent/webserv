@@ -133,7 +133,7 @@ typedef struct s_clt_data
 	size_t					minus_header; // substract this number on data_size before make header (for content-length)
 	std::string				header;
 	ssize_t					data_size;
-	ssize_t					data_sended;
+	ssize_t					data_sent;
 	int						wsatus; // status du fork
 	int						wpid; // status de la reception
 	//std::FILE				*cgi_return;

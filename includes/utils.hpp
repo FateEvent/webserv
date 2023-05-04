@@ -13,7 +13,7 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
-//#define DEBUG
+#define DEBUG
 #include <iostream>
 #include <fstream>
 #include <cstring>
