@@ -6,9 +6,6 @@ echo "content-type: text/html; charset=UTF-8\r\n\r\n";
 <!-- Contrbuted by GS -->
 <html><head></head><body>
 <?php
-while (list($var,$value) = each ($_ENV)) {
-    echo "$var => $value <br />";
-}
 
 echo "Début de l'attente...\n";
 sleep(30);

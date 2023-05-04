@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: stissera <stissera@student.42.fr>          +#+  +:+       +#+         #
+#    By: averon <averon@student.42Mulhouse.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/03/10 10:20:15 by stissera          #+#    #+#              #
-#    Updated: 2023/04/22 01:35:46 by stissera         ###   ########.fr        #
+#    Updated: 2023/05/04 16:13:12 by averon           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		=	webserv
 CC			=	c++
-FLAGS		=	-Wall -Werror -Wextra -std=c++11 -Og -g -fsanitize=address
+FLAGS		=	-Wall -Werror -Wextra -std=c++98 -Og -g -fsanitize=address
 INCLUDES	=	./includes/utils.h
 FILES		=	utils/file_to_map.cpp \
 				utils/multi_to_config.cpp \
