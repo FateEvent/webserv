@@ -29,8 +29,10 @@ body {
 	grid-area: header;
 	width: 100%;
 	height: auto;
-	position: static;
-	top: 0;
+	/* To attach the navbar to the top of the page */
+	position: fixed;
+	top: 0px;
+
 	line-height: 0.7;
 	background: linear-gradient(45deg, ivory, lightgrey, rgba(245, 245, 245, 0.938));
 }
@@ -187,30 +189,29 @@ img {
 	display: inline-block;
 	border: solid 2px;
 	text-align: center;
-	flex: 50px;
+	flex: 25px;
 	flex-wrap: wrap;
 	margin: 5px;
+	height: fit-content;
 }
 
 .offer-title {
 	font-size: 2.5rem;
 	margin-top: 0%;
 	background-color: lightgrey;
-	align-self: flex-start;
 	align-content: center;
 }
 
 .offer-content {
-	font-size: 1rem;
-	align-self: flex-start;
-	justify-content: justify;
 	margin-left: 5px;
 	margin-right: 5px;
-	height: fit-content;
+}
+
+.offer-content h2 {
+	font-size: 2rem;
 }
 
 .info {
-	align-self: flex-end;
 	align-content: center;
 }
 
@@ -219,6 +220,7 @@ button[type=button] {
 	border: none;
 	color: white;
 	padding: 8px 16px;
+	height: 30px;
 	text-decoration: none;
 	margin: 2px 1px;
 	cursor: pointer;
@@ -233,19 +235,15 @@ button[type=button] {
 
 .footer {
 	grid-area: footer;
-	display: grid;
 	width: 100%;
 	font-size: 2rem;
 	line-height: 2.5rem;
-	grid-template-columns: 2fr 3fr 2fr;
-	grid-template-areas:
-	"trademark nothing other-links";
 	background: linear-gradient(45deg, ivory, lightgrey, rgba(245, 245, 245, 0.938));
 }
 
 .other-links {
-	grid-area: other-links;
-	display: block;
+	display: inline;
+	float: right;
 }
 
 .other-links ul {
@@ -255,7 +253,7 @@ button[type=button] {
 }
   
 .other-links li {
-	float: left;
+	float: right;
 	padding: 14px 16px;
 	font-size: medium;
 }
@@ -266,6 +264,5 @@ button[type=button] {
 }
 
 .trademark {
-	grid-area: trademark;
-	display: block;
+	display: inline;
 }
